@@ -1,0 +1,16 @@
+service SupportingService {
+  include "ddb/DynamoDb"
+  include "../../../http/Http"
+
+  DynamoDb { table: "foo" } -> 
+  any fn (any) {
+    artifact: "./foo.js"
+    runtime: "node"
+  }
+
+  Http { method: "get" path: "/"} -> 
+  any otherFn (any) {
+    artifact: "./foo.js"
+    runtime: "node"
+  }
+}

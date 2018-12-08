@@ -1,0 +1,10 @@
+{
+  "aws": {
+    "config": {
+      "region": "us-west-2",
+      "accessKeyId": "<your access key id>",
+      "secretAccessKey": "<your access key>"
+    },
+    "preCreatedRole": "The arn for an 'AWSLambdaBasicExecutionRole' with added 'AmazonS3FullAccess' policy"
+  }
+}

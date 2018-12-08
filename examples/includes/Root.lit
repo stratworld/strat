@@ -1,0 +1,15 @@
+service Root {
+  include "./SupportingService"
+  include "../../../http/Http"
+
+  Http { method: "get", path: "/" } ->
+  any index () {
+    artifact: "./foo.js"
+  }
+
+  Http { method: "post", path: "/" } ->
+  any poster (any) {
+    artifact: "./foo.js"
+    runtime: "node"
+  }
+}

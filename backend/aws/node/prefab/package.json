@@ -1,0 +1,14 @@
+{
+  "name": "prefab-node-host",
+  "version": "0.0.0",
+  "description": "The prefabricated node host files used to generate a node host in Lit",
+  "main": "hostRoot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.355.0"
+  }
+}

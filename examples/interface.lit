@@ -1,0 +1,10 @@
+// this hasn't been implemented yet
+interface Root {
+  include "../../../http/Http"
+
+  -> Http { method: "get", path: "/" }
+  any index ()
+
+  -> Http { method: "post", path: "/" }
+  any poster (any)
+}

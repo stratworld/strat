@@ -1,0 +1,25 @@
+{
+  "name": "lit-cloud-language",
+  "version": "0.1.0",
+  "description": "A language to represent and execute intent for serverless infrastructure",
+  "main": "lit.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CaptainCharlieGreen/LitCloudLanguage.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CaptainCharlieGreen/LitCloudLanguage/issues"
+  },
+  "homepage": "https://github.com/CaptainCharlieGreen/LitCloudLanguage#readme",
+  "dependencies": {
+    "aws-sdk": "^2.373.0"
+  }
+}
