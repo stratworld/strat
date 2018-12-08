@@ -8,6 +8,8 @@ A working example project can be found in examples/includes/Root.lit
 
 # To Run
 
+The examples require an "event library" called Http which will eventually be part of the standard library.  You'll need to pull [that library](https://github.com/CaptainCharlieGreen/litHttp) down as well into a directory next to this one.
+
 Copy the litconfig.TEMPLATE.json file as "litconfig.json" and set the keys within.
 
 Then
