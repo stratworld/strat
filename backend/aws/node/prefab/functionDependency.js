@@ -10,7 +10,7 @@ module.exports = function (arg) {
   };
 
   // optional sort of thingie
-  var arugment;
+  var argument;
   if (arg !== undefined && arg !== null) {
     argument = {
       valuePresent: arg !== undefined && arg !== null,

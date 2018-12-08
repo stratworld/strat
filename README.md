@@ -21,5 +21,7 @@ Then (this is just for convenience -- you can also create a link from /usr/bin)
 Then
   $ ./lit.js build examples/includes/Root.lit
 
+Running examples/includes/Root.lit builds S3 and Lambda resources in your AWS account.  Check them out!
+
 This has not been tested on Windows or MacOS.  It should work on Mac, and I'd be surprised if it worked on Windows.
 
