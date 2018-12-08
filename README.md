@@ -1,6 +1,6 @@
-# The Lit Cloud Language
+# The Lit System Language
 
-Lit is a language to represent and deploy cloud infrastructure.
+Lit is a language to represent and deploy event based systems.
 
 Development is in the extreme early stage -- use at your own risk.
 
