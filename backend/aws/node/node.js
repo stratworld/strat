@@ -7,7 +7,7 @@ const mkdir = promisify(fs.mkdir);
 const cp = promisify(fs.copyFile);
 const writeFile = promisify(fs.writeFile);
 const exec = promisify(require('child_process').exec);
-const rimraf = (dirName) => exec(`rm -rf ${dirName}`);
+const directories = require('../../../directories');
 const hostFile = path.resolve(__dirname, 'prefab/', 'hostRoot.js');
 const packageJson = path.resolve(__dirname, 'prefab/', 'package.json');
 const prefabNodeModules = path.resolve(__dirname, 'prefab/', 'node_modules');
@@ -19,9 +19,6 @@ const NodeHost = function () {}
 
 NodeHost.prototype.package = function (hostConfig) {
   const artifact = hostConfig.host.artifacts[0].artifact;
-  this.work = path.join(__dirname, `/work_${hostConfig.host.name}`);
-  this.service = path.join(this.work, '/service');
-  this.configDest = path.join(this.work, 'config.json');
 
   return this.makeWorkDirectory()
     .then(() => this.resolveDependencies(hostConfig.scope))
@@ -38,8 +35,13 @@ NodeHost.prototype.package = function (hostConfig) {
 };
 
 NodeHost.prototype.makeWorkDirectory = function() {  
-  return rimraf(this.work)
-    .then(() => mkdir(this.work))
+  return directories.fresh()
+    .then(work => {
+      this.work = work;
+      this.service = path.join(this.work, '/service');
+      this.configDest = path.join(this.work, 'config.json');
+      return R();
+    })
     .then(() => mkdir(this.service));
 }
 
