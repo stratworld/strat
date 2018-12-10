@@ -14,6 +14,10 @@ module.exports = [
     entry: path.resolve(__dirname, 'libs/include')
   },
   {
+    name: 'loader',
+    entry: path.resolve(__dirname, 'artifacts/loader')
+  },
+  {
     name: 'id',
     entry: path.resolve(__dirname, 'id.js')
   },

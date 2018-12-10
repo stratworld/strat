@@ -32,7 +32,10 @@ function getHosts (ir) {
               : getRuntime(fn, path)),
             scope: serviceName,
             artifacts: [
-              getArtifact(service, fn, path)
+              {
+                name: name(service, fn),
+                artifact: fn.artifact
+              }
             ]
           }
         })
@@ -73,17 +76,6 @@ function isFunctionResource (fn) {
 
 function getRuntime (fn, path) {
   return checkAndGetConfig(fn, 'runtime', path);
-}
-
-function getArtifact (service, fn, path) {
-  const artifactPath = checkAndGetConfig(fn, 'artifact', path);
-  const absolutePath = stdPath.isAbsolute(artifactPath)
-    ? artifactPath
-    : stdPath.resolve(stdPath.dirname(path), artifactPath);
-  return {
-    name: name(service, fn),
-    artifact: absolutePath
-  };
 }
 
 function checkAndGetConfig (fn, key, path) {
