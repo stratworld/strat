@@ -34,7 +34,7 @@ function getHosts (ir) {
             artifacts: [
               {
                 name: name(service, fn),
-                artifact: fn.artifact
+                ...fn.artifact
               }
             ]
           }

@@ -1,18 +1,24 @@
-const nodeHost = require('../aws/node/node');
+const nodeHost = require('../aws/node/nodeHost');
+const ArchiveBuilder = require('./archiveBuilder');
 
 module.exports = function (ir) {
-  return Promise.all(ir.hosts.map(host => createHost({
-    host: host,
-    scope: ir.scopes[host.scope],
-    role: ir.roles[host.scope],
-    id: ir.id
-  })));
+  return ir.hosts.map(host => {
+    const data = createHost({
+      host: host,
+      scope: ir.scopes[host.scope]
+    });
+    return {
+      data: data,
+      role: ir.roles[host.scope],
+      runtime: host.runtime,
+      ...host.compute
+    };
+  });
 };
 
 function createHost (hostConfig) {
   if (hostConfig.host.compute === 'blob') {
-    hostConfig.hostPackage = hostConfig.host.artifacts[0].artifact;
-    return R(hostConfig);
+    return hostConfig.host.artifacts[0].data;
   }
   return nodeHost(hostConfig);
 }

@@ -7,7 +7,6 @@ const backend = require('./backend/passes');
 const fs = require('fs');
 const readFile = require('util').promisify(fs.readFile);
 const path = require('path');
-const directories = require('./directories');
 
 var stdinData;
 if (!process.stdin.isTTY) {
@@ -115,18 +114,15 @@ if (process.argv[3] !== undefined) {
 }
 
 if (require.main === module) {
-  directories.clean()
-  .then(() => {
-    runCommand(process.argv[2], filename)
-      .then(finalResults => {
-        console.log(JSON.stringify(finalResults, null, 2));
-        process.exit(0);
-      })
-      .catch(e => {
-        //todo: identify if this is an internal failure or a logical failure
-        console.log('FAILURE');
-        console.log(e);
-        process.exit(1);
-      });
+  runCommand(process.argv[2], filename)
+    .then(finalResults => {
+      console.log(JSON.stringify(finalResults, null, 2));
+      process.exit(0);
+    })
+    .catch(e => {
+      //todo: identify if this is an internal failure or a logical failure
+      console.log('FAILURE');
+      console.log(e);
+      process.exit(1);
     });
 }

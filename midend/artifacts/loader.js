@@ -24,18 +24,18 @@ module.exports = function (ir) {
   .then(() => R(ir));
 };
 
+//todo: branch on what the artifact declaration is.
+// In the future, more than just single files can be
+// artifacts.  Web addresses can be artifacts.
 function load (filePath) {
   return readFile(filePath);
 }
 
 function getType (filePath) {
-  const extension = stdPath.extname(filePath);
+  return stdPath.extname(filePath);
 }
 
 function resolveArtifact (service, fn, declaredPath) {
-  //todo: branch on what the artifact declaration is.
-  // In the future, more than just single files can be
-  // artifacts.  Web addresses can be artifacts.
   const filePath = getArtifactPath(service, fn, declaredPath);
   const type = getType(filePath);
   return load(filePath, type)
