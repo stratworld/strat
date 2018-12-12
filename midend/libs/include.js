@@ -143,9 +143,17 @@ function getBundles (service) {
       if (bundles[eventName] === undefined) {
         bundles[eventName] = [];
       }
+      var functionName;
+      if (traverse(dispatch, ['function']).length === 1) {
+        const fn = traverse(dispatch, ['function'])[0];
+        functionName = `${val(service, 'name')}-${val(fn, 'name')}`;
+      } else {
+        const reference = traverse(dispatch, ['reference'])[0];
+        functionName = `${val(reference, 'service')}-${val(reference, 'function')}`;
+      }
       bundles[eventName].push({
         eventConfig: kvpsToMap(traverse(event, ['kvp'])),
-        functionName: val(traverse(dispatch, ['function'])[0], 'name')
+        functionName: functionName
       });
 
       return bundles;

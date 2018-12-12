@@ -1,6 +1,6 @@
 #! /usr/bin/node
 
-require('./jsExtensions');
+const serialize = require('./jsExtensions').serialize;
 const frontend = require('./frontend/passes');
 const midend = require('./midend/passes');
 const backend = require('./backend/passes');
@@ -116,7 +116,7 @@ if (process.argv[3] !== undefined) {
 if (require.main === module) {
   runCommand(process.argv[2], filename)
     .then(finalResults => {
-      console.log(JSON.stringify(finalResults, null, 2));
+      console.log(serialize(finalResults));
       process.exit(0);
     })
     .catch(e => {

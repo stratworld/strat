@@ -47,3 +47,21 @@ if (typeof Array.prototype.pipePromise !== 'function') {
     }, (startingPromise === undefined ? R() : startingPromise));
   }
 }
+
+module.exports = {
+  serialize: truncateBuffersStringify
+}
+
+// 1) Buffers are annoying when serialized
+// 2) 'stringify' is an obnoxious name
+// 3) ', null, 2' is obnoxious
+function truncateBuffersStringify (object) {
+  return JSON.stringify(object, bufferCleaner, 2);
+}
+
+function bufferCleaner (key, value) {
+  if (key === 'data' && value.data === undefined) {
+    return `<Binary data Buffer of length ${value.length} truncated>`;
+  }
+  return value;
+}

@@ -8,7 +8,11 @@ const policies = [
   canOnlyIncludeANameOnce,
   namesCanOnlyBeDeclaredOnce,
   shapeNamesHaveBeenDeclared,
-  eventsMustHaveBeenIncluded
+  eventsMustHaveBeenIncluded,
+  canOnlyReferenceIncludedServices,
+  
+  //todo: requires refactor of this file
+  //referencesPointToRealFunctions
 ];
 
 module.exports = function (ir) {
@@ -120,6 +124,24 @@ function eventsMustHaveBeenIncluded (file) {
         msg: `${filePath} line ${line(event, 'name')}
 Event ${val(event, 'name')} is not included.`
       };
+    }
+  });
+}
+
+function canOnlyReferenceIncludedServices (file) {
+  const filePath = val(file, 'path');
+  const references = traverse(file, ['service', 'dispatch', 'reference']);
+  const includedServices = traverse(file, ['service', 'include'])
+    .map(include => path.basename(val(include, 'path'), '.lit'))
+    .constantMapping(true);
+  references.forEach(reference => {
+    const referenceService = val(reference, 'service');
+    if (!includedServices[referenceService]) {
+      throw {
+        error: 'Unincluded service reference',
+        msg: `${filePath} line ${line(reference, 'service')}
+Service ${referenceService} is not included.`
+      }
     }
   });
 }

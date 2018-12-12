@@ -81,6 +81,15 @@ module.exports = function (T, error, descend) {
       }, block);
     },
     function: () => {
+      if (T.peek2().type === 'PERIOD') {
+        const otherService = T.consume('IDENTIFIER');
+        T.consume('PERIOD');
+        const otherFunction = T.consume('IDENTIFIER');
+        return AST('reference', {
+          service: otherService,
+          function: otherFunction
+        });
+      }
       const otuputShape = descend('shape');
       const name = T.consume('IDENTIFIER');
       var inputShape;

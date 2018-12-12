@@ -47,6 +47,7 @@ module.exports = function (Statements) {
 
     function ->
       shape IDENTIFIER '(' (shape)? ')' block
+      IDENTIFIER '.' IDENTIFIER
 
     */
     function: Statements.function,
