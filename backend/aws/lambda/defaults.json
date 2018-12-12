@@ -1,4 +1,4 @@
 {
-  "Handler": "host.handler",
+  "Handler": "lit_generated_host_entry.handler",
   "Description": "built by Lit"
 }

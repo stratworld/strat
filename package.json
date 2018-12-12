@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CaptainCharlieGreen/LitCloudLanguage.git"
+    "url": "git+https://github.com/CaptainCharlieGreen/LitSystemLanguage.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/CaptainCharlieGreen/LitCloudLanguage/issues"
+    "url": "https://github.com/CaptainCharlieGreen/LitSystemLanguage/issues"
   },
-  "homepage": "https://github.com/CaptainCharlieGreen/LitCloudLanguage#readme",
+  "homepage": "https://github.com/CaptainCharlieGreen/LitSystemLanguage#readme",
   "dependencies": {
     "adm-zip": "^0.4.13",
     "aws-sdk": "^2.373.0"

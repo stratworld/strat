@@ -75,18 +75,11 @@ function isFunctionResource (fn) {
 }
 
 function getRuntime (fn, path) {
-  return checkAndGetConfig(fn, 'runtime', path);
-}
-
-function checkAndGetConfig (fn, key, path) {
-  const valueToken = getConfig(fn, key);
-  const fnLine = line(fn, 'name');
-  if (valueToken === undefined) {
-    throw {
+  if (fn.artifact.type === '.js');
+    return "node";
+  throw {
       error: 'Invalid function',
       msg: `${path} line ${fnLine}
-Function ${val(fn, 'name')} is missing required key '${key}'`
+Function ${val(fn, 'name')} can't be executed--only artifacts with a ".js" extension can be executed`
     };
-  }
-  return valueToken.value;
 }
