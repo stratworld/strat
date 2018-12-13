@@ -1,4 +1,22 @@
+/*global Lit*/
 const config = require('./config.json');
+
+
+// returns a function that will invoke the named Lit artifact
+const litHelpText = {
+  error: "Pass an absolute function name into Lit. Ex: Lit('Books-getBooks')"
+};
+Lit = function (functionName) {
+  if (typeof functionName !== 'string') {
+    throw litHelpText;
+  }
+  const tokens = functionName.split('-');
+  if (tokens.length !== 2) {
+    throw litHelpText;
+  }
+  return resolve(functionName);
+};
+
 const handler = require(config.handlerPath);
 
 /*
@@ -37,3 +55,26 @@ module.exports = function (event, context, callback) {
   });
 }
 
+function resolve (functionName) {
+  const resolution = config.scope[functionName];
+  if (resolution === undefined) {
+    throw {
+      error: `${functionName} is not defined in the current scope.`
+    };
+  }
+
+  var infrastructureLayer;
+  switch (resolution.service) {
+    case 'lambda':
+      infrastructureLayer = './functionDependency';
+      break;
+    case 's3':
+      infrastructureLayer = './resourceDependency';
+      break;
+    default:
+      throw {
+        error: `Could not resolve dependency of type ${resolution.service}`
+      };
+  }
+  return require(infrastructureLayer)(resolution);
+}

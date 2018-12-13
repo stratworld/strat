@@ -3,14 +3,26 @@ AWS.config.update(require('../../litconfig.json').aws.config);
 
 const lambda = require('../aws/lambda/create');
 const s3 = require('../aws/s3/upload');
+const s3Upload = s3.upload;
+const createBucket = s3.createBucket;
 
 module.exports = function (resources) {
-  return Promise.all(resources.map(deploy))
+  return preDeploy(resources)
+    .then(() => Promise.all(resources.map(deploy)));
+}
+
+function preDeploy (resources) {
+  const s3Resources = resources
+    .filter(resource => resource.service === 's3');
+  if (s3Resources.length > 0) {
+    return createBucket(s3Resources[0].Bucket);
+  }
+  return R();
 }
 
 function deploy (resource) {
   if (resource.service === 'lambda') {
     return lambda(resource);
   }
-  return s3(resource);
+  return s3Upload(resource);
 }
