@@ -17,7 +17,7 @@ module.exports = function (ir) {
 };
 
 function createHost (hostConfig) {
-  if (hostConfig.host.compute === 'blob') {
+  if (hostConfig.host.compute.type === 'blob') {
     return hostConfig.host.artifacts[0].data;
   }
   return nodeHost(hostConfig);

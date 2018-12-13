@@ -6,6 +6,7 @@ const traverse = ast.traverse;
 const line = ast.line;
 const val = ast.val;
 const getConfig = ast.getConfig;
+const resolveFunction = ast.resolveFunction;
 
 module.exports = function (ir) {
   const filesWithSource = getFilesWithSource(ir);
@@ -19,7 +20,7 @@ module.exports = function (ir) {
 
   return Promise.all(filesWithServices.map(file => {
     const service = traverse(file, ['service'])[0];
-    const bundles = getBundles(service);
+    const bundles = getBundles(service, ir);
     return Promise.all(bundles.keys()
       .map(eventName => {
 
@@ -115,9 +116,9 @@ function requirePath (declaredFile, pathToken) {
   } catch (e) {
     throw {
       error: 'File not found',
-      msg: `${declaredFile} line ${pathToken.line}
+      msg: `${val(declaredFile, 'path')} line ${pathToken.line}
 Failed to load ${pathToken.value}
-${e}`
+${e.stack}`
     }
   }
 }
@@ -135,7 +136,7 @@ A bundle:
 */
 // Assume one event and one function per dispatch
 // Will probably change this in the future
-function getBundles (service) {
+function getBundles (service, program) {
   return traverse(service, ['dispatch'])
     .reduce((bundles, dispatch) => {
       const event = traverse(dispatch, ['event'])[0];
@@ -144,16 +145,22 @@ function getBundles (service) {
         bundles[eventName] = [];
       }
       var functionName;
+      var resolvedFunction;
       if (traverse(dispatch, ['function']).length === 1) {
         const fn = traverse(dispatch, ['function'])[0];
         functionName = `${val(service, 'name')}-${val(fn, 'name')}`;
+        resolvedFunction = fn;
       } else {
         const reference = traverse(dispatch, ['reference'])[0];
         functionName = `${val(reference, 'service')}-${val(reference, 'function')}`;
+        resolvedFunction = resolveFunction(program, functionName);
       }
+      const artifact = getConfig(resolvedFunction, 'artifact').value;
       bundles[eventName].push({
         eventConfig: kvpsToMap(traverse(event, ['kvp'])),
-        functionName: functionName
+        functionName: functionName,
+        artifact: artifact,
+        isResource: traverse(resolvedFunction, ['shape']).length < 2
       });
 
       return bundles;

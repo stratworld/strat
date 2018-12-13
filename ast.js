@@ -33,6 +33,17 @@ module.exports = {
     return includes
       .map(include => val(include, 'path'))
       .map(path => pathMap[path])
+  },
+  resolveFunction: (program, functionName) => {
+    const tokens = functionName.split('-');
+    const serviceName = tokens[0];
+    const localFunctionName = tokens[1];
+    return traverse(program, ['file', 'service'])
+      .filter(service => val(service, 'name') === serviceName)
+      .flatmap(foundService => traverse(foundService, ['function'])
+        .concat(traverse(foundService, ['dispatch', 'function'])))
+      .filter(fn => val(fn, 'name') === localFunctionName)
+      [0];
   }
 };
 

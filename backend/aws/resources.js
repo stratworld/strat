@@ -6,6 +6,7 @@ module.exports = function (host, id) {
 
 function getBlobImplementation (host, id) {
   return {
+    type: 'blob',
     service: 's3',
     Key: host.name,
     Bucket: id
@@ -14,6 +15,7 @@ function getBlobImplementation (host, id) {
 
 function getFunctionImplementation (host, id) {
   return {
+    type: 'function',
     service: 'lambda',
     FunctionName: `${id}-${host.name}`
   }

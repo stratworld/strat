@@ -3,7 +3,6 @@ const s3 = new AWS.S3();
 
 module.exports = function (config) {
   return function (arg) {
-    console.log(config)
     var params = {
       Bucket: config.Bucket, 
       Key: config.Key
