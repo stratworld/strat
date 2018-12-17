@@ -8,20 +8,26 @@ const createBucket = s3.createBucket;
 
 module.exports = function (resources) {
   return preDeploy(resources)
-    .then(() => Promise.all(resources.map(deploy)));
+    .then(() => Promise.all(resources.map(resource => {
+      return deploy(resource)
+        .then(implementation => {
+          resource.implementation = implementation;
+          return R(resource);
+        });
+    })));
 }
 
 function preDeploy (resources) {
   const s3Resources = resources
-    .filter(resource => resource.service === 's3');
+    .filter(resource => resource.compute.service === 's3');
   if (s3Resources.length > 0) {
-    return createBucket(s3Resources[0].Bucket);
+    return createBucket(s3Resources[0].compute.Bucket);
   }
   return R();
 }
 
 function deploy (resource) {
-  if (resource.service === 'lambda') {
+  if (resource.compute.service === 'lambda') {
     return lambda(resource);
   }
   return s3Upload(resource);

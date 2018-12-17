@@ -27,10 +27,9 @@ const nodeRuntime = AST('kvp', {
 
 // Takes an artifact and returns a function AST
 module.exports = function (artifact) {
-  const baseName = path.basename(artifact).split('.')[0];
   return AST('function', {
     name: {
-      value: `lit_generated_${baseName}`,
+      value: `lit_generated_proxy_${artifact.eventName}`,
       line: 0,
       type: 'IDENTIFIER'
     }
@@ -41,7 +40,7 @@ module.exports = function (artifact) {
       type: 'IDENTIFIER'
     },
     value: {
-      value: artifact,
+      value: artifact.data,
       line: 0,
       type: 'IDENTIFIER'
     }

@@ -14,6 +14,10 @@ module.exports = [
     entry: path.resolve(__dirname, 'libs/include')
   },
   {
+    name: 'connector',
+    entry: path.resolve(__dirname, 'libs/connector')
+  },
+  {
     name: 'loader',
     entry: path.resolve(__dirname, 'artifacts/loader')
   },

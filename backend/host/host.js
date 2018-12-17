@@ -11,7 +11,8 @@ module.exports = function (ir) {
       data: data,
       role: ir.roles[host.scope],
       runtime: host.runtime,
-      ...host.compute
+      events: host.events,
+      ...host
     };
   });
 };

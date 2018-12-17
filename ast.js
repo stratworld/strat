@@ -44,7 +44,12 @@ module.exports = {
         .concat(traverse(foundService, ['dispatch', 'function'])))
       .filter(fn => val(fn, 'name') === localFunctionName)
       [0];
-  }
+  },
+  kvpsToMap: (kvps = []) => kvps
+    .reduce((map, kvp) => {
+      map[val(kvp, 'key')] = val(kvp, 'value');
+      return map;
+    }, {})
 };
 
 // This encodes a mini ast traversal language:

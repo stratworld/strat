@@ -5,6 +5,7 @@ const line = ast.line;
 const resolve = ast.resolve;
 const traverse = ast.traverse;
 const getConfig = ast.getConfig;
+const kvpsToMap = ast.kvpsToMap;
 
 module.exports = function (ir) {
   return R({
@@ -22,11 +23,13 @@ function getHosts (ir) {
       const path = pathAndServiceTuple[0];
       const service = pathAndServiceTuple[1];
       const serviceName = val(service, 'name');
+      const proxyNameLookup = toProxyLookup(getEvents(service));
 
       return traverse(service, ['function'])
         .map(fn => {
+          const fnName = name(service, fn);
           return {
-            name: name(service, fn),
+            name: fnName,
             runtime: (isFunctionResource(fn)
               ? undefined
               : getRuntime(fn, path)),
@@ -36,7 +39,8 @@ function getHosts (ir) {
                 name: name(service, fn),
                 ...fn.artifact
               }
-            ]
+            ],
+            events: getProxyEvents(proxyNameLookup, fnName)
           }
         })
     })
@@ -58,6 +62,44 @@ function getScopes (ir) {
         .constantMapping(true);
       return scopes;
     }, {});
+}
+
+function getEvents (service) {
+  return traverse(service, ['event'])
+    .map(cleanEvent)
+    .reduce((typeLookup, nextEvent) => {
+      if (typeLookup[nextEvent.type] === undefined) {
+        typeLookup[nextEvent.type] = [];
+      }
+      typeLookup[nextEvent.type].push(nextEvent);
+      return typeLookup;
+    }, {});
+}
+
+function cleanEvent (event) {
+  return {
+    type: val(event, 'name'),
+    ...kvpsToMap(event.kvp)
+  };
+}
+
+function toProxyLookup (eventLookup) {
+  return eventLookup.keys()
+    .reduce((proxyLookup, nextKey) => {
+      const newKey = `proxy_${nextKey}`;
+      proxyLookup[newKey] = eventLookup[nextKey];
+      return proxyLookup;
+    }, {});
+}
+
+function getProxyEvents (proxyLookup, fnName) {
+  if (fnName.indexOf('lit_generated_proxy') === -1) {
+    return [];
+  }
+  return proxyLookup.keys()
+    .filter(key => fnName.indexOf(key) > -1)
+    .map(key => proxyLookup[key])
+    [0];
 }
 
 function name (service, fn) {

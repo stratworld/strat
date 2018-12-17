@@ -5,6 +5,7 @@ const stdPath = require('path');
 const traverse = ast.traverse;
 const line = ast.line;
 const val = ast.val;
+const kvpsToMap = ast.kvpsToMap;
 const getConfig = ast.getConfig;
 const resolveFunction = ast.resolveFunction;
 
@@ -34,14 +35,18 @@ Failed to run ${eventName}.`
         // todo: way better error handling
         try {
           return eventIncluders[eventName](bundles[eventName], val(service, 'name'))
+            .then(newArtifactBuffer => R({
+              data: newArtifactBuffer,
+              eventName: eventName
+            }))
             .catch(error)
         } catch (e) {
           return error(e);
         }
         
       }))
-      .then(newArtifacts => addFunctionsIntoService(service, newArtifacts
-        .map(newArtifact => resolvePath(file, newArtifact))));
+      .then(newArtifacts =>
+        addFunctionsIntoService(service, newArtifacts));
   }))
   .then(() => R(ir));
 };
@@ -53,12 +58,13 @@ function addFunctionsIntoService (service, newArtifacts) {
   const newFunctions = newArtifacts.map(proxyFunctionFactory)
     .concat(traverse(service, ['dispatch', 'function']))
     .concat(traverse(service, ['function']));
+  const events = traverse(service, ['dispatch', 'event']);
 
-  // DANGER ZONE
   delete service.dispatch;
   delete service.function;
 
   service.function = newFunctions;
+  service.event = events;
   return R();
 }
 
@@ -164,13 +170,5 @@ function getBundles (service, program) {
       });
 
       return bundles;
-    }, {});
-}
-
-function kvpsToMap (kvps = []) {
-  return kvps
-    .reduce((map, kvp) => {
-      map[val(kvp, 'key')] = val(kvp, 'value');
-      return map;
     }, {});
 }

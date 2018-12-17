@@ -6,11 +6,14 @@ const putObject = promisify(s3.putObject.bind(s3));
 
 function upload (resource) {
   return putObject({
-    Bucket: resource.Bucket,
-    Key: resource.Key,
+    Bucket: resource.compute.Bucket,
+    Key: resource.compute.Key,
     Body: resource.data
   })
-  .then(() => R(`Successfully uploaded ${resource.Bucket}/${resource.Key}`));
+  .then(() => R({
+    key: resource.compute.Key,
+    bucket: resource.compute.Bucket
+  }));
 };
 
 module.exports = {

@@ -10,7 +10,7 @@ module.exports = function (resource) {
   if (!params.Runtime) throw `could not find runtime ${runtime}`;
 
   params.Code = { ZipFile: resource.data }
-  params.FunctionName = resource.FunctionName;
+  params.FunctionName = resource.compute.FunctionName;
   params.Role = resource.role;
 
   /*
@@ -25,7 +25,10 @@ module.exports = function (resource) {
     lambda.createFunction(params, function (err, res) {
       if (err) reject(err);
       else {
-        resolve(`Successfully created lambda ${resource.FunctionName}`);
+        resolve({
+          functionName: res.FunctionName,
+          functionArn: res.FunctionArn
+        });
       }
     });
   });

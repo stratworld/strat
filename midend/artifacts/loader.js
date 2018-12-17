@@ -9,36 +9,49 @@ const getConfig = ast.getConfig;
 
 module.exports = function (ir) {
   return Promise.all(traverse(ir, ['file']).map(file => {
-    const services = traverse(file, ['service']);
+    const functions = traverse(file, ['service', 'function']);
     const filePath = val(file, 'path');
-    return Promise.all(services.map(service => {
-      return Promise.all(traverse(service, ['function'])
-        .map(fn => {
-          return resolveArtifact(service, fn, filePath)
-            .then(artifact => {
-              fn.artifact = artifact;
-            });
-        }));
-    }));
+    return Promise.all(functions
+      .map(fn => {
+        return resolveArtifact(fn, filePath)
+          .then(artifact => {
+            fn.artifact = artifact;
+          });
+      }));
   }))
   .then(() => R(ir));
 };
 
-//todo: branch on what the artifact declaration is.
-// In the future, more than just single files can be
-// artifacts.  Web addresses can be artifacts.
-function load (filePath) {
-  return readFile(filePath);
+function getArtifact (fn, declaredPath) {
+  const configValue = checkAndGetConfig(fn, 'artifact', declaredPath);
+  if (Buffer.isBuffer(configValue)) {
+    return {
+      artifactType: 'buffer',
+      value: configValue
+    };
+  }
+  const filePath = stdPath.isAbsolute(configValue)
+    ? configValue
+    : stdPath.resolve(stdPath.dirname(declaredPath), configValue);
+  return {
+    artifactType: 'file',
+    value: filePath
+  };
 }
 
-function getType (filePath) {
-  return stdPath.extname(filePath);
-}
+function resolveArtifact (fn, declaredPath) {
+  const artifact = getArtifact(fn, declaredPath);
+  if (artifact.artifactType === 'buffer') {
+    return R({
+      data: artifact.value,
+      type: '.js',
+      path: 'bufferData.js'
+    });
+  }
 
-function resolveArtifact (service, fn, declaredPath) {
-  const filePath = getArtifactPath(service, fn, declaredPath);
-  const type = getType(filePath);
-  return load(filePath, type)
+  const filePath = artifact.value;
+  const type = stdPath.extname(filePath);
+  return readFile(filePath)
     .then(data => R({
       data: data,
       type: type,
@@ -51,13 +64,6 @@ function resolveArtifact (service, fn, declaredPath) {
 Failed to load file ${filePath}.`
       })
     })
-}
-
-function getArtifactPath (service, fn, declaredPath) {
-  const artifactPath = checkAndGetConfig(fn, 'artifact', declaredPath);
-  return stdPath.isAbsolute(artifactPath)
-    ? artifactPath
-    : stdPath.resolve(stdPath.dirname(declaredPath), artifactPath);
 }
 
 function checkAndGetConfig (fn, key, declaredPath) {

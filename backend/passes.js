@@ -16,5 +16,9 @@ module.exports = [
   {
     name: 'deploy',
     entry: path.resolve(__dirname, 'deploy/deploy')
+  },
+  {
+    name: 'connect',
+    entry: path.resolve(__dirname, 'connect/connect')
   }
 ];
