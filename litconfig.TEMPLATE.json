@@ -5,6 +5,6 @@
       "accessKeyId": "<your access key id>",
       "secretAccessKey": "<your access key>"
     },
-    "preCreatedRole": "The arn for an 'AWSLambdaBasicExecutionRole' with added 'AmazonS3FullAccess' policy"
+    "preCreatedRole": "The arn for an 'AWSLambdaBasicExecutionRole' with added 'AmazonS3FullAccess' policy.  Must be assumable by Lambda and Api gateway"
   }
 }
