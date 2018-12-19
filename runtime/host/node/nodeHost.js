@@ -1,10 +1,8 @@
-const ArchiveBuilder = require('../../host/archiveBuilder');
+const ArchiveBuilder = require('./archiveBuilder');
 const stdPath = require('path');
 const hostPrefab = stdPath.resolve(__dirname, 'prefab');
 const hostDir = 'lit_generated_host';
 const copyFiles = [
-  'functionDependency.js',
-  'resourceDependency.js',
   'host.js'
 ];
 
@@ -32,6 +30,7 @@ NodeHost.prototype.build = function () {
     this.getConfig(), `${hostDir}/config.json`);
 };
 
+// todo: figure out routing and supplying dependency invocation files/configs
 NodeHost.prototype.getConfig = function () {
   const config = {
     // if the artifact is a zip file, assume an index.js file in the root

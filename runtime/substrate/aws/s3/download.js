@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
 
 module.exports = function (config) {
-  return function (arg) {
+  return function () {
     var params = {
       Bucket: config.Bucket, 
       Key: config.Key

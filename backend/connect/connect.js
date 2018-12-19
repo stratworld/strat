@@ -1,9 +1,4 @@
-const AWS = require('aws-sdk');
-const sdkInfo = {
-  substrate: 'aws',
-  sdk: AWS,
-  region: require('../../litconfig.json').aws.config.region
-};
+const sdkInfo = require('../../runtime/substrate/substrateFactory')().info;
 
 module.exports = ir => {
   const hostsWithEvents = ir.filter(host => host.events);

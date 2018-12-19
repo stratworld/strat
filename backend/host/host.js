@@ -1,5 +1,4 @@
-const nodeHost = require('../aws/node/nodeHost');
-const ArchiveBuilder = require('./archiveBuilder');
+const hoster = require('../../runtime/host/hostFactory')();
 
 module.exports = function (ir) {
   return ir.hosts.map(host => {
@@ -21,5 +20,5 @@ function createHost (hostConfig) {
   if (hostConfig.host.compute.type === 'blob') {
     return hostConfig.host.artifacts[0].data;
   }
-  return nodeHost(hostConfig);
+  return hoster(hostConfig);
 }

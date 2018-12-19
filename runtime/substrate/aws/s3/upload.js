@@ -4,19 +4,14 @@ const s3 = new AWS.S3();
 const createBucket = promisify(s3.createBucket.bind(s3));
 const putObject = promisify(s3.putObject.bind(s3));
 
-function upload (resource) {
+module.exports = function (resource) {
   return putObject({
-    Bucket: resource.compute.Bucket,
-    Key: resource.compute.Key,
+    Bucket: resource.compute.config.Bucket,
+    Key: resource.compute.config.Key,
     Body: resource.data
   })
   .then(() => R({
-    key: resource.compute.Key,
-    bucket: resource.compute.Bucket
+    key: resource.compute.config.Key,
+    bucket: resource.compute.config.Bucket
   }));
 };
-
-module.exports = {
-  upload: upload,
-  createBucket: bucketName => createBucket({ Bucket: bucketName })
-}

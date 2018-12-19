@@ -10,7 +10,7 @@ module.exports = function (resource) {
   if (!params.Runtime) throw `could not find runtime ${runtime}`;
 
   params.Code = { ZipFile: resource.data }
-  params.FunctionName = resource.compute.FunctionName;
+  params.FunctionName = resource.compute.config.FunctionName;
   params.Role = resource.role;
 
   /*

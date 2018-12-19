@@ -1,4 +1,4 @@
-const awsResources = require('../aws/resources');
+const resources = require('../../runtime/substrate/substrateFactory')().resources;
 module.exports = function (ir) {
   ir.hosts = ir.hosts.map(host => createCompute(host, ir.id))
   ir.scopes = getScopeWithCompute(ir);
@@ -7,7 +7,7 @@ module.exports = function (ir) {
 }
 
 function createCompute (host, id) {
-  host.compute = awsResources(host, id);
+  host.compute = resources(host, id);
   return host;
 }
 
