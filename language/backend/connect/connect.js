@@ -1,4 +1,4 @@
-const sdkInfo = require('../../runtime/substrate/substrateFactory')().info;
+const sdkInfo = require('../../../runtime/substrate/substrateFactory')().info;
 
 module.exports = ir => {
   const hostsWithEvents = ir.filter(host => host.events);

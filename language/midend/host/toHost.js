@@ -7,16 +7,16 @@ const traverse = ast.traverse;
 const getConfig = ast.getConfig;
 const kvpsToMap = ast.kvpsToMap;
 
-module.exports = function (ir) {
+module.exports = function (ast) {
   return R({
-    id: val(ir, 'id'),
-    hosts: getHosts(ir),
-    scopes: getScopes(ir)
+    id: val(ast, 'id'),
+    hosts: getHosts(ast),
+    scopes: getScopes(ast)
   });
 }
 
-function getHosts (ir) {
-  return traverse(ir, ['file'])
+function getHosts (ast) {
+  return traverse(ast, ['file'])
     .flatmap(file => traverse(file, ['service'])
       .map(service => [val(file, 'path'), service]))
     .flatmap(pathAndServiceTuple => {
@@ -46,13 +46,13 @@ function getHosts (ir) {
     })
 }
 
-function getScopes (ir) {
-  return traverse(ir, ['file', 'service'])
+function getScopes (ast) {
+  return traverse(ast, ['file', 'service'])
     .reduce((scopes, service) => {
       const serviceName = val(service, 'name');
       const declaredFunctions = traverse(service, ['function'])
         .map(fn => name(serviceName, fn));
-      const includedFunctions = resolve(ir, traverse(service, ['include']))
+      const includedFunctions = resolve(ast, traverse(service, ['include']))
         .flatmap(resolvedFile => traverse(resolvedFile, ['service']))
         .flatmap(service => traverse(service, ['function'])
           .map(fn => name(service, fn)))

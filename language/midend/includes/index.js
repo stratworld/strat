@@ -1,25 +1,28 @@
 const ast = require('../../ast');
 const AST = ast.build;
 const traverse = ast.traverse;
-const lit = require('../../lit');
+const compile = require('../../compiler');
 const stdPath = require('path');
 const fs = require('fs');
+const promisify = require('util').promisify;
 const stat = function (pathObj) {
   return require('util').promisify(fs.stat)(pathObj.value);
 }
+const readFile = promisify(fs.readFile);
 
-module.exports = function (ir) {
-  return traversal(ir);
+module.exports = function (ast) {
+  return traversal(ast);
 }
 
-function traversal (ir) {
+function traversal (ast) {
   const asts = {};
 
   function executeFrontend (fileName) {
-    if (fileName === ir.tokens.path.value) {
-      return R(ir);
+    if (fileName === ast.tokens.path.value) {
+      return R(ast);
     }
-    return lit('frontend', fileName);
+    return readFile(fileName)
+      .then(data => compile('frontend', data.toString(), fileName));
   }
 
   function traverseDependencyGraph (path) {
@@ -27,24 +30,24 @@ function traversal (ir) {
       return R();
     }
     return executeFrontend(path.value)
-      .then(newIr => {
-        asts[path.value] = newIr;
-        const edgesOut = traverse(newIr, ['service', 'include', 'tokens', 'path']);
+      .then(newAst => {
+        asts[path.value] = newAst;
+        const edgesOut = traverse(newAst, ['service', 'include', 'tokens', 'path']);
         return Promise.all(edgesOut
-          .map(edgePath => resolvePath(edgePath, newIr)
+          .map(edgePath => resolvePath(edgePath, newAst)
             .then(traverseDependencyGraph)));
       });
   }
 
-  return traverseDependencyGraph(ir.tokens.path)
+  return traverseDependencyGraph(ast.tokens.path)
     .then(() => R(AST('program', {
-          root: ir.tokens.path
+          root: ast.tokens.path
     }, asts.values())));
 }
 
 //todo: add some kind of LITPATH resolution like Go and Node
-function resolvePath (path, parentIr) {
-  const parentFile = parentIr.tokens.path.value;
+function resolvePath (path, parentAst) {
+  const parentFile = parentAst.tokens.path.value;
   const parentDirectory = stdPath.dirname(parentFile);
   var absolutePath;
   if (!stdPath.isAbsolute(path.value)) {

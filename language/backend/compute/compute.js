@@ -1,4 +1,4 @@
-const resources = require('../../runtime/substrate/substrateFactory')().resources;
+const resources = require('../../../runtime/substrate/substrateFactory')().resources;
 module.exports = function (ir) {
   ir.hosts = ir.hosts.map(host => createCompute(host, ir.id))
   ir.scopes = getScopeWithCompute(ir);

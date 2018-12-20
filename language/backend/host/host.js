@@ -1,4 +1,4 @@
-const hoster = require('../../runtime/host/hostFactory')();
+const hoster = require('../../../runtime/host/hostFactory')();
 
 module.exports = function (ir) {
   return ir.hosts.map(host => {

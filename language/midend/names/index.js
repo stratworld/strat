@@ -15,13 +15,13 @@ const policies = [
   //referencesPointToRealFunctions
 ];
 
-module.exports = function (ir) {
+module.exports = function (ast) {
   // policies are read only, synchronous, and throw on violation
   policies.forEach(policy => {
-    const files = traverse(ir, ['file']);
+    const files = traverse(ast, ['file']);
     files.forEach(file => policy(file));
   });
-  return ir;
+  return ast;
 };
 
 // Since declarations are 1:1, file names should be the same as the thing declared

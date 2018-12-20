@@ -9,19 +9,19 @@ const kvpsToMap = ast.kvpsToMap;
 const getConfig = ast.getConfig;
 const resolveFunction = ast.resolveFunction;
 
-module.exports = function (ir) {
-  const filesWithSource = getFilesWithSource(ir);
-  if (filesWithSource.length === 0) return ir;
+module.exports = function (ast) {
+  const filesWithSource = getFilesWithSource(ast);
+  if (filesWithSource.length === 0) return ast;
   const eventIncluders = filesWithSource.reduce((lookup, nextFileWithSource) => {
     const sourceName = val(traverse(nextFileWithSource, ['source'])[0], 'name');
     lookup[sourceName] = getIncluder(nextFileWithSource);
     return lookup;
   }, {});
-  const filesWithServices = getFilesWithService(ir);
+  const filesWithServices = getFilesWithService(ast);
 
   return Promise.all(filesWithServices.map(file => {
     const service = traverse(file, ['service'])[0];
-    const bundles = getBundles(service, ir);
+    const bundles = getBundles(service, ast);
     return Promise.all(bundles.keys()
       .map(eventName => {
 
@@ -48,7 +48,7 @@ Failed to run ${eventName}.`
       .then(newArtifacts =>
         addFunctionsIntoService(service, newArtifacts));
   }))
-  .then(() => R(ir));
+  .then(() => R(ast));
 };
 
 // This mutates the service by:
@@ -68,16 +68,16 @@ function addFunctionsIntoService (service, newArtifacts) {
   return R();
 }
 
-function getFilesWithSource (ir) {
-  return getFilesWithX(ir, 'source');
+function getFilesWithSource (ast) {
+  return getFilesWithX(ast, 'source');
 }
 
-function getFilesWithService (ir) {
-  return getFilesWithX(ir, 'service');
+function getFilesWithService (ast) {
+  return getFilesWithX(ast, 'service');
 }
 
-function getFilesWithX (ir, X) {
-  return traverse(ir, ['file'])
+function getFilesWithX (ast, X) {
+  return traverse(ast, ['file'])
     .filter(file => traverse(file, [X]).length > 0);
 }
 

@@ -1,9 +1,7 @@
 #! /usr/bin/node
 
 const serialize = require('./jsExtensions').serialize;
-const frontend = require('./frontend/passes');
-const midend = require('./midend/passes');
-const backend = require('./backend/passes');
+const compile = require('./language/compiler');
 const fs = require('fs');
 const readFile = require('util').promisify(fs.readFile);
 const path = require('path');
@@ -38,91 +36,31 @@ function scanArgumentFile (filename) {
     .then(fileData => fileData.toString());
 }
 
-function executeChain (chain, filename) {
-  if ((chain || []).length === 0) return;
-  var startingDataPromise;
-  if (chain[0].name === 'scan') {
-    startingDataPromise = scanArgumentFile(filename);
-  } else if (typeof stdinData === 'object') {
-    startingDataPromise = stdinData;
-  } else {
-    //todo: inform the user what command's output should be piped
-    console.log(`pipe data into this ex:
-      $ lit scan foo.lit | lit ${chain[0].name}`);
-    process.exit(1);
-  }
-
-  return chain
-    .map(link => executeLinkPromise(link, filename))
-    .pipePromise(startingDataPromise);
-}
-
-function executeLinkPromise (link, filename) {
-  return function (previousLinkResults) {
-    try {
-      const result = require(link.entry)(previousLinkResults, filename);
-      return typeof result.then === 'function'
-        ? result
-        : R(result);
-    } catch (err) {
-      console.error(`Failure while running '${link.name}'.`)
-      return J(err);
-    }
-  }
-}
-
-const everything = []
-  .concat(frontend)
-  .concat(midend)
-  .concat(backend);
-
-const commands = {
-  frontend: fn => executeChain(frontend, fn),
-  midend: fn => executeChain(midend, fn),
-  backend: fn => executeChain(backend, fn),
-  build: fn => executeChain(everything, fn)
-};
-
-function runCommand (command, filepath) {
-  if (command === undefined) {
-    console.log(`usage: lit command [filename]
-    where command is one of:
-      ${commands.keys().join('\n    ')}`);
-    process.exit(1);
-  } else {
-    const prebuilt = commands[command];
-    if (prebuilt) {
-      return prebuilt(filepath);
-    } else {
-      const singleCommand = everything
-        .filter(potentialCommand => potentialCommand.name === command)
-        [0];
-      if (singleCommand !== undefined) {
-        return executeChain([singleCommand], filepath);
-      } else {
-        return J(`Could not find command ${command}`);
-      }
-    }
-  }
-}
-
-module.exports = runCommand;
-
 var filename;
 if (process.argv[3] !== undefined) {
   filename = path.resolve(process.cwd(), process.argv[3]);
 }
 
-if (require.main === module) {
-  runCommand(process.argv[2], filename)
-    .then(finalResults => {
-      console.log(serialize(finalResults));
-      process.exit(0);
-    })
-    .catch(e => {
-      //todo: identify if this is an internal failure or a logical failure
-      console.log('FAILURE');
-      console.log(e);
-      process.exit(1);
-    });
+const command = process.argv[2];
+
+var work;
+if (typeof stdinData === 'object') {
+  work = stdinData.then(data => compile(command, data, filename))
+} else if (typeof filename === 'string') {
+  work = scanArgumentFile(filename)
+    .then(data => compile(command, data, filename));
+} else {
+  console.log('Usages:')
+  console.log('    lit command filename');
+  console.log('    <output from a previous lit command> | lit command');
+  process.exit(127);
 }
+
+work
+  .then(finalResults => {
+    console.log(serialize(finalResults));
+    process.exit(0);
+  })
+  .catch(e => {
+    process.exit(1);
+  });

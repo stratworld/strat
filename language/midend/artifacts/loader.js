@@ -7,8 +7,8 @@ const val = ast.val;
 const traverse = ast.traverse;
 const getConfig = ast.getConfig;
 
-module.exports = function (ir) {
-  return Promise.all(traverse(ir, ['file']).map(file => {
+module.exports = function (ast) {
+  return Promise.all(traverse(ast, ['file']).map(file => {
     const functions = traverse(file, ['service', 'function']);
     const filePath = val(file, 'path');
     return Promise.all(functions
@@ -19,7 +19,7 @@ module.exports = function (ir) {
           });
       }));
   }))
-  .then(() => R(ir));
+  .then(() => R(ast));
 };
 
 function getArtifact (fn, declaredPath) {
