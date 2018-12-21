@@ -14,11 +14,11 @@ Lit = function (functionName) {
 };
 
 function resolve (functionName) {
-  const resolution = config.scope[functionName];
+  const resolution = scope[functionName];
   if (resolution === undefined) {
     throw `${functionName} is not defined in the current scope.`;
   }
-  const transport = require(resolution.invoke);
+  const transport = require(resolution.invoke)(resolution.config);
 
   return function (arg) {
     //todo: compose this
@@ -33,8 +33,7 @@ function resolve (functionName) {
       if (failure !== undefined) {
         return Promise.reject(failure);
       }
-      return Promise.resolve(result.data);
+      return result.data;
     });
   }
 }
-

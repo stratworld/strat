@@ -1,5 +1,6 @@
+const handlerPath = require('./config.json').handlerPath;
 module.exports = function (event, context, callback) {
-  respond(handler, event, callback);
+  respond(event, callback);
 }
 
 /*
@@ -36,13 +37,13 @@ function respond (event, cb) {
 
     var handler;
     try {
-      handler = require(config.handlerPath);
+      handler = require(handlerPath);
     } catch (e) {
-      if (e.message === `Cannot find module '${config.handlerPath}'`) {
+      if (e.message === `Cannot find module '${handlerPath}'`) {
         return {
           systemRejection: {
-            message: `Could not find handler module ${config.handlerPath}`,
-            error: `Could not find handler module ${config.handlerPath}`
+            message: `Could not find handler module ${handlerPath}`,
+            error: `Could not find handler module ${handlerPath}`
           }
         };
       }
@@ -54,11 +55,11 @@ function respond (event, cb) {
       };
     }
 
-    if (typeof handler !== function) {
+    if (typeof handler !== 'function') {
       return {
         systemRejection: {
           message: 'Handler is not a function',
-          error: `The handler exported by ${config.handlerPath} is not a function`
+          error: `The handler exported by ${handlerPath} is not a function`
         }
       };
     }
@@ -72,20 +73,20 @@ function respond (event, cb) {
           data: promise
         };
       }
-      promise
+      return promise
         .then(result => Promise.resolve({
           data: result
         }))
         .catch(e => Promise.resolve({
           componentRejection: {
-            message: `Executing ${config.handlerPath} rejected`,
+            message: `Executing ${handlerPath} rejected`,
             error: e
           }
         }));
     } catch (e) {
       return {
         componentFailure: {
-          message: `Unhandled exception while executing ${config.handlerPath}`,
+          message: `Unhandled exception while executing ${handlerPath}`,
           error: e
         }
       };
