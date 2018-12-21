@@ -16,25 +16,18 @@ const passChains = {
 };
 
 function runCommand (command, startingInput, filename) {
-  if (command === undefined) {
-    return J(`usage: lit command [filename]
-    where command is one of:
-      ${commands.keys().join('\n    ')}`);
+  const prebuilt = passChains[command];
+  if (prebuilt) {
+    return executePasses(prebuilt, startingInput, filename);
   } else {
-    const prebuilt = passChains[command];
-    if (prebuilt) {
-      return executePasses(prebuilt, startingInput, filename);
-    } else {
-      const singleCommand = everything
-        .filter(potentialCommand => potentialCommand.name === command)
-        [0];
-      if (singleCommand !== undefined) {
-        return executePasses([singleCommand], startingInput, filename);
-      } else {
-        return J(`Could not find command ${command}`);
-      }
+    const singleCommand = everything
+      .filter(potentialCommand => potentialCommand.name === command)
+      [0];
+    if (singleCommand) {
+      return executePasses([singleCommand], startingInput, filename);
     }
   }
+  return J(`Could not find command ${command}`);
 }
 
 function executePasses (passes, startingInput, filename) {

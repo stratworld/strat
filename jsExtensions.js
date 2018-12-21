@@ -27,19 +27,6 @@ if (typeof Array.prototype.constantMapping !== 'function') {
     }, {});
   }
 }
-
-if (typeof Object.prototype.values !== 'function') {
-  Object.prototype.values = function () {
-    return Object.keys(this).map(key => this[key]);
-  }
-}
-
-if (typeof Object.prototype.keys !== 'function') {
-  Object.prototype.keys = function () {
-    return Object.keys(this);
-  }
-}
-
 if (typeof Array.prototype.pipePromise !== 'function') {
   Array.prototype.pipePromise = function (startingPromise) {
     return this.reduce((totalPromise, nextPromise) => {
@@ -47,6 +34,34 @@ if (typeof Array.prototype.pipePromise !== 'function') {
     }, (startingPromise === undefined ? R() : startingPromise));
   }
 }
+
+if (typeof Object.prototype.values !== 'function') {
+  Object.prototype.values = function () {
+    return Object.keys(this).map(key => this[key]);
+  }
+}
+if (typeof Object.prototype.keys !== 'function') {
+  Object.prototype.keys = function () {
+    return Object.keys(this);
+  }
+}
+if (typeof Object.prototype.pairs !== 'function') {
+  Object.prototype.pairs = function () {
+    return Object.keys(this)
+      .map(key => [key, this[key]]);
+  };
+}
+if (typeof Object.prototype.map !== 'function') {
+  Object.prototype.map = function (fn) {
+    if (fn === undefined) return this;
+    return Object.keys(this)
+      .reduce((newMap, key) => {
+        newMap[key] = fn(this[key]);
+        return newMap;
+      }, {});
+  };
+}
+
 
 module.exports = {
   serialize: truncateBuffersStringify

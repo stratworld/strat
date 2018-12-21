@@ -1,16 +1,16 @@
 const ArchiveBuilder = require('./archiveBuilder');
 const stdPath = require('path');
 const hostPrefab = stdPath.resolve(__dirname, 'prefab');
+const hostFileDirectory = stdPath.resolve(hostPrefab, 'host/');
+const ls = require('util').promisify(require('fs').readdir);
 const hostDir = 'lit_generated_host';
-const copyFiles = [
-  'host.js'
-];
+const invocationsDir = `${hostDir}/invocations`;
 
 module.exports = function (hostConfig) {
   const builder = new ArchiveBuilder(hostConfig.host.artifacts[0]);
   const host = new NodeHost(hostConfig, builder);
-  host.build();
-  return host.data();
+  return host.build()
+    .then(() => host.data());
 };
 
 const NodeHost = function (config, archiveBuilder) {
@@ -20,17 +20,42 @@ const NodeHost = function (config, archiveBuilder) {
 };
 
 NodeHost.prototype.build = function () {
-  copyFiles.forEach(file => {
-    this.archiveBuilder.copy(stdPath.resolve(hostPrefab, file), hostDir);
-  });
-  this.archiveBuilder.copy(
-    stdPath.resolve(hostPrefab, 'lit_generated_host_entry.js'));
+  return ls(hostFileDirectory)
+    .then(files => {
+      files.forEach(file => {
+        this.archiveBuilder.copy(stdPath.resolve(hostFileDirectory, file), hostDir);
+      });
 
-  this.archiveBuilder.addDataAsFile(
-    this.getConfig(), `${hostDir}/config.json`);
+      this.archiveBuilder.copy(
+        stdPath.resolve(hostPrefab, 'lit_generated_host_entry.js'));
+
+      this.buildInvocations();
+
+      this.archiveBuilder.addDataAsFile(
+        this.getConfig(), `${hostDir}/config.json`);
+    });
 };
 
-// todo: figure out routing and supplying dependency invocation files/configs
+NodeHost.prototype.buildInvocations = function () {
+  const invocations = this.config.scope
+    .values()
+    .reduce((invocations, dependency) => {
+      invocations[dependency.service] = dependency.invoke;
+      return invocations;
+    }, {});
+
+  invocations
+    .pairs()
+    .map(kvp =>
+      this.archiveBuilder.copy(kvp[1],
+        stdPath.join(invocationsDir, kvp[0])));
+};
+
+function invocationFileName (service, invocationFilePath) {
+  return `${service}-${stdPath.basename(invocationFilePath)}`;
+}
+
+//todo: routing
 NodeHost.prototype.getConfig = function () {
   const config = {
     // if the artifact is a zip file, assume an index.js file in the root
@@ -39,6 +64,13 @@ NodeHost.prototype.getConfig = function () {
       ? '../index.js'
       : '../' + stdPath.basename(this.artifact.path),
     scope: this.config.scope
+      .map(value => {
+        return {
+          config: value.config,
+          // the relative require path from the host file to the invocation file
+          invoke: `../${invocationsDir}/${value.service}/${stdPath.basename(value.invoke)}`
+        };
+      })
   };
   return Buffer.from(JSON.stringify(config));
 };
