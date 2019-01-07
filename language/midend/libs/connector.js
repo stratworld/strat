@@ -20,7 +20,7 @@ function getConnectorPaths (ast) {
   return traverse(ast, ['file'])
     .filter(file => traverse(file, ['source']).length > 0)
     .reduce((connectorPaths, nextFile) => {
-      const source =traverse(nextFile, ['source'])[0];
+      const source = traverse(nextFile, ['source'])[0];
       const filePath = val(nextFile, 'path');
       const sourceName = val(source, 'name');
       const connector = getConfig(source, 'connector');

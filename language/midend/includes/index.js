@@ -10,6 +10,13 @@ const stat = function (pathObj) {
 }
 const readFile = promisify(fs.readFile);
 
+const stdSources = stdPath.resolve(__dirname, '../../../stdSources');
+const litStdPaths = fs.readdirSync(stdSources)
+  .reduce((paths, stdModuleName) => {
+    paths[stdModuleName] = stdPath.join(stdSources, stdModuleName, `${stdModuleName}.lit`);
+    return paths;
+  }, {});
+
 module.exports = function (ast) {
   return traversal(ast);
 }
@@ -50,14 +57,18 @@ function resolvePath (path, parentAst) {
   const parentFile = parentAst.tokens.path.value;
   const parentDirectory = stdPath.dirname(parentFile);
   var absolutePath;
-  if (!stdPath.isAbsolute(path.value)) {
-    absolutePath = stdPath.resolve(parentDirectory, path.value);
+  if (litStdPaths[path.value]) {
+    absolutePath = litStdPaths[path.value];
   } else {
-    absolutePath = path.value;
-  }
+    if (!stdPath.isAbsolute(path.value)) {
+      absolutePath = stdPath.resolve(parentDirectory, path.value);
+    } else {
+      absolutePath = path.value;
+    }
 
-  if (stdPath.extname(absolutePath) === '') {
-    absolutePath = absolutePath + '.lit';
+    if (stdPath.extname(absolutePath) === '') {
+      absolutePath = absolutePath + '.lit';
+    }
   }
   
   return exists(Object.assign(path, {

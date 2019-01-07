@@ -1,66 +1,62 @@
 R = x => Promise.resolve(x);
 J = x => Promise.reject(x);
 
-if (typeof Array.prototype.flat !== 'function') {
-  Array.prototype.flat = function () {
-    return this.reduce((fm, n) => fm.concat(n), []);
-  }
-}
-if (typeof Array.prototype.flatmap !== 'function') {
-  Array.prototype.flatmap = function (fn) {
-    if (typeof fn === 'function') {
-      return this.map(fn).flat();
-    }
-    return this.flat();
-  };
-}
-if (typeof Array.prototype.purge !== 'function') {
-  Array.prototype.purge = function () {
-    return this.filter(x => x !== undefined);
-  }
-}
-if (typeof Array.prototype.constantMapping !== 'function') {
-  Array.prototype.constantMapping = function (constant) {
-    return this.reduce((set, element) => {
-      set[element] = constant;
-      return set;
-    }, {});
-  }
-}
-if (typeof Array.prototype.pipePromise !== 'function') {
-  Array.prototype.pipePromise = function (startingPromise) {
-    return this.reduce((totalPromise, nextPromise) => {
-      return totalPromise.then(result => nextPromise(result));
-    }, (startingPromise === undefined ? R() : startingPromise));
-  }
+Array.prototype.flat = function () {
+  return this.reduce((fm, n) => fm.concat(n), []);
 }
 
-if (typeof Object.prototype.values !== 'function') {
-  Object.prototype.values = function () {
-    return Object.keys(this).map(key => this[key]);
+Array.prototype.flatmap = function (fn) {
+  if (typeof fn === 'function') {
+    return this.map(fn).flat();
   }
+  return this.flat();
+};
+
+Array.prototype.purge = function () {
+  return this.filter(x => x !== undefined);
 }
-if (typeof Object.prototype.keys !== 'function') {
-  Object.prototype.keys = function () {
-    return Object.keys(this);
-  }
+
+Array.prototype.constantMapping = function (constant) {
+  return this.reduce((set, element) => {
+    set[element] = constant;
+    return set;
+  }, {});
 }
-if (typeof Object.prototype.pairs !== 'function') {
-  Object.prototype.pairs = function () {
-    return Object.keys(this)
-      .map(key => [key, this[key]]);
-  };
+
+Array.prototype.pipePromise = function (startingPromise) {
+  return this.reduce((totalPromise, nextPromise) => {
+    return totalPromise.then(result => nextPromise(result));
+  }, (startingPromise === undefined ? R() : startingPromise));
 }
-if (typeof Object.prototype.map !== 'function') {
-  Object.prototype.map = function (fn) {
-    if (fn === undefined) return this;
-    return Object.keys(this)
-      .reduce((newMap, key) => {
-        newMap[key] = fn(this[key]);
-        return newMap;
-      }, {});
-  };
+
+Array.prototype.first = function (predicate) {
+  return typeof predicate === 'function'
+    ? this.filter(predicate)[0]
+    : this[0];
 }
+
+Object.prototype.values = function () {
+  return Object.keys(this).map(key => this[key]);
+}
+
+Object.prototype.keys = function () {
+  return Object.keys(this);
+}
+
+Object.prototype.pairs = function () {
+  return Object.keys(this)
+    .map(key => [key, this[key]]);
+};
+
+Object.prototype.map = function (fn) {
+  if (fn === undefined) return this;
+  return Object.keys(this)
+    .reduce((newMap, key) => {
+      newMap[key] = fn(this[key]);
+      return newMap;
+    }, {});
+};
+
 
 
 module.exports = {

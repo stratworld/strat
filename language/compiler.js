@@ -21,8 +21,7 @@ function runCommand (command, startingInput, filename) {
     return executePasses(prebuilt, startingInput, filename);
   } else {
     const singleCommand = everything
-      .filter(potentialCommand => potentialCommand.name === command)
-      [0];
+      .first(potentialCommand => potentialCommand.name === command);
     if (singleCommand) {
       return executePasses([singleCommand], startingInput, filename);
     }

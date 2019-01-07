@@ -1,3 +1,0 @@
-source DynamoDb {
-  artifactBuilder: "./builder.js"
-}

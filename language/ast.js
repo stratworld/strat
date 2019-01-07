@@ -5,15 +5,15 @@ module.exports = {
       tokens: tokens
     };
     (children || [])
-    .flat()
-    .purge()
-    .forEach(child => {
-      const childType = child.type;
-      if (thisNode[childType] === undefined) {
-        thisNode[childType] = [];
-      }
-      thisNode[childType].push(child);
-    });
+      .flat()
+      .purge()
+      .forEach(child => {
+        const childType = child.type;
+        if (thisNode[childType] === undefined) {
+          thisNode[childType] = [];
+        }
+        thisNode[childType].push(child);
+      });
 
     return thisNode;
   },
@@ -23,7 +23,7 @@ module.exports = {
   getConfig: (node, key) => traverse(node, ['kvp'])
     .filter(kvp => tokenDive(kvp, 'key', 'value') === key)
     .map(kvp => kvp.tokens.value)
-    [0],
+    .first(),
   resolve: (program, includes) => {
     const pathMap = traverse(program, ['file'])
       .reduce((map, file) => {
@@ -42,8 +42,7 @@ module.exports = {
       .filter(service => val(service, 'name') === serviceName)
       .flatmap(foundService => traverse(foundService, ['function'])
         .concat(traverse(foundService, ['dispatch', 'function'])))
-      .filter(fn => val(fn, 'name') === localFunctionName)
-      [0];
+      .first(fn => val(fn, 'name') === localFunctionName);
   },
   kvpsToMap: (kvps = []) => kvps
     .reduce((map, kvp) => {

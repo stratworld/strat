@@ -34,7 +34,6 @@ ArchiveBuilder.prototype.copy = function (filePathToCopy, pathFromRoot) {
 }
 
 ArchiveBuilder.prototype.data = function () {
-  this.zip.writeZip('out.zip')
   return this.zip.toBuffer();
 }
 
