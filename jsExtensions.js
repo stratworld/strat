@@ -48,14 +48,16 @@ Object.prototype.pairs = function () {
     .map(key => [key, this[key]]);
 };
 
-Object.prototype.map = function (fn) {
-  if (fn === undefined) return this;
-  return Object.keys(this)
-    .reduce((newMap, key) => {
-      newMap[key] = fn(this[key]);
-      return newMap;
-    }, {});
-};
+// This makes the AWS SDK blow up because they have some code
+// that does if(anObject[stringThatCanBe"map"])...
+// Object.prototype.map = function (fn) {
+//   if (fn === undefined) return this;
+//   return Object.keys(this)
+//     .reduce((newMap, key) => {
+//       newMap[key] = fn(this[key]);
+//       return newMap;
+//     }, {});
+// };
 
 
 

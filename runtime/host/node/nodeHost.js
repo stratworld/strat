@@ -64,13 +64,16 @@ NodeHost.prototype.getConfig = function () {
       ? '../index.js'
       : '../' + stdPath.basename(this.artifact.path),
     scope: this.config.scope
-      .map(value => {
-        return {
+      .keys()
+      .reduce((newScope, key) => {
+        const value = this.config.scope[key];
+        newScope[key] = {
           config: value.config,
           // the relative require path from the host file to the invocation file
           invoke: `../${invocationsDir}/${value.service}/${stdPath.basename(value.invoke)}`
         };
-      })
+        return newScope;
+      }, {})
   };
   return Buffer.from(JSON.stringify(config));
 };
