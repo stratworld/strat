@@ -23,7 +23,7 @@ module.exports = {
   getConfig: (node, key) => traverse(node, ['kvp'])
     .filter(kvp => tokenDive(kvp, 'key', 'value') === key)
     .map(kvp => kvp.tokens.value)
-    .first(),
+    [0],
   resolve: (program, includes) => {
     const pathMap = traverse(program, ['file'])
       .reduce((map, file) => {
@@ -42,7 +42,8 @@ module.exports = {
       .filter(service => val(service, 'name') === serviceName)
       .flatmap(foundService => traverse(foundService, ['function'])
         .concat(traverse(foundService, ['dispatch', 'function'])))
-      .first(fn => val(fn, 'name') === localFunctionName);
+      .filter(fn => val(fn, 'name') === localFunctionName)
+      [0];
   },
   kvpsToMap: (kvps = []) => kvps
     .reduce((map, kvp) => {

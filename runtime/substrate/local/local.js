@@ -1,4 +1,5 @@
-const statedBuildLocation = require('../../../litconfig.json').local.directory;
+//todo: this is brittle and doesn't inform the user what's needed
+const statedBuildLocation = require('../../config')().local.directory;
 const path = require('path');
 const buildLocation = path.resolve(statedBuildLocation);
 const fs = require('fs');
@@ -12,6 +13,8 @@ module.exports = {
       fs.mkdirSync(path.resolve(buildLocation, id));
     } catch (e) {
       //drop -- the directory is already created
+      // todo: this could also fail if the configuration for
+      // the path buildLocation is invalid
     }
     return host.runtime === undefined
       ? getResourceImplementation(host, id)

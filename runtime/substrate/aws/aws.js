@@ -1,6 +1,6 @@
 const path = require('path');
 const AWS = require('aws-sdk');
-const config = require('../../../litconfig.json').aws.config;
+const config = require('../../config')().aws.config;
 AWS.config.update(config);
 
 module.exports = {
@@ -13,7 +13,8 @@ module.exports = {
     return host.runtime === undefined
       ? getBlobImplementation(host, id)
       : getFunctionImplementation(host, id)
-  }
+  },
+  roles: require('./iam/iam')
 };
 
 function getBlobImplementation (host, id) {

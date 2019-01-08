@@ -99,7 +99,7 @@ function getProxyEvents (proxyLookup, fnName) {
   return proxyLookup.keys()
     .filter(key => fnName.indexOf(key) > -1)
     .map(key => proxyLookup[key])
-    .first();
+    [0];
 }
 
 function name (service, fn) {
