@@ -9,7 +9,7 @@ module.exports = function (events, implementation) {
       path: request.url.replace(`/${events.service}`, ''),
       httpMethod: request.method
     }, null, function (err, result) {
-      format(result, response);
+      format(err, result, response);
     });
   }
 
@@ -26,22 +26,28 @@ module.exports = function (events, implementation) {
   });
 }
 
-function format (result, res) {
-  var data = result.data;
-  if (data.statusCode === undefined) {
-    console.log(result);
-    //wierd shit
-    data = {
-      statusCode: 500,
-      headers: {},
-      body: data
+function format (err, result, res) {
+  if (err) {
+    res.writeHead(500);
+    res.write(JSON.stringify(err));
+    res.end();
+  } else {
+    var data = result.data;
+    if (data.statusCode === undefined) {
+      //wierd shit
+      data = {
+        statusCode: 500,
+        headers: {},
+        body: data
+      }
     }
+    res.writeHead(data.statusCode, data.headers);
+    if (data.body) {
+      res.write((typeof data.body === 'string'
+        ? data.body
+        : JSON.stringify(data.body)));
+    }
+    res.end();
   }
-  res.writeHead(data.statusCode, data.headers);
-  if (data.body) {
-    res.write((typeof data.body === 'string'
-      ? data.body
-      : JSON.stringify(data.body)));
-  }
-  res.end();
+  
 }

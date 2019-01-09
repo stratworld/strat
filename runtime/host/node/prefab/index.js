@@ -1,4 +1,5 @@
 const scope = require('./config.json').scope;
+
 const failures = [
   'componentRejection',
   'componentFailure',
@@ -6,20 +7,18 @@ const failures = [
   'serviceFailure'
 ];
 
-Lit = function (functionName) {
+
+module.exports = function (functionName) {
   if (typeof functionName !== 'string' || functionName.length === 0) {
     throw "Pass an absolute function name into Lit. Ex: Lit('Books-getBooks')";;
   }
-  return resolve(functionName);
-};
 
-function resolve (functionName) {
   const resolution = scope[functionName];
   if (resolution === undefined) {
     throw `${functionName} is not defined in the current scope.`;
   }
-  const transport = require(resolution.invoke)(resolution.config);
 
+  const transport = require(resolution.invoke)(resolution.config);
   return function (arg) {
     //todo: compose this
     return transport({

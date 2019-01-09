@@ -1,4 +1,3 @@
-const handlerPath = require('./config.json').handlerPath;
 module.exports = function (event, context, callback) {
   respond(event, callback);
 }
@@ -19,18 +18,20 @@ function respond (event, cb) {
     workDoing
       .then(result => cb(null, result));
   } else {
-    cb(null, workDoing);
+    cb(workDoing, null);
   }
 
   function work () {
+    var handlerPath;
     try {
-      const config = require('./config.json');
-      require('./resolver');
+      const config = require('../node_modules/lit/config.json');
+      require('../node_modules/lit/index.js');
+      handlerPath = config.handlerPath;
     } catch (e) {
       return {
         systemFailure: {
           message: 'Failed to initialize the Lit host.',
-          error: e
+          error: e.message
         }
       };
     }

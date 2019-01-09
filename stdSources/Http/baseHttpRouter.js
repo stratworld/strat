@@ -1,4 +1,4 @@
-
+const Lit = require('lit');
 module.exports = function (event) {
   const method = event.httpMethod;
   const t = new Traverser(tree);
@@ -23,6 +23,7 @@ module.exports = function (event) {
           body: `invalid json input: ${e}`
         });
       }
+
       return Lit(traversalResult.dependency.name)({
         body: body,
         params: traversalResult.params

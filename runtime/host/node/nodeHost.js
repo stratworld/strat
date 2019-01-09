@@ -5,6 +5,9 @@ const hostFileDirectory = stdPath.resolve(hostPrefab, 'host/');
 const ls = require('util').promisify(require('fs').readdir);
 const hostDir = 'lit_generated_host';
 const invocationsDir = `${hostDir}/invocations`;
+const resolverPath = stdPath.resolve(__dirname, 'prefab/index.js');
+const resolverPathDest = 'node_modules/lit';
+const configDest = 'node_modules/lit/config.json';
 
 module.exports = function (hostConfig) {
   const builder = new ArchiveBuilder(hostConfig.host.artifacts[0]);
@@ -26,13 +29,15 @@ NodeHost.prototype.build = function () {
         this.archiveBuilder.copy(stdPath.resolve(hostFileDirectory, file), hostDir);
       });
 
+      this.archiveBuilder.copy(resolverPath, resolverPathDest);
+
       this.archiveBuilder.copy(
         stdPath.resolve(hostPrefab, 'lit_generated_host_entry.js'));
 
       this.buildInvocations();
 
       this.archiveBuilder.addDataAsFile(
-        this.getConfig(), `${hostDir}/config.json`);
+        this.getConfig(), configDest);
     });
 };
 
@@ -69,8 +74,8 @@ NodeHost.prototype.getConfig = function () {
         const value = this.config.scope[key];
         newScope[key] = {
           config: value.config,
-          // the relative require path from the host file to the invocation file
-          invoke: `../${invocationsDir}/${value.service}/${stdPath.basename(value.invoke)}`
+          // the relative require path from dependency index file to the invocation file
+          invoke: `../../${invocationsDir}/${value.service}/${stdPath.basename(value.invoke)}`
         };
         return newScope;
       }, {})
