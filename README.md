@@ -24,6 +24,26 @@ Its like serverless meets containers--a sys file is like a container that contai
   - Your local computer
   - A docker container
 
+## What else does it do?
+
+Because your .lit files don't specify infrastructure directly, the Lit compiler can do what compilers have done for normal languages for decades--**the Lit compiler can optimize your infrastrucutre**:
+
+  - Write your code as many functions, then run those functions all on a single Lambda to reduce costs, improve end user latency, and reduce cold starts.  Early test show this can reduce Lambda hosting costs from 60% to 90%\*.  Code deployed with Lit is both cheaper to operate and produces a better end user experience.
+  - Lit creates the perfect permission roles for your components based on their dependencies at compile time.
+  - Lit hosts your code inside a thin networking layer configured at compile time.  This layer exposes a "composition API" which can be used to change the runtime behavior of your system.  Practical examples include:
+    - Component stack traces.  Track services invoked by request.
+    - System debugging.  Step through events as they pass through your system.
+
+And a reminder--the same .sys file you run in production can be deployed without change to your local system to reproduce bugs and get your hands on system behavior.
+
+\* AWS rounds up to the nearest 100ms when billing Lambda functions, and most functions execute much faster than 100ms.  By running serial Lambda functions on the same invocation Lit prevents your company from wasting Lambda execution time.
+
+## How is this all possible?  Sounds too good to be true.
+
+Just as high level languages require the programmer to give up the fine grained control assembly affords, Lit forces the system designer to build in a certian way.  Thankfully, that way happens to be the same way people recognize as "best practice" today--stateless event based systems.  There is no way for a Lit function to save something to a file system--there is no concept of a file system in Lit.  But who today writes stuff to files on their servers?  And even if one component is stateful, all the other components can be built as a Lit system that sits alongside the stateful component running on traditional servers.
+
+And Lit would not have been possible 10 years ago before the creation of functions as a service infrastructure.  Services like AWS Lambda provide the crucial bedrock abstraction over servers that Lit is built on top of.  You can think of Lit as the realization and application of the potential of serverless technology.  Lit can guarantee scalability and remove that concern from the programmer because it runs on these FAAS technologies that scale indefinitely.
+
 
 ## Hello World
 

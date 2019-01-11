@@ -7,7 +7,6 @@ const failures = [
   'serviceFailure'
 ];
 
-
 module.exports = function (functionName) {
   if (typeof functionName !== 'string' || functionName.length === 0) {
     throw "Pass an absolute function name into Lit. Ex: Lit('Books-getBooks')";;
