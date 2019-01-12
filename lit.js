@@ -33,7 +33,7 @@ if (!process.stdin.isTTY) {
 
 function scanArgumentFile (filename) {
   return readFile(filename)
-    .then(fileData => fileData.toString());
+    // .then(fileData => fileData.toString());
 }
 
 var filename;

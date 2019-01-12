@@ -4,3 +4,4 @@ work*/
 out.json
 litconfig.json
 build
+*.sys

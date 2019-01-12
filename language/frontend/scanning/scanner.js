@@ -6,8 +6,9 @@ const identifierRegex = /^[a-zA-Z_]+$/g;
 
 function scan (input, filename) {
   var tokens = [], index = 0, token, newLines = 0;
-  while(index < input.length) {
-    token = chunk(index, input);
+  const inputString = input.toString();
+  while(index < inputString.length) {
+    token = chunk(index, inputString);
     if (token.type === 'NEWLINE' || token.type === 'COMMENT') newLines++;
     if (token.type === 'STRING') newLines += countNewLines(token.value);
     token.line = newLines + 1;

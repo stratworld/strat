@@ -12,7 +12,8 @@ const passChains = {
   frontend: frontend,
   midend: midend,
   backend: backend,
-  build: everything
+  build: frontend.concat(midend),
+  deploy: backend
 };
 
 function runCommand (command, startingInput, filename) {

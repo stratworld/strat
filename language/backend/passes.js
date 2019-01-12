@@ -2,6 +2,10 @@ const path = require('path');
 
 module.exports = [
   {
+    name: 'ingest',
+    entry: path.resolve(__dirname, 'ingest/ingest')
+  },
+  {
     name: 'roles',
     entry: path.resolve(__dirname, 'roles/roles')
   },

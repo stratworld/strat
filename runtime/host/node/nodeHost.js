@@ -1,4 +1,4 @@
-const ArchiveBuilder = require('./archiveBuilder');
+const ArchiveBuilder = require('../../../util/archiveBuilder');
 const stdPath = require('path');
 const hostPrefab = stdPath.resolve(__dirname, 'prefab');
 const hostFileDirectory = stdPath.resolve(hostPrefab, 'host/');

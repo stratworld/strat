@@ -26,7 +26,11 @@ module.exports = [
     entry: path.resolve(__dirname, 'id.js')
   },
   {
-    name: 'host',
-    entry: path.resolve(__dirname, 'host/toHost')
+    name: 'sysir',
+    entry: path.resolve(__dirname, 'sys/toSysIr.js')
+  },
+  {
+    name: 'sysfile',
+    entry: path.resolve(__dirname, 'sys/sys.js')
   }
 ];
