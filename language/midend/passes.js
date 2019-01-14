@@ -30,6 +30,10 @@ module.exports = [
     entry: path.resolve(__dirname, 'sys/toSysIr.js')
   },
   {
+    name: 'collapse',
+    entry: path.resolve(__dirname, 'hostCollapse/collapse.js')
+  },
+  {
     name: 'sysfile',
     entry: path.resolve(__dirname, 'sys/sys.js')
   }

@@ -7,7 +7,7 @@ module.exports = function (sysFileBuffer) {
     ir = JSON.parse(sysFile.read('ir').toString());  
   } catch (e) {
     return J({
-      error: 'Invalid sys file',
+      error: 'Invalid .sys file',
       msg: `Could not parse the ir from the sys file. ${e}`,
     });
   }
@@ -16,7 +16,7 @@ module.exports = function (sysFileBuffer) {
     (ir.hosts || []).forEach(host => {
       (host.artifacts || []).forEach(artifact => {
         const error = {
-          error: 'Invalid sys file',
+          error: 'Invalid .sys file',
           msg: `Could not open the artifact for ${artifact.name}`
         };
         try {
