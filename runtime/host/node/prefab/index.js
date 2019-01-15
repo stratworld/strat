@@ -17,10 +17,12 @@ module.exports = function (functionName) {
     throw `${functionName} is not defined in the current scope.`;
   }
 
+  //todo: check if this is on-host, then use local transport
   const transport = require(resolution.invoke)(resolution.config);
   return function (arg) {
     //todo: compose this
     return transport({
+      callee: functionName,
       data: arg
     }).then(result => {
       const failure = failures

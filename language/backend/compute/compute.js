@@ -14,10 +14,11 @@ function createCompute (host, id) {
 function getScopeWithCompute (ir) {
   const implementationLookup = ir.hosts
     .reduce((lookup, host) => {
-      lookup[host.name] = host.compute;
+      host.artifacts.forEach(artifact => {
+        lookup[artifact.name] = host.compute;
+      });
       return lookup;
     }, {});
-
   return ir.scopes
     .keys()
     .reduce((newScopes, nextScopeName) => {

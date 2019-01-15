@@ -30,11 +30,10 @@ Assumption:
 
 Tactics:
   Given two hosts A and B, combine them if:
-    (1) They share the same runtime AND
+    (1) They share the same runtime
     (2) at least one function in A shares a scope with at least one function in B.
-    (3) at most one host receives events
+    (3) at most one of A and B receives events
   The graph of functions will be a connected graph because of how includes work, so we can ignore (2).
-  Let the backend split hosts up as it sees fit
   Scopes remain unchanged
 */
 
@@ -76,8 +75,11 @@ whichever host is receiving the most time sensitive event type.  Most of the tim
 that event type will be HTTP.  Given the algorithm in cllapseHosts, the first
 host of a runtime gets the most functions, so we want the first host for each
 runtime to be the Http proxy.
+
+todo: What happens when there are multiple declarations of a single event source
+within one system?  EX: 2 files have include "Http"
 */
-function httpHostsFirst (A, B) {
+function httpHostsFirst (A) {
   return (A.events !== undefined
     && A.events[0] !== undefined
     && A.events[0].type === 'Http')

@@ -22,6 +22,9 @@ function respond (event, cb) {
   }
 
   function work () {
+    //todo: dynamically pick which handler we need to use based on the
+    // callee property of the argument
+    // if no callee is supplied, then use the event receiver for this host
     var handlerPath;
     try {
       const config = require('../node_modules/lit/config.json');

@@ -58,7 +58,7 @@ if (typeof stdinData === 'object') {
 
 work
   .then(finalResults => {
-    console.log(serialize(finalResults));
+    // console.log(serialize(finalResults));
     process.exit(0);
   })
   .catch(e => {

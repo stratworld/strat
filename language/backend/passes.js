@@ -17,12 +17,12 @@ module.exports = [
     name: 'buildhost',
     entry: path.resolve(__dirname, 'host/host')
   },
-  {
-    name: 'deploy',
-    entry: path.resolve(__dirname, 'deploy/deploy')
-  },
-  {
-    name: 'connect',
-    entry: path.resolve(__dirname, 'connect/connect')
-  }
+  // {
+  //   name: 'deploy',
+  //   entry: path.resolve(__dirname, 'deploy/deploy')
+  // },
+  // {
+  //   name: 'connect',
+  //   entry: path.resolve(__dirname, 'connect/connect')
+  // }
 ];
