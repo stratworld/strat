@@ -1,4 +1,6 @@
-const scope = require('./config.json').scope;
+const config = require('./config.json');
+const scope = config.scope;
+const defaultFunction = config.defaultFunction;
 
 const failures = [
   'componentRejection',
@@ -8,6 +10,10 @@ const failures = [
 ];
 
 module.exports = function (functionName) {
+  if (functionName === undefined) {
+    functionName = defaultFunction;
+  }
+  
   if (typeof functionName !== 'string' || functionName.length === 0) {
     throw "Pass an absolute function name into Lit. Ex: Lit('Books-getBooks')";;
   }
@@ -17,12 +23,11 @@ module.exports = function (functionName) {
     throw `${functionName} is not defined in the current scope.`;
   }
 
-  //todo: check if this is on-host, then use local transport
   const transport = require(resolution.invoke)(resolution.config);
   return function (arg) {
     //todo: compose this
     return transport({
-      callee: functionName,
+      _litCallee: functionName,
       data: arg
     }).then(result => {
       const failure = failures

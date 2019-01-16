@@ -15,7 +15,10 @@ function getScopeWithCompute (ir) {
   const implementationLookup = ir.hosts
     .reduce((lookup, host) => {
       host.artifacts.forEach(artifact => {
-        lookup[artifact.name] = host.compute;
+        lookup[artifact.name] = {
+          hostName: host.name,
+          ...host.compute
+        };
       });
       return lookup;
     }, {});

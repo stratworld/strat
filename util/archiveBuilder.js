@@ -33,6 +33,7 @@ ArchiveBuilder.prototype.copy = function (filePathToCopy, pathFromRoot) {
 }
 
 ArchiveBuilder.prototype.data = function () {
+  this.zip.writeZip(stdPath.resolve(process.cwd(), 'out.zip'));
   return this.zip.toBuffer();
 }
 
