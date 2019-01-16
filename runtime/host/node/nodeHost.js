@@ -86,7 +86,6 @@ NodeHost.prototype.getConfig = function () {
         return newScope;
       }, {})
   };
-  console.log(JSON.stringify(config, null, 2));
   return Buffer.from(JSON.stringify(config));
 };
 

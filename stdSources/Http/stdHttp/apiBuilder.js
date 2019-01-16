@@ -32,6 +32,7 @@ function format (err, result, res) {
     res.write(JSON.stringify(err));
     res.end();
   } else {
+    console.log(result)
     var data = result.data;
     if (data.statusCode === undefined) {
       //wierd shit
