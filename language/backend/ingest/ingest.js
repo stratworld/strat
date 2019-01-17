@@ -1,10 +1,11 @@
 const ArchiveBuilder = require('../../../util/archiveBuilder');
+const stdPath = require('path');
 
 module.exports = function (sysFileBuffer) {
   const sysFile = new ArchiveBuilder(sysFileBuffer);
   var ir;
   try {
-    ir = JSON.parse(sysFile.read('ir').toString());  
+    ir = JSON.parse(sysFile.read('ir.json').toString());  
   } catch (e) {
     return J({
       error: 'Invalid .sys file',
@@ -20,11 +21,13 @@ module.exports = function (sysFileBuffer) {
           msg: `Could not open the artifact for ${artifact.name}`
         };
         try {
-          artifact.data = sysFile.read(artifact.name);  
+          artifact.data = sysFile.read(
+            stdPath.join(artifact.name, stdPath.basename(artifact.path)));
         } catch (e) {
           throw error;
         }
         if (artifact.data === undefined) {
+
           throw error;
         }
       });

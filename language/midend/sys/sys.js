@@ -12,12 +12,14 @@ function buildSysArchive (ir) {
   const archive = new ArchiveBuilder();
   (ir.hosts || []).forEach(host => {
     (host.artifacts || []).forEach(artifact => {
-      archive.addDataAsFile(artifact.data, artifact.name);
+      archive.addDataAsFile(
+        artifact.data,
+        `${artifact.name}/${stdPath.basename(artifact.path)}`);
       delete artifact.data;
     });
   });
 
-  archive.addDataAsFile(Buffer.from(JSON.stringify(ir)), 'ir');
+  archive.addDataAsFile(Buffer.from(JSON.stringify(ir)), 'ir.json');
 
   return archive.data();
 }

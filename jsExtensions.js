@@ -48,6 +48,16 @@ Object.prototype.pairs = function () {
     .map(key => [key, this[key]]);
 };
 
+Object.prototype.purge = function () {
+  Object.keys(this)
+    .forEach(key => {
+      if (this[key] === undefined) {
+        delete this[key];
+      }
+    });
+  return this;
+}
+
 module.exports = {
   serialize: truncateBuffersStringify
 }

@@ -10,7 +10,9 @@ module.exports = function (config) {
     return new Promise(function (resolve, reject) {
       s3.getObject(params, function(err, data) {
         if (err) reject(err.stack);
-        else resolve(data.Body.toString());
+        else resolve({
+          data: data.Body.toString()
+        });
       });  
     });
   }

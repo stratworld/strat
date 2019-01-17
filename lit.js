@@ -9,7 +9,7 @@ const path = require('path');
 var stdinData;
 if (!process.stdin.isTTY) {
   stdinData = new Promise(function (resolve, reject) {
-    var stdin = process.openStdin();
+    const stdin = process.openStdin();
     var data = "";
     stdin.on('data', function(chunk) {
       data += chunk;
@@ -31,11 +31,6 @@ if (!process.stdin.isTTY) {
   });
 }
 
-function scanArgumentFile (filename) {
-  return readFile(filename)
-    // .then(fileData => fileData.toString());
-}
-
 var filename;
 if (process.argv[3] !== undefined) {
   filename = path.resolve(process.cwd(), process.argv[3]);
@@ -47,12 +42,12 @@ var work;
 if (typeof stdinData === 'object') {
   work = stdinData.then(data => compile(command, data, filename))
 } else if (typeof filename === 'string') {
-  work = scanArgumentFile(filename)
+  work = readFile(filename)
     .then(data => compile(command, data, filename));
 } else {
-  console.log('Usages:')
-  console.log('    lit command filename');
-  console.log('    <output from a previous lit command> | lit command');
+  console.error('Usages:')
+  console.error('    lit command filename');
+  console.error('    <output from a previous lit command> | lit command');
   process.exit(127);
 }
 
@@ -62,5 +57,6 @@ work
     process.exit(0);
   })
   .catch(e => {
+    console.error(e);
     process.exit(1);
   });

@@ -1,48 +1,35 @@
 const ArchiveBuilder = require('../../../util/archiveBuilder');
 const stdPath = require('path');
 const hostPrefab = stdPath.resolve(__dirname, 'prefab');
-const hostFileDirectory = stdPath.resolve(hostPrefab, 'host/');
-const ls = require('util').promisify(require('fs').readdir);
-const hostDir = 'lit_generated_host';
-const invocationsDir = `${hostDir}/invocations`;
-const resolverPath = stdPath.resolve(__dirname, 'prefab/index.js');
-const resolverPathDest = 'node_modules/lit';
+const invocationsDir = 'node_modules/lit/invocations';
 const configDest = 'node_modules/lit/config.json';
 
-module.exports = function (hostConfig) {
-  const builder = new ArchiveBuilder(hostConfig.host.artifacts[0]);
-  const host = new NodeHost(hostConfig, builder);
-  return host.build()
-    .then(() => host.data());
+module.exports = function (hostWithScope) {
+  const host = new NodeHost(hostWithScope);
+  host.build()
+  return R(host.data());
 };
 
-const NodeHost = function (config, archiveBuilder) {
-  this.archiveBuilder = archiveBuilder;
-  this.config = config;
-  this.artifact = config.host.artifacts[0];
+const NodeHost = function (config) {
+  this.archiveBuilder = new ArchiveBuilder();
+  this.host = config.host;
+  this.scope = config.scope;
 };
 
 NodeHost.prototype.build = function () {
-  return ls(hostFileDirectory)
-    .then(files => {
-      files.forEach(file => {
-        this.archiveBuilder.copy(stdPath.resolve(hostFileDirectory, file), hostDir);
-      });
+  this.archiveBuilder.copyDirectory(hostPrefab);
 
-      this.archiveBuilder.copy(resolverPath, resolverPathDest);
+  this.host.artifacts.forEach(artifact => {
+    this.archiveBuilder.addDataAsFile(artifact.data, `${artifact.name}/index.js`);
+  });
 
-      this.archiveBuilder.copy(
-        stdPath.resolve(hostPrefab, 'lit_generated_host_entry.js'));
+  this.copyInvocations();
 
-      this.buildInvocations();
-
-      this.archiveBuilder.addDataAsFile(
-        this.getConfig(), configDest);
-    });
+  this.archiveBuilder.addDataAsFile(this.getConfig(), configDest);
 };
 
-NodeHost.prototype.buildInvocations = function () {
-  const invocations = this.config.scope
+NodeHost.prototype.copyInvocations = function () {
+  const invocations = this.scope
     .values()
     .reduce((invocations, dependency) => {
       invocations[dependency.service] = dependency.invoke;
@@ -50,33 +37,33 @@ NodeHost.prototype.buildInvocations = function () {
     }, {});
 
   invocations
+    .purge()
     .pairs()
     .map(kvp =>
       this.archiveBuilder.copy(kvp[1],
-        stdPath.join(invocationsDir, kvp[0])));
+        stdPath.join(invocationsDir, kvp[0], 'index.js')));
 };
 
-function invocationFileName (service, invocationFilePath) {
-  return `${service}-${stdPath.basename(invocationFilePath)}`;
-}
-
-//todo: routing
 NodeHost.prototype.getConfig = function () {
   const config = {
-    // if the artifact is a zip file, assume an index.js file in the root
-    // else, then the actual file is the entry point
-    handlerPath: this.artifact.type === '.zip'
-      ? '../index.js'
-      : '../' + stdPath.basename(this.artifact.path),
-    scope: this.config.scope
+    defaultFunction: this.host.name,
+    scope: this.scope
       .keys()
-      .reduce((newScope, key) => {
-        const value = this.config.scope[key];
-        newScope[key] = {
-          config: value.config,
-          // the relative require path from dependency index file to the invocation file
-          invoke: `../../${invocationsDir}/${value.service}/${stdPath.basename(value.invoke)}`
-        };
+      .reduce((newScope, functionName) => {
+        if (this.scope[functionName].hostName === this.host.name) {
+          newScope[functionName] = {
+            service: 'onHost',
+            config: {
+              functionName: functionName,
+              shouldntWrap: this.host.name === functionName
+            }
+          }
+        } else {
+          newScope[functionName] = {
+            service: this.scope[functionName].service,
+            config: this.scope[functionName].config
+          }
+        }
         return newScope;
       }, {})
   };

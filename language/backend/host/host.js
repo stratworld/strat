@@ -15,9 +15,9 @@ module.exports = function (ir) {
   }));
 };
 
-function createHost (hostConfig) {
-  if (hostConfig.host.compute.type === 'blob') {
-    return R(hostConfig.host.artifacts[0].data);
+function createHost (hostWithScope) {
+  if (hostWithScope.host.compute.type === 'blob') {
+    return R(hostWithScope.host.artifacts[0].data);
   }
-  return hoster(hostConfig);
+  return hoster(hostWithScope);
 }

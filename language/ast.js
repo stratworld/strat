@@ -64,10 +64,6 @@ module.exports = {
 // can be found along the given path of types.
 // EX: to get all includes for each file from a program AST:
 //  traverse(program, ['file', 'service|source', 'include']);
-//
-// TODO: this language should be encapsulated within this file*
-// I can't figure out how to do that while allowing custom traversals
-// *this function leaks grammar information to people who shouldn't care
 function traverse (node, path) {
   return (path || [])
     .purge()
