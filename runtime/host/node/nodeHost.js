@@ -55,7 +55,7 @@ NodeHost.prototype.getConfig = function () {
             service: 'onHost',
             config: {
               functionName: functionName,
-              shouldWrapIt: this.host.name !== functionName
+              shouldntWrap: this.host.name === functionName
             }
           }
         } else {
