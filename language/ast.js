@@ -18,7 +18,7 @@ module.exports = {
     return thisNode;
   },
   traverse: traverse,
-  val: (node, key) => tokenDive(node, key, 'value'),
+  val: val,
   line: (node, key) => tokenDive(node, key, 'line'),
   getConfig: (node, key) => traverse(node, ['kvp'])
     .filter(kvp => tokenDive(kvp, 'key', 'value') === key)
@@ -79,4 +79,8 @@ function tokenDive (node, key, prop) {
   return key === undefined || node.tokens[key] === undefined
       ? undefined
       : node.tokens[key][prop];
+}
+
+function val (node, key) {
+  return tokenDive(node, key, 'value');
 }

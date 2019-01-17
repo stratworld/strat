@@ -10,12 +10,16 @@ module.exports = {
   },
   resources: function (host, id) {
     try {
-      fs.mkdirSync(path.resolve(buildLocation, id));
+      fs.mkdirSync(buildLocation);
     } catch (e) {
-      //drop -- the directory is already created
-      // todo: this could also fail if the configuration for
-      // the path buildLocation is invalid
+      // drop--the build directory is already created; this is fine
+      // can also throw because of incorrect buildLocation config
+      // but that will be exposed below
     }
+    // don't try-drop around this--if this id is already built
+    // then we want to throw because lit deploy on the same .sys file
+    // is not idempotent by design
+    fs.mkdirSync(path.resolve(buildLocation, id));
     return host.runtime === undefined
       ? getResourceImplementation(host, id)
       : getFunctionImplementation(host, id)

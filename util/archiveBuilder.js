@@ -23,7 +23,7 @@ const ArchiveBuilder = function (artifactObject) {
 
 ArchiveBuilder.prototype.read = function (filename) {
   return this.zip.getEntries()
-    .filter(entry => entry.name === filename)
+    .filter(entry => entry.entryName === filename)
     .map(foundEntries => foundEntries.getData())
     [0];
 }
