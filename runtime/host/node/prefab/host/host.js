@@ -11,6 +11,7 @@ module.exports = function (event, context, cb) {
   }
 }
 
+//correct
 function invokeDefault (callee, event, cb) {
   callee(event)
     .then(result => cb(null, result))

@@ -18,7 +18,7 @@ module.exports = {
     return thisNode;
   },
   traverse: traverse,
-  val: val,
+  val: (node, key) => tokenDive(node, key, 'value'),
   line: (node, key) => tokenDive(node, key, 'line'),
   getConfig: (node, key) => traverse(node, ['kvp'])
     .filter(kvp => tokenDive(kvp, 'key', 'value') === key)
@@ -64,10 +64,6 @@ module.exports = {
 // can be found along the given path of types.
 // EX: to get all includes for each file from a program AST:
 //  traverse(program, ['file', 'service|source', 'include']);
-//
-// TODO: this language should be encapsulated within this file*
-// I can't figure out how to do that while allowing custom traversals
-// *this function leaks grammar information to people who shouldn't care
 function traverse (node, path) {
   return (path || [])
     .purge()
@@ -83,8 +79,4 @@ function tokenDive (node, key, prop) {
   return key === undefined || node.tokens[key] === undefined
       ? undefined
       : node.tokens[key][prop];
-}
-
-function val (node, key) {
-  return tokenDive(node, key, 'value');
 }

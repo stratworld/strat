@@ -24,7 +24,7 @@ module.exports = function (events, implementation) {
       console.log(`http source listening on http://localhost:${port}`);
     })
   });
-}
+};
 
 function format (err, result, res) {
   if (err) {
@@ -32,23 +32,12 @@ function format (err, result, res) {
     res.write(JSON.stringify(err));
     res.end();
   } else {
-    console.log(result)
-    var data = result.data;
-    if (data.statusCode === undefined) {
-      //wierd shit
-      data = {
-        statusCode: 500,
-        headers: {},
-        body: data
-      }
-    }
-    res.writeHead(data.statusCode, data.headers);
-    if (data.body) {
-      res.write((typeof data.body === 'string'
-        ? data.body
-        : JSON.stringify(data.body)));
+    res.writeHead(result.statusCode, result.headers);
+    if (result.body) {
+      res.write((typeof result.body === 'string'
+        ? result.body
+        : JSON.stringify(result.body)));
     }
     res.end();
   }
-  
 }

@@ -9,14 +9,14 @@ Observations:
 Goal:
   Reduce all of the above by running functions on close-to-hand (the same) invocations.
 
-Assumption:
+Assertion:
   If two functions are inside a scope together, its better to run them on the same host
 
 Assumption:
   There will be things that prevent running two functions on the same lambda.
     - their hosts are different languages
     - their host would be over capacity
-    - they have different permission roles ?
+    - they have different permission roles
     - only one type of event can be received by a host.  The host can't know which
       function to send the event to if there are more than one event types
 
@@ -27,6 +27,8 @@ Assumption:
   Functions will be well behaved:
     - They don't write to the filesystem
     - They don't declare global variables
+  How can we force or mitigate these restrictions?
+  User code probably won't do this but their deps might.
 
 Tactics:
   Given two hosts A and B, combine them if:
