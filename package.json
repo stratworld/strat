@@ -7,7 +7,7 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha test/**/*.js --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -22,5 +22,8 @@
   "dependencies": {
     "adm-zip": "^0.4.13",
     "aws-sdk": "^2.373.0"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
   }
 }
