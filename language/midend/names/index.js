@@ -103,8 +103,8 @@ ${val(shape, 'name')} is undefined.  Only ${allowedShapes
 }
 
 function getFunctions (file) {
-  return traverse(file, ['service', 'function'])
-    .concat(traverse(file, ['service', 'dispatch', 'function']));
+  return traverse(file, ['service', 'function', 'functionName'])
+    .concat(traverse(file, ['service', 'dispatch', 'functionName']));
 }
 
 function eventsMustHaveBeenIncluded (file) {

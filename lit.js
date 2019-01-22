@@ -1,7 +1,8 @@
 #! /usr/bin/node
 
-const serialize = require('./jsExtensions').serialize;
-const compile = require('./language/compiler');
+const compiler = require('./language/compiler');
+const compile = compiler.runCommand;
+const serializeAST = compiler.serializeAST;
 const fs = require('fs');
 const readFile = require('util').promisify(fs.readFile);
 const path = require('path');
@@ -53,7 +54,7 @@ if (typeof stdinData === 'object') {
 
 work
   .then(finalResults => {
-    console.log(serialize(finalResults));
+    console.log(serializeAST(finalResults));
     process.exit(0);
   })
   .catch(e => {

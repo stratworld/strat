@@ -1,88 +1,52 @@
+/*
+file
+  (service|source)
+
+service
+  "service" IDENTIFIER '{' (component|include)* '}'
+
+source  
+  "source" IDENTIFIER block
+
+include
+  "include" (STRING|IDENTIFIER)
+
+component
+  (dispatch|function)
+
+function
+  functionName STRING
+
+dispatch
+  events functionName? STRING
+  events IDENTIFIER "." IDENTIFIER  
+
+events
+  event+ "->"
+
+event
+  IDENTIFIER block
+
+functionName
+  IDENTIFIER signature "->"
+
+signature
+  "(" shape? ")" ":" shape
+
+block
+  "{" kvp* "}"
+
+kvp
+  IDENTIFIER ":" (STRING|NUMBER)
+
+shape
+  IDENTIFIER
+
+-Lexical grammar-
+STRING: "this is a \" string"
+NUMBER: /^[0-9]+(\.[0-9]*)?$/g
+IDENTIFIER: /^[a-zA-Z_]+$/g
+*/
 module.exports = function (Statements) {
-  return {
-    /*
-
-    file ->
-      declaration
-
-    */
-    file: Statements.file,
-    /*
-
-    declaration ->
-      service
-      source
-
-    */
-    declaration: Statements.declaration,
-    /*
-
-    service ->
-      "service" IDENTIFIER '{' (component|kvp|include)* '}'
-
-    */
-    service: Statements.service,
-    /*
-
-    source ->
-      "source" IDENTIFIER block
-
-    */
-    source: Statements.source,
-    /*
-
-    component ->
-      (eventDispatch)? function
-
-    */
-    component: Statements.component,
-    /*
-
-    include ->
-      "include" STRING
-
-    */
-    include: Statements.include,
-    /*
-
-    function ->
-      shape IDENTIFIER '(' (shape)? ')' block
-      IDENTIFIER '.' IDENTIFIER
-
-    */
-    function: Statements.function,
-    /*
-
-    eventDispatch ->
-      IDENTIFIER block "->"
-
-    */
-    eventDispatch: Statements.eventDispatch,
-    /*
-
-    block ->
-      "{" (kvp)* "}"
-
-    */
-    block: Statements.block,
-    /*
-
-    kvp ->
-      IDENTIFIER ':' (STRING|NUMBER)
-
-    */
-    kvp: Statements.kvp,
-    /*
-
-    shape ->
-      IDENTIFIER
-
-    */
-    shape: Statements.shape
-  }
-  /*
-    STRING: "this is a \" string"
-    NUMBER: /^[0-9]+(\.[0-9]*)?$/g
-    IDENTIFIER: /^[a-zA-Z_]+$/g
-  */
-};
+  return Statements;
+}
