@@ -19,7 +19,9 @@ ${negativeCase.source}`)))
               done();
             } else {
               done(new Error(`The following source code didn't throw the correct error code
-  expected ${negativeCase.code} got ${e.errorCode}
+  expected ${negativeCase.code} got ${e.errorCode}.  Error:
+
+${JSON.stringify(e, null, 2)}
 
 ${negativeCase.source}`));
             }
@@ -28,7 +30,25 @@ ${negativeCase.source}`));
     });
   });
 
-  // describe('positive', () => {
+  describe('positive', () => {
+    positiveCases.forEach(positiveCase => {
+      it ('should compile correctly', done => {
+        compile(
+          null,
+          'names',
+          Buffer.from(positiveCase.source),
+          positiveCase.filename)
+          .then(() => done())
+          .catch(e => {
+            done(new Error(`
+The following source code threw an error when it shouldnt.
 
-  // });
+${JSON.stringify(e, null, 2)}
+
+${positiveCase.source}`
+              ));
+          });
+      });
+    });
+  });
 });

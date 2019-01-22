@@ -88,7 +88,7 @@ module.exports = function (T, error, descend) {
       const service = T.consume('IDENTIFIER');
       T.consume('PERIOD');
       const fn = T.consume('IDENTIFIER');
-      return AST('dispatch', {
+      return AST('reference', {
         service: service,
         function: fn
       });

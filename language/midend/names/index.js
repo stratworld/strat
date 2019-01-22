@@ -38,6 +38,7 @@ function fileNameShouldMatchEntity (file) {
   if (entity !== undefined) {
     if (val(entity, 'name') !== fileName) {
       throw {
+        errorCode: 'E_NAMES_MISMATCH',
         error: 'Naming violation',
         msg: `${filePath} line ${line(entity, 'name')}
 ${val(entity, 'name')} should be declared in a file named ${val(entity, 'name')}.lit`
@@ -63,6 +64,7 @@ function checkDupNames (entities, filepath) {
     const entityName = path.basename(entityPathToken.value, '.lit');
     if (existingNameTokens[entityName] !== undefined) {
       throw {
+        errorCode: 'E_NAMES_DUPLICATE',
         error: 'Naming violation',
         msg: `${filepath} line ${entityPathToken.line}
 ${entityName} is already declared on line ${existingNameTokens[entityName].line}`
@@ -75,7 +77,9 @@ ${entityName} is already declared on line ${existingNameTokens[entityName].line}
 
 function namesCanOnlyBeDeclaredOnce (file) {
   const functions = getFunctions(file);
-  checkDupNames(functions, val(file, 'path'));
+  const functionsAndIncludes = functions
+    .concat(traverse(file, ['service|source', 'include']))
+  checkDupNames(functionsAndIncludes, val(file, 'path'));
 }
 
 const allowedShapes = {
@@ -88,10 +92,12 @@ function shapeNamesHaveBeenDeclared (file) {
   // any and void are global shapes
   const functions = getFunctions(file);
   functions.forEach(fn => {
-    const shapes = traverse(fn, ['shape']);
+    const signature = traverse(fn, []);
+    const shapes = traverse(fn, ['signature', 'shape']);
     shapes.forEach(shape => {
       if (!allowedShapes[val(shape, 'name')]) {
         throw {
+          errorCode: 'E_NAMES_UNDECLARED',
           error: 'Undeclared shape',
           msg: `${filePath} line ${line(shape, 'name')}
 ${val(shape, 'name')} is undefined.  Only ${allowedShapes
@@ -120,6 +126,7 @@ function eventsMustHaveBeenIncluded (file) {
     const filePath = val(file, 'path');
     if (!includeNames[val(event, 'name')]) {
       throw {
+        errorCode: 'E_NAMES_UNDECLARED',
         error: 'Undeclared event',
         msg: `${filePath} line ${line(event, 'name')}
 Event ${val(event, 'name')} is not included.`
@@ -138,6 +145,7 @@ function canOnlyReferenceIncludedServices (file) {
     const referenceService = val(reference, 'service');
     if (!includedServices[referenceService]) {
       throw {
+        errorCode: 'E_NAMES_UNDECLARED',
         error: 'Unincluded service reference',
         msg: `${filePath} line ${line(reference, 'service')}
 Service ${referenceService} is not included.`
