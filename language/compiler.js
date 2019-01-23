@@ -1,4 +1,4 @@
-const serializeAST = require('../util/jsExtensions').serialize;
+const serializeAST = require('../util/jsExtensions');
 const frontend = require('./frontend/passes');
 const midend = require('./midend/passes');
 const backend = require('./backend/passes');
