@@ -1,11 +1,16 @@
 #! /usr/bin/node
 
-const compiler = require('./language/compiler');
+const compilerConstructor = require('./language/compiler');
+const defaultFs = require('./util/fileSystem');
+const defaultLoader = require('./util/loader');
+const compiler = compilerConstructor({
+  fs: defaultFs,
+  loader: defaultLoader
+});
 const compile = compiler.runCommand;
 const serializeAST = compiler.serializeAST;
-const fs = require('fs');
-const readFile = require('util').promisify(fs.readFile);
-const path = require('path');
+
+const stdPath = require('path');
 
 var stdinData;
 if (!process.stdin.isTTY) {
@@ -34,7 +39,7 @@ if (!process.stdin.isTTY) {
 
 var filename;
 if (process.argv[3] !== undefined) {
-  filename = path.resolve(process.cwd(), process.argv[3]);
+  filename = stdPath.resolve(process.cwd(), process.argv[3]);
 }
 
 const command = process.argv[2];
@@ -43,7 +48,7 @@ var work;
 if (typeof stdinData === 'object') {
   work = stdinData.then(data => compile(command, data, filename))
 } else if (typeof filename === 'string') {
-  work = readFile(filename)
+  work = defaultFs.cat(filename)
     .then(data => compile(command, data, filename));
 } else {
   console.error('Usages:')

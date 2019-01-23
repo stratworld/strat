@@ -58,9 +58,7 @@ Object.prototype.purge = function () {
   return this;
 }
 
-module.exports = {
-  serialize: truncateBuffersStringify
-}
+module.exports = truncateBuffersStringify;
 
 // 1) Buffers are annoying when serialized
 // 2) 'stringify' is an obnoxious name

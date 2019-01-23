@@ -1,9 +1,19 @@
 const serializeAST = require('../util/jsExtensions');
-const frontend = require('./frontend/passes');
-const midend = require('./midend/passes');
-const backend = require('./backend/passes');
+const stdPath = require('path');
+const frontend = passify(require('./frontend/passes'));
+const midend = passify(require('./midend/passes'));
+const backend = passify(require('./backend/passes'));
 const errorFormat = require('./errors');
 
+function passify (passTuple) {
+  return passTuple
+    .map(tuple => {
+      return {
+        name: tuple[0],
+        entry: stdPath.resolve(__dirname, tuple[1])
+      };
+    });
+}
 
 const everything = []
   .concat(frontend)
@@ -30,35 +40,38 @@ function getSegment (start, stop) {
   return segment;
 }
 
-function runSegment (start, stop, startingInput, filename) {
-  return executePasses(getSegment(start, stop), startingInput, filename);
-}
-
-function runCommand (command, startingInput, filename) {
-  const prebuilt = prebuiltSegments[command];
-  if (prebuilt) {
-    return executePasses(prebuilt, startingInput, filename);
-  } else {
-    const singleCommand = everything
-      .first(potentialCommand => potentialCommand.name === command);
-    if (singleCommand) {
-      return executePasses([singleCommand], startingInput, filename);
-    }
+module.exports = function (dependencies) {
+  function runSegment (start, stop, startingInput, filename) {
+    return executePasses(getSegment(start, stop), startingInput, filename);
   }
-  return J(`Could not find command ${command}`);
-}
 
-function executePasses (passes, startingInput, filename) {
-  return passes
-    .reduce((previousResultPromise, nextPass) => {
-      return previousResultPromise
-        .then(result => require(nextPass.entry)(result, filename))
-    }, R(startingInput))
-    .catch(errorFormat);
-}
+  function runCommand (command, startingInput, filename) {
+    const prebuilt = prebuiltSegments[command];
+    if (prebuilt) {
+      return executePasses(prebuilt, startingInput, filename);
+    } else {
+      const singleCommand = everything
+        .first(potentialCommand => potentialCommand.name === command);
+      if (singleCommand) {
+        return executePasses([singleCommand], startingInput, filename);
+      }
+    }
+    return J(`Could not find command ${command}`);
+  }
 
-module.exports = {
-  runCommand: runCommand,
-  runSegment: runSegment,
-  serializeAST: serializeAST
+  function executePasses (passes, startingInput, filename) {
+    return passes
+      .reduce((previousResultPromise, nextPass) => {
+        return previousResultPromise
+          .then(result => dependencies.loader(nextPass.entry)
+            (dependencies)
+            (result, filename))
+      }, R(startingInput))
+      .catch(errorFormat);
+  }
+  return {
+    runCommand: runCommand,
+    runSegment: runSegment,
+    serializeAST: serializeAST
+  }
 };

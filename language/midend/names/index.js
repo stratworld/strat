@@ -15,7 +15,9 @@ const policies = [
   //referencesPointToRealFunctions
 ];
 
-module.exports = function (ast) {
+module.exports = () => assertNames;
+
+function assertNames (ast) {
   // policies are read only, synchronous, and throw on violation
   policies.forEach(policy => {
     const files = traverse(ast, ['file']);
