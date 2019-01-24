@@ -1,17 +1,21 @@
 module.exports = [
   {
-    filename: 'Backend.lit',
-    source: `
+    entry: 'Backend.lit',
+    name: 'duplicate function definition',
+    files: {
+    'Backend.lit': B(`
 service Backend {
   ddb ():any -> "./ddb.js"
   ddb ():any -> "./ddb.js"
 }
-`,
-    code: 'E_NAMES_DUPLICATE'
+`)},
+    errorCode: 'E_NAMES_DUPLICATE'
   },
   {
-    filename: 'Backend.lit',
-    source: `
+    entry: 'Backend.lit',
+    name: 'duplicate function definition with dispatch',
+    files: {
+    'Backend.lit': B(`
 service Backend {
   include "Http"
 
@@ -19,55 +23,65 @@ service Backend {
     ddb ():any -> "./ddb.js"
   ddb ():any -> "./ddb.js"
 }
-`,
-    code: 'E_NAMES_DUPLICATE'
+`)},
+    errorCode: 'E_NAMES_DUPLICATE'
   },
   {
-    filename: 'Somethingelse.lit',
-    source: `
+    entry: 'Somethingelse.lit',
+    name: 'mismatched file name',
+    files: {
+    'Somethingelse.lit': B(`
 service Backend {
   ddb ():any -> "./ddb.js"
 }
-`,
-    code: 'E_NAMES_MISMATCH'
+`)},
+    errorCode: 'E_NAMES_MISMATCH'
   },
   {
-    filename: 'Backend.lit',
-    source: `
+    entry: 'Backend.lit',
+    name: 'event source not included',
+    files: {
+    'Backend.lit': B(`
 service Backend {
   Http {} -> "./ddb.js"
 }
-`,
-    code: 'E_NAMES_UNDECLARED'
+`)},
+    errorCode: 'E_NAMES_UNDECLARED'
   },
   {
-    filename: 'Backend.lit',
-    source: `
+    entry: 'Backend.lit',
+    name: 'shape not declared',
+    files: {
+    'Backend.lit': B(`
 service Backend {
   foo (foo):any -> "./ddb.js"
 }
-`,
-    code: 'E_NAMES_UNDECLARED'
+`)},
+    errorCode: 'E_NAMES_UNDECLARED'
   },
   {
-    filename: 'Backend.lit',
-    source: `
+    entry: 'Backend.lit',
+    name: 'Other service not included',
+    files: {
+    'Backend.lit': B(`
 service Backend {
   include "Http"
 
   Http {} -> Other.other
 }
-`,
-    code: 'E_NAMES_UNDECLARED'
+`)},
+    errorCode: 'E_NAMES_UNDECLARED'
   },
   {
-    filename: 'Backend.lit',
-    source: `
+    entry: 'Backend.lit',
+    name: 'function name conflicts with source include name',
+    files: {
+    'Backend.lit': B(`
 service Backend {
   include "Http"
   Http ():any -> "./ddb.js"
 }
-`,
-    code: 'E_NAMES_DUPLICATE'
+`)},
+    errorCode: 'E_NAMES_DUPLICATE'
   },
 ];

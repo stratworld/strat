@@ -7,7 +7,7 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/**/*.js --reporter spec"
+    "test": "./node_modules/mocha/bin/mocha test/language/**/*.js --reporter spec"
   },
   "repository": {
     "type": "git",
