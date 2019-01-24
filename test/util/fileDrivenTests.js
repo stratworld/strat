@@ -26,15 +26,22 @@ module.exports = function (cases, stop) {
               done(new Error(`${testCase.name} didn't throw the correct error code
   expected ${testCase.errorCode} got ${e.errorCode}.  Error:
 
-${JSON.stringify(e, null, 2)}`))
+${stringifyError(e)}`))
             }
           } else {
             done(new Error(`
 ${testCase.name} threw an error when it shouldnt. Error:
 
-${JSON.stringify(e, null, 2)}`));
+${stringifyError(e)}`));
           }
         });
     });
   });
 };
+
+function stringifyError (e) {
+  if (e instanceof Error) {
+    return e.stack;
+  }
+  return JSON.stringify(e, null, 2);
+}

@@ -9,7 +9,11 @@ const kvpsToMap = ast.kvpsToMap;
 const getConfig = ast.getConfig;
 const resolveFunction = ast.resolveFunction;
 
-module.exports = function (ast) {
+module.exports = function (dependencies) {
+  return includes;
+}
+
+function includes (ast) {
   const filesWithSource = getFilesWithSource(ast);
   if (filesWithSource.length === 0) return ast;
   const eventIncluders = filesWithSource.reduce((lookup, nextFileWithSource) => {
