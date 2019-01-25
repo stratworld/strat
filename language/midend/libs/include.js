@@ -9,8 +9,10 @@ const kvpsToMap = ast.kvpsToMap;
 const getConfig = ast.getConfig;
 const resolveFunction = ast.resolveFunction;
 
+const functionFinder = require('./functionFinder');
 module.exports = function (dependencies) {
-  return includes;
+  return functionFinder;
+  //return includes;
 }
 
 function includes (ast) {
@@ -144,11 +146,10 @@ A bundle:
   ]
 }
 */
-// Assume one event and one function per dispatch
-// Will probably change this in the future
 function getBundles (service, program) {
   return traverse(service, ['dispatch'])
     .reduce((bundles, dispatch) => {
+      //this takes the first event; there could be more than one
       const event = traverse(dispatch, ['event'])[0];
       const eventName = val(event, 'name');
       if (bundles[eventName] === undefined) {

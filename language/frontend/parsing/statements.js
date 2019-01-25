@@ -109,7 +109,10 @@ module.exports = function (T, error, descend) {
     },
     functionName: () => {
       const name = T.consume('IDENTIFIER');
-      const signature = descend('signature');
+      var signature;
+      if (T.peek().type !== 'ARROW') {
+        signature = descend('signature');
+      }
       T.consume('ARROW');
       return AST('functionName', {
         name: name

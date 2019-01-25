@@ -58,6 +58,14 @@ Object.prototype.purge = function () {
   return this;
 }
 
+const crypto = require('crypto');
+
+Object.prototype.hash = function () {
+  const shasum = crypto.createHash('sha1');
+  shasum.update(JSON.stringify(this));
+  return shasum.digest('hex');
+}
+
 module.exports = truncateBuffersStringify;
 
 // 1) Buffers are annoying when serialized

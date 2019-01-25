@@ -28,7 +28,7 @@ event
   IDENTIFIER block
 
 functionName
-  IDENTIFIER signature "->"
+  IDENTIFIER signature? "->"
 
 signature
   "(" shape? ")" ":" shape
