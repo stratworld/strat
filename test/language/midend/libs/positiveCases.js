@@ -80,4 +80,23 @@ service Backend {
     },
     entry: 'Backend.lit'
   },
+  {
+    name: 'reference to other service function',
+    files: {
+      'Backend.lit': B(`
+service Backend {
+  include "Http"
+  include "./Other"
+
+  Http { method: "get", path: "bleh" } -> Other.other
+}
+`),
+      'Other.lit': B(`
+service Other {
+  other ():any -> "./index.js"
+}`),
+      'index.js': B(`module.exports = () => "hello world"`)
+    },
+    entry: 'Backend.lit'
+  },
 ];

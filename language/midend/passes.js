@@ -1,6 +1,7 @@
 module.exports = [
   [ 'includes', 'midend/includes/index'],
   [ 'names', 'midend/names/index'],
+  [ 'namegen', 'midend/names/nameGen'],
   [ 'libinclude', 'midend/libs/include'],
   [ 'connector', 'midend/libs/connector'],
   [ 'loader', 'midend/artifacts/loader'],

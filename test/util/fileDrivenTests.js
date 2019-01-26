@@ -11,11 +11,15 @@ module.exports = function (cases, stop) {
         stop,
         fs.cat(testCase.entry),
         testCase.entry)
-        .then(() => {
+        .then(resultAst => {
           if (testCase.errorCode !== undefined) {
             done(new Error(`${testCase.name} didn't throw ${testCase.errorCode} when an error was expected.`));
           } else {
-            done();
+            if (typeof testCase.assertion === 'function') {
+              testCase.assertion(resultAst, done);
+            } else {
+              done();
+            }
           }
         })
         .catch(e => {

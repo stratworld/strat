@@ -6,20 +6,20 @@
 const ast = require('../../ast');
 const traverse = ast.traverse;
 const val = ast.val;
+const resolveFunction = ast.resolveFunction;
 const kvpsToMap = ast.kvpsToMap;
 const stdPath = require('path');
 
+var moduleScopeAst;
 module.exports = function (ast) {
-  const x = getServices(ast)
+
+  // woa, this is dangerous and lazy!
+  // yes, but its a SYNCHRONOUS module so its OK!
+  moduleScopeAst = ast;
+
+  return getServices(ast)
      .map(sourceMapping);
-
-    console.log(x)
-     
-  return {};
 };
-
-// function name is prefixed by the service
-// generated function names must be greater scope than this file
 
 function getServices (ast) {
   return traverse(ast, ['file', 'service']);
@@ -32,7 +32,7 @@ function sourceMapping (service) {
   return {
     service: serviceName,
     events: traverse(service, ['dispatch'])
-      .flatmap(getFunctionInfos)
+      .flatmap(dispatch => getFunctionInfos(dispatch, serviceName))
       .reduce((lookup, nextFunction) => {
         if (lookup[nextFunction.eventName] === undefined) {
           lookup[nextFunction.eventName] = [];
@@ -46,15 +46,9 @@ function sourceMapping (service) {
 // returns an array
 // A dispatch can have multiple events but only one function
 // return an info for each event
-function getFunctionInfos (dispatch) {
+function getFunctionInfos (dispatch, serviceName) {
   const events = traverse(dispatch, ['event']);
-  const functionName = traverse(dispatch, ['functionName'])[0];
-  const functionInfo = {
-    // references!!!!
-    artifact: stdPath.basename(val(dispatch, 'artifact')),
-    isResource: getIsResource(functionName),
-    functionName: getName(functionName, events[0])
-  };
+  const functionInfo = getFunctionInfo(dispatch, serviceName);
 
   return events.map(event => Object.assign({
       eventName: getEventName(event),
@@ -62,19 +56,47 @@ function getFunctionInfos (dispatch) {
     }, functionInfo));
 }
 
+function getFunctionInfo (functionAst, serviceName) {
+  const reference = traverse(functionAst, ['reference'])[0];
+  if (reference !== undefined) {
+    return getReferenceInfo(
+      val(reference, 'service'),
+      val(reference, 'function'));
+  }
+  const functionNameAst = traverse(functionAst, ['functionName'])[0];
+  return {
+    artifact: stdPath.basename(val(functionAst, 'artifact')),
+    isResource: getIsResource(functionNameAst),
+    functionName: qualifyFunctionName(
+      serviceName,
+      getName(functionNameAst))
+  };
+}
+
+function getReferenceInfo (serviceName, functionName) {
+  const functionAst = resolveFunction(
+    moduleScopeAst,
+    serviceName,
+    functionName);
+  const functionNameAst = traverse(functionAst, ['functionName'])[0];
+  return {
+    artifact: stdPath.basename(val(functionAst, 'artifact')),
+    isResource: getIsResource(functionNameAst),
+    functionName: qualifyFunctionName(
+      serviceName,
+      functionName)
+  };
+}
+
+function qualifyFunctionName (serviceName, functionName) {
+  return `${serviceName}.${functionName}`;
+}
+
 function getIsResource (functionNameAst) {
   return traverse(functionNameAst, ['signature'])[0] === undefined;
 }
 
-function getName (functionNameAst, eventAst) {
-  if (functionNameAst === undefined) {
-    //create a name from the eventAst
-    //the event config + event name is unique per service
-    return {
-      name: getEventName(eventAst),
-      config: getEventConfig(eventAst)
-    }.hash();
-  }
+function getName (functionNameAst) {
   return val(functionNameAst, 'name');
 }
 
