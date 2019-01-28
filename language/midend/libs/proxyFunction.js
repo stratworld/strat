@@ -1,4 +1,3 @@
-const path = require('path');
 const AST = require('../../ast').build;
 
 const anyAst = {
@@ -12,37 +11,18 @@ const anyAst = {
   }
 }
 
-const nodeRuntime = AST('kvp', {
-  key: {
-    value: 'runtime',
-    line: 0,
-    type: 'IDENTIFIER'
-  },
-  value: {
-    value: 'node',
-    line: 0,
-    type: 'IDENTIFIER'
-  }
-})
-
-// Takes an artifact and returns a function AST
-module.exports = function (artifact) {
-  return AST('function', {
+function getFunctionNameAst (eventName) {
+  return AST('functionName', {
     name: {
-      value: `lit_generated_proxy_${artifact.eventName}`,
+      value: `lit_generated_proxy_${eventName}`,
       line: 0,
       type: 'IDENTIFIER'
     }
-  }, AST('kvp', {
-    key: {
-      value: 'artifact',
-      line: 0,
-      type: 'IDENTIFIER'
-    },
-    value: {
-      value: artifact.data,
-      line: 0,
-      type: 'IDENTIFIER'
-    }
-  }), nodeRuntime, anyAst, anyAst);
+  }, AST('signature', {}, anyAst, anyAst));
+}
+
+module.exports = function (artifact) {
+  const ast = AST('function', {}, getFunctionNameAst(artifact.eventName));
+  ast.artifact = artifact.data;
+  return ast;
 }
