@@ -39,7 +39,7 @@ Tactics:
   Scopes remain unchanged
 */
 
-module.exports = function (ir) {
+module.exports = deps => ir => {
   ir.hosts = collapseHosts(ir.hosts);
   return ir;
 }

@@ -7,7 +7,7 @@ const traverse = ast.traverse;
 const getConfig = ast.getConfig;
 const kvpsToMap = ast.kvpsToMap;
 
-module.exports = function (ast) {
+module.exports = deps => ast => {
   return R({
     id: val(ast, 'id'),
     hosts: getHosts(ast),
@@ -108,12 +108,12 @@ function name (service, fn) {
     : val(service, 'name');
   const fnName = typeof fn === 'string'
     ? fn
-    : val(fn, 'name');
+    : val(traverse(fn, ['functionName'])[0], 'name');
   return `${serviceName}-${fnName}`;
 }
 
 function isFunctionResource (fn) {
-  return traverse(fn, ['shape']).length < 2;
+  return traverse(fn, ['functionName', 'signature']).length === 0;
 }
 
 function getRuntime (fn, path) {
