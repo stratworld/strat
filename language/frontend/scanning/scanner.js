@@ -4,6 +4,8 @@ const ignoreTokens = Tokens.ignoreTokens;
 const numberRegex = /^[0-9]+(\.[0-9]*)?$/g;
 const identifierRegex = /^[a-zA-Z_]+$/g;
 
+module.exports = () => scan;
+
 function scan (input, filename) {
   var tokens = [], index = 0, token, newLines = 0;
   const inputString = input.toString();
@@ -157,5 +159,3 @@ function chunk (start, input) {
   }
   return ret;
 }
-
-module.exports = scan;

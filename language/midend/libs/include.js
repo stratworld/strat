@@ -1,174 +1,105 @@
-const proxyFunctionFactory = require('./proxyFunction');
 const ast = require("../../ast");
-const AST = ast.build;
 const stdPath = require('path');
 const traverse = ast.traverse;
-const line = ast.line;
 const val = ast.val;
-const kvpsToMap = ast.kvpsToMap;
-const getConfig = ast.getConfig;
-const resolveFunction = ast.resolveFunction;
+const includerFinder = require('./includerFinder');
+const functionFinder = require('./functionFinder');
+const proxyFunctionFactory = require('./proxyFunction');
 
-module.exports = function (ast) {
-  const filesWithSource = getFilesWithSource(ast);
-  if (filesWithSource.length === 0) return ast;
-  const eventIncluders = filesWithSource.reduce((lookup, nextFileWithSource) => {
-    const sourceName = val(traverse(nextFileWithSource, ['source'])[0], 'name');
-    lookup[sourceName] = getIncluder(nextFileWithSource);
-    return lookup;
-  }, {});
-  const filesWithServices = getFilesWithService(ast);
+module.exports = function (dependencies) {
+  return includes;
+}
 
-  return Promise.all(filesWithServices.map(file => {
-    const service = traverse(file, ['service'])[0];
-    const bundles = getBundles(service, ast);
-    return Promise.all(bundles.keys()
-      .map(eventName => {
+function includes (ast) {
+  const includers = includerFinder(ast);
+  const serviceEventBundles = functionFinder(ast);
+  const serviceAstLookup = getServiceAstLookup(ast);
 
-        const error = e => J({
-          error: e,
-          msg: `${val(file, 'path')}
-Failed to run ${eventName}.`
-        });
+  return Promise.all(serviceEventBundles
+    .map(serviceEventBundle =>
+      executeIncluders(serviceEventBundle, includers)
+        .then(proxyArtifacts => {
+          addFunctionsIntoService(
+            serviceAstLookup[serviceEventBundle.service],
+            proxyArtifacts);
+          return R();
+        })))
+    .then(() => R(ast));
+}
 
-        // this is where we actually invoke the library
-        // todo: way better error handling
-        try {
-          return eventIncluders[eventName](bundles[eventName], val(service, 'name'))
-            .then(newArtifactBuffer => R({
-              data: newArtifactBuffer,
+/*
+Example serviceEventBundle:
+{
+  "service": "Backend",
+  "events": {
+    "Http": [
+      {
+        "eventName": "Http",
+        "eventConfig": {
+          "method": "get",
+          "path": "bleh"
+        },
+        "artifact": "index.js",
+        "isResource": false,
+        "functionName": "Other.other"
+      }
+    ]
+  }
+}
+*/
+function executeIncluders (serviceEventBundle, includers) {
+  return Promise.all(serviceEventBundle.events
+    .keys()
+    .map(eventName => {
+
+      const error = e => J({
+        error: e,
+        msg: `Failed to run ${eventName}.`
+      });
+
+      try {
+        return includers[eventName](serviceEventBundle.events[eventName], serviceEventBundle.service)
+          .then(proxyArtifactBuffer => {
+            return {
+              data: proxyArtifactBuffer,
               eventName: eventName
-            }))
-            .catch(error)
-        } catch (e) {
-          return error(e);
-        }
-        
-      }))
-      .then(newArtifacts =>
-        addFunctionsIntoService(service, newArtifacts));
-  }))
-  .then(() => R(ast));
-};
+            };
+          })
+          .catch(e => error(e));
+      } catch (e) {
+        return error(e);
+      }
+    }));
+}
 
 // This mutates the service by:
 //  removing all dispatches
 //  adding proxy functions that call the artifacts the libraries built
-function addFunctionsIntoService (service, newArtifacts) {
-  const newFunctions = newArtifacts.map(proxyFunctionFactory)
-    .concat(traverse(service, ['dispatch', 'function']))
-    .concat(traverse(service, ['function']));
-  const events = traverse(service, ['dispatch', 'event']);
+function addFunctionsIntoService (serviceAst, newArtifacts) {
+  const newFunctions = newArtifacts
+    .map(proxyFunctionFactory)
+    .concat(traverse(serviceAst, ['dispatch']))
+    .concat(traverse(serviceAst, ['function']))
+    .filter(fn => fn.reference === undefined);
+  const events = traverse(serviceAst, ['dispatch', 'event']);
 
-  delete service.dispatch;
-  delete service.function;
+  newFunctions.forEach(fn => {
+    fn.type = 'function';
+    delete fn.event;
+  });
 
-  service.function = newFunctions;
-  service.event = events;
-  return R();
+  delete serviceAst.dispatch;
+  delete serviceAst.function;
+
+  serviceAst.function = newFunctions;
+  serviceAst.event = events;
 }
 
-function getFilesWithSource (ast) {
-  return getFilesWithX(ast, 'source');
-}
-
-function getFilesWithService (ast) {
-  return getFilesWithX(ast, 'service');
-}
-
-function getFilesWithX (ast, X) {
-  return traverse(ast, ['file'])
-    .filter(file => traverse(file, [X]).length > 0);
-}
-
-function getIncluder (fileWithSource) {
-  const fileWithSourcePath = val(fileWithSource, 'path');
-  const source = traverse(fileWithSource, ['source'])[0];
-  const artifactBuilder = getConfig(
-    source,
-    'artifactBuilder'
-  );
-  const nameLine = line(source, 'name');
-
-  if (artifactBuilder === undefined) {
-    throw {
-      error: 'Invalid event source',
-      msg: `${fileWithSourcePath} line ${nameLine}
-Event sources must supply a 'artifactBuilder' key in their config.`
-    };
-  }
-  const builder = requirePath(fileWithSource, artifactBuilder);
-  if (typeof builder !== 'function') {
-    throw {
-      error: 'Invalid event source',
-      msg: `${fileWithSourcePath} line ${nameLine}
-Export of ${artifactBuilder.value} is not a function.`
-    }
-  }
-  return builder;
-}
-
-function resolvePath (declaredFile, pathStr) {
-  const parentDirectory = stdPath.dirname(val(declaredFile, 'path'));
-  return !stdPath.isAbsolute(pathStr)
-    ? stdPath.resolve(parentDirectory, pathStr)
-    : pathStr;
-}
-
-function requirePath (declaredFile, pathToken) {
-  const absolutePath = resolvePath(declaredFile, pathToken.value);
-  try {
-    return require(absolutePath);
-  } catch (e) {
-    throw {
-      error: 'File not found',
-      msg: `${val(declaredFile, 'path')} line ${pathToken.line}
-Failed to load ${pathToken.value}
-${e.stack}`
-    }
-  }
-}
-
-/*
-A bundle:
-{
-  [eventName]: [
-    {
-      eventConfig: {...},
-      functionName: STRING
-    }
-  ]
-}
-*/
-// Assume one event and one function per dispatch
-// Will probably change this in the future
-function getBundles (service, program) {
-  return traverse(service, ['dispatch'])
-    .reduce((bundles, dispatch) => {
-      const event = traverse(dispatch, ['event'])[0];
-      const eventName = val(event, 'name');
-      if (bundles[eventName] === undefined) {
-        bundles[eventName] = [];
-      }
-      var functionName;
-      var resolvedFunction;
-      if (traverse(dispatch, ['function']).length === 1) {
-        const fn = traverse(dispatch, ['function'])[0];
-        functionName = `${val(service, 'name')}-${val(fn, 'name')}`;
-        resolvedFunction = fn;
-      } else {
-        const reference = traverse(dispatch, ['reference'])[0];
-        functionName = `${val(reference, 'service')}-${val(reference, 'function')}`;
-        resolvedFunction = resolveFunction(program, functionName);
-      }
-      const artifact = getConfig(resolvedFunction, 'artifact').value;
-      bundles[eventName].push({
-        eventConfig: kvpsToMap(traverse(event, ['kvp'])),
-        functionName: functionName,
-        artifact: artifact,
-        isResource: traverse(resolvedFunction, ['shape']).length < 2
-      });
-
-      return bundles;
+function getServiceAstLookup (ast) {
+  return traverse(ast, ['file', 'service'])
+    .reduce((lookup, nextService) => {
+      const name = val(nextService, 'name');
+      lookup[name] = nextService;
+      return lookup;
     }, {});
 }

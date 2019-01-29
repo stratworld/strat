@@ -6,7 +6,7 @@ const val = ast.val;
 const line = ast.line;
 const AST = ast.build;
 
-module.exports = ast => {
+module.exports = deps => ast => {
   const connectorPaths = getConnectorPaths(ast);
   const events = traverse(ast, ['file', 'service', 'event']);
   events.forEach(event => event.kvp = (event.kvp || [])

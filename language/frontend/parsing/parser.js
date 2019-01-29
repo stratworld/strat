@@ -1,6 +1,8 @@
 const TokenFeed = require("./tokenFeed");
 
-module.exports = function (tokens) {
+module.exports = () => parse;
+
+function parse (tokens) {
 	const tokenFeed = TokenFeed(tokens.tokens);
 	
 	function error (nextToken, errorMsg) {

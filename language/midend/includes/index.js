@@ -1,24 +1,30 @@
 const ast = require('../../ast');
 const AST = ast.build;
 const traverse = ast.traverse;
-const compile = require('../../compiler');
+const compilerConstructor = require('../../compiler');
 const stdPath = require('path');
-const fs = require('fs');
-const promisify = require('util').promisify;
-const stat = function (pathObj) {
-  return require('util').promisify(fs.stat)(pathObj.value);
-}
-const readFile = promisify(fs.readFile);
+const stdSourcesPath = stdPath.resolve(__dirname, '../../../stdSources');
 
-const stdSources = stdPath.resolve(__dirname, '../../../stdSources');
-const litStdPaths = fs.readdirSync(stdSources)
-  .reduce((paths, stdModuleName) => {
-    paths[stdModuleName] = stdPath.join(stdSources, stdModuleName, `${stdModuleName}.lit`);
-    return paths;
-  }, {});
+var fs;
+var loader;
+var litStdPaths;
+module.exports = function (deps) {
+  fs = deps.fs;
+  loader = deps.loader;
+  const stdPathsPromise = fs.ls(stdSourcesPath)
+    .then(stdModules => stdModules
+      .reduce((paths, stdModuleName) => {
+        paths[stdModuleName] = stdPath.join(stdSourcesPath, stdModuleName, `${stdModuleName}.lit`);
+        return paths;
+      }, {}));
 
-module.exports = function (ast) {
-  return traversal(ast);
+  return function (ast, filename) {
+    return stdPathsPromise
+      .then(result => {
+        litStdPaths = result;
+        return traversal(ast, filename);
+      });
+  }
 }
 
 function traversal (ast) {
@@ -28,8 +34,14 @@ function traversal (ast) {
     if (fileName === ast.tokens.path.value) {
       return R(ast);
     }
-    return readFile(fileName)
-      .then(data => compile('frontend', data.toString(), fileName));
+    return fs.cat(fileName)
+      .then(data => {
+        const compile = compilerConstructor({
+          loader: loader,
+          fs: fs
+        }).runCommand;
+        return compile('frontend', data.toString(), fileName);
+      });
   }
 
   function traverseDependencyGraph (path) {
@@ -77,7 +89,7 @@ function resolvePath (path, parentAst) {
 }
 
 function exists (path, parentFileName) {
-  return stat(path)
+  return fs.stat(path.value)
     .then(() => R(path))
     .catch(e => J({
         msg: `File not found

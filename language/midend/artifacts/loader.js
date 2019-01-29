@@ -7,7 +7,7 @@ const val = ast.val;
 const traverse = ast.traverse;
 const getConfig = ast.getConfig;
 
-module.exports = function (ast) {
+module.exports = deps => ast => {
   return Promise.all(traverse(ast, ['file']).map(file => {
     const functions = traverse(file, ['service', 'function']);
     const filePath = val(file, 'path');
@@ -23,16 +23,16 @@ module.exports = function (ast) {
 };
 
 function getArtifact (fn, declaredPath) {
-  const configValue = checkAndGetConfig(fn, 'artifact', declaredPath);
-  if (Buffer.isBuffer(configValue)) {
+  if (Buffer.isBuffer(fn.artifact)) {
     return {
       artifactType: 'buffer',
-      value: configValue
+      value: fn.artifact
     };
   }
-  const filePath = stdPath.isAbsolute(configValue)
-    ? configValue
-    : stdPath.resolve(stdPath.dirname(declaredPath), configValue);
+  const artifactValue = val(fn, 'artifact');
+  const filePath = stdPath.isAbsolute(artifactValue)
+    ? artifactValue
+    : stdPath.resolve(stdPath.dirname(declaredPath), artifactValue);
   return {
     artifactType: 'file',
     value: filePath
@@ -64,17 +64,4 @@ function resolveArtifact (fn, declaredPath) {
 Failed to load file ${filePath}.`
       })
     })
-}
-
-function checkAndGetConfig (fn, key, declaredPath) {
-  const valueToken = getConfig(fn, key);
-  const fnLine = line(fn, 'name');
-  if (valueToken === undefined) {
-    throw {
-      error: 'Invalid function',
-      msg: `${declaredPath} line ${fnLine}
-Function ${val(fn, 'name')} is missing required key '${key}'`
-    };
-  }
-  return valueToken.value;
 }

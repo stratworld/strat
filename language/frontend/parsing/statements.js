@@ -3,14 +3,14 @@ const AST = require("../../ast").build;
 module.exports = function (T, error, descend) {
   return {
     file: () => {
-      return AST('file', {}, descend('declaration'));
-    },
-    declaration: () => {
+      var next;
       if (T.match('SOURCE')) {
-        return descend('source');
+        next = 'source';
+      } else {
+        T.consume('SERVICE');
+        next = 'service';
       }
-      T.consume('SERVICE');
-      return descend('service');
+      return AST('file', {}, descend(next));
     },
     source: () => {
       const name = T.consume('IDENTIFIER');
@@ -29,8 +29,6 @@ module.exports = function (T, error, descend) {
         && T.peek().type !== 'END') {
         if (T.match('INCLUDE')) {
           includes.push(descend('include'));
-        } else if (T.peek().type === 'IDENTIFIER' && T.peek2().type === 'COLON') {
-          kvps.push(descend('kvp'));
         } else {
           components.push(descend('component'))
         }
@@ -48,12 +46,9 @@ module.exports = function (T, error, descend) {
     component: () => {
       var eventAst;
       if (T.peek().type === 'IDENTIFIER' && T.peek2().type === 'LEFT_BRACE') {
-        eventAst = descend('eventDispatch');
+        return descend('dispatch');
       }
-      const componentAst = descend('function');
-      return eventAst === undefined
-        ? componentAst
-        : AST('dispatch', {}, [componentAst], [eventAst]);
+      return descend('function');
     },
     block: () => {
       T.consume('LEFT_BRACE');
@@ -72,39 +67,67 @@ module.exports = function (T, error, descend) {
         value: value
       });
     },
-    eventDispatch: () => {
+    dispatch: () => {
+      const events = [];
+      var functionName;
+      while(!T.match('ARROW')) {
+        events.push(descend('event'));
+      }
+      if (T.peek().type === 'IDENTIFIER'
+          && T.peek2().type === 'PERIOD') {
+        return AST('dispatch', {}, events, descend('reference'));
+      } else if (T.peek().type === 'IDENTIFIER') {
+        functionName = descend('functionName');
+      }
+      const artifact = T.consume('STRING');
+      return AST('dispatch', {
+        artifact: artifact
+      }, events, functionName);
+    },
+    reference: () => {
+      const service = T.consume('IDENTIFIER');
+      T.consume('PERIOD');
+      const fn = T.consume('IDENTIFIER');
+      return AST('reference', {
+        service: service,
+        function: fn
+      });
+    },
+    event: () => {
       const name = T.consume('IDENTIFIER');
       const block = descend('block');
-      T.consume('ARROW');
       return AST('event', {
         name: name
       }, block);
     },
     function: () => {
-      if (T.peek2().type === 'PERIOD') {
-        const otherService = T.consume('IDENTIFIER');
-        T.consume('PERIOD');
-        const otherFunction = T.consume('IDENTIFIER');
-        return AST('reference', {
-          service: otherService,
-          function: otherFunction
-        });
-      }
-      const otuputShape = descend('shape');
+      const functionName = descend('functionName');
+      const artifact = T.consume('STRING');
+      return AST('function', {
+        artifact: artifact
+      }, functionName);
+    },
+    functionName: () => {
       const name = T.consume('IDENTIFIER');
-      var inputShape;
+      var signature;
+      if (T.peek().type !== 'ARROW') {
+        signature = descend('signature');
+      }
+      T.consume('ARROW');
+      return AST('functionName', {
+        name: name
+      }, signature);
+    },
+    signature: () => {
       T.consume('LEFT_PAREN');
-      if (T.peek().type === 'IDENTIFIER') {
-        inputShape = descend('shape');  
+      var inputShape;
+      if (T.peek().type !== 'RIGHT_PAREN') {
+        inputShape = descend('shape');
       }
       T.consume('RIGHT_PAREN');
-      const block = descend('block');
-      return AST('function', {
-        name: name,
-        // todo: we lose which shape was input/output.
-        // Right now, this doesn't matter and the AST doesn't
-        // have a great vehicle to save this.
-      }, block, inputShape, otuputShape);
+      T.consume('COLON');
+      const outputShape = descend('shape');
+      return AST('signature', {}, outputShape, inputShape);
     },
     shape: () => {
       const name = T.consume('IDENTIFIER');
