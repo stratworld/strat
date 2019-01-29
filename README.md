@@ -13,16 +13,13 @@ HelloWorld.lit:
 service HelloWorld {
   include "Http"
 
-  Http { method: "get", path: "*" } ->
-  any helloWorld (void) {
-    artifact: "helloWorld.js"
-  }
+  Http { method: "get", path: "*" } -> "./index.html"
 }
 ```
 
-helloWorld.js:
-```js
-module.exports = () => "Hello World!"
+index.html:
+```html
+<h1>Hello World</h1>
 ```
 
 ## What's a "system language"?
