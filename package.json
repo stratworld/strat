@@ -1,11 +1,9 @@
 {
-  "name": "lit-cloud-language",
-  "version": "0.1.0",
+  "name": "litc",
+  "version": "0.1.1",
   "description": "A language to represent and execute intent for serverless infrastructure",
   "main": "lit.js",
-  "directories": {
-    "example": "examples"
-  },
+  "preferGlobal": true,
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test/language/**/*.js --reporter spec"
   },
@@ -13,10 +11,14 @@
     "type": "git",
     "url": "git+https://github.com/CaptainCharlieGreen/LitSystemLanguage.git"
   },
-  "author": "",
+  "author": "Litsys",
+  "keywords": ["serverless", "devops", "system", "language"],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/CaptainCharlieGreen/LitSystemLanguage/issues"
+  },
+  "bin": {
+    "litc": "./lit.js"
   },
   "homepage": "https://github.com/CaptainCharlieGreen/LitSystemLanguage#readme",
   "dependencies": {
