@@ -16,5 +16,5 @@ module.exports = () => {
   if (fs.existsSync(potentialConfigFile)) {
     return require(potentialConfigFile);
   }
-  throw `Could not find a litconfig.json file.  Looked in ${lookedLocation}`;
+  return require('./defaultConfig.json');
 };

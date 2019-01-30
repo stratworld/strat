@@ -1,0 +1,6 @@
+{
+  "substrate": "local",
+  "local": {
+    "directory": "./lit_build"
+  }
+}

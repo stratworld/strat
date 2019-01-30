@@ -4,9 +4,16 @@ Lit is a language to represent and deploy systems.
 
 Write your software in regular programming languages like Javascript then write .lit files that describe how your components fit together to form a system.  No infrastrucutre configuration or setup needed.  Lit compiles your normal code and .lit files into a .sys file, then it can deploy .sys files to any substrate including AWS, Azure, Docker containers, and single machines.
 
-## Hello World
+## Hello World / Quick Start
 
-This is what it takes to build a system that can serve "Hello World" over http.  This code can be deployed onto AWS or your local machine without modification:
+1) Install [NodeJS + npm](https://nodejs.org/en/)
+
+2) Install lit's compiler litc:
+```bash
+  $ npm install -g litc
+```
+
+This is what it takes to build a system that can serve "Hello World" over http:
 
 HelloWorld.lit:
 ```
@@ -20,6 +27,11 @@ service HelloWorld {
 index.html:
 ```html
 <h1>Hello World</h1>
+```
+
+Create these two files in a directory, and then run:
+```bash
+  $ litc build ./HelloWorld.lit && litc deploy ./HelloWorld.sys
 ```
 
 ## What's a "system language"?
