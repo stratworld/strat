@@ -12,7 +12,7 @@
     "url": "git+https://github.com/CaptainCharlieGreen/LitSystemLanguage.git"
   },
   "author": "Litsys",
-  "keywords": ["serverless", "devops", "system", "language"],
+  "keywords": ["serverless", "devops", "system", "language", "lambda", "apigateway"],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/CaptainCharlieGreen/LitSystemLanguage/issues"
