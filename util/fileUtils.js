@@ -2,6 +2,8 @@ const promisify = require('util').promisify;
 const stdPath = require('path');
 const fs = require('fs');
 const ls = promisify(fs.readdir);
+const rm = promisify(fs.unlink);
+const rmdir = promisify(fs.rmdir);
 const stat = promisify(fs.stat);
 const isDirectory = file => stat(file)
   .then(stats => stats.isDirectory());
@@ -30,10 +32,17 @@ async function recursiveLs (absoluteDirectoryPath) {
   return files;
 }
 
-async function rimraf (absoluteDirectoryPath) {
-  const files = await recursiveLs(absoluteDirectoryPath);
-  // const fileTree = 
-  return;
+async function rimraf (absolutePath) {
+  if (await isDirectory(absolutePath)) {
+    const filesInDirectory = await ls(absolutePath);
+    if (filesInDirectory.length !== 0) {
+      await Promise.all(filesInDirectory
+        .map(file => rimraf(stdPath.resolve(absolutePath, file))));
+    }
+    return rmdir(absolutePath);
+  } else {
+    return rm(absolutePath);
+  }
 }
 
 module.exports = {

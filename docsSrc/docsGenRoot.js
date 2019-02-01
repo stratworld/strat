@@ -11,7 +11,7 @@ const markdown = stdPath.resolve(__dirname, './markdown');
   const markdownFiles
     = await fileUtils.recursiveLs(markdown);
 
-  await fileUtils.rimraf(stdPath.resolve);
+  await fileUtils.rimraf(docs);
 
   const indexFiles = await Promise.all(markdownFiles
     .map(transformMarkdown));
@@ -35,5 +35,5 @@ async function transformMarkdown (markdownFilePath) {
   // add header
 // remove the docs folder
 // build index file
-// copy assets
+// copy assets (including CNAME file)
 // copy out the readme index files in the same structure
