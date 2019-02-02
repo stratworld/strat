@@ -2,6 +2,7 @@ const Zip = require('adm-zip');
 const stdPath = require('path');
 const recursiveLs = require('./fileUtils').recursiveLs;
 const isDirectory = require('./fileUtils').isDirectory;
+const fs = require('fs');
 const cat = fs.readFileSync;
 
 const ArchiveBuilder = function (artifactObject) {
@@ -52,6 +53,10 @@ ArchiveBuilder.prototype.copyDirectory = function (absoluteDirectoryPath, pathFr
 
 ArchiveBuilder.prototype.copy = function (filePathToCopy, pathFromRoot) {
   this.zip.addFile(pathFromRoot, cat(filePathToCopy));
+}
+
+ArchiveBuilder.prototype.files = function (destinationDirectory) {
+  this.zip.extractAllTo(destinationDirectory);
 }
 
 ArchiveBuilder.prototype.data = function () {
