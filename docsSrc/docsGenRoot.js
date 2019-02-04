@@ -27,7 +27,7 @@ const assets = stdPath.resolve(__dirname, './assets');
   indexFiles.forEach(file => {
     archive.addDataAsFile(
       Buffer.from(wrapInTemplate(file.html, contents)),
-      stdPath.relative(markdown, file.filePath));
+      getTargetLocation(file.filePath));
   });
 
   await archive.copyDirectory(assets);
@@ -48,8 +48,11 @@ async function transformMarkdown (markdownFilePath) {
 
 // build out a left side navigation panel
 function buildContents (markdownFiles) {
-  console.log(markdownFiles)
   return '<h1>div</h1>';
+}
+
+function getTargetLocation (filePath) {
+  return stdPath.relative(markdown, filePath.replace('.md', '.html'));
 }
 
 function wrapInTemplate (html, contents) {
