@@ -1,4 +1,25 @@
-<h1>div</h1><h1 id="thelitsystemlanguage">The Lit System Language</h1>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+  <div id="header">
+    <div>
+      <img src="/litplaincrop.png" alt="Lit" height="40">
+      <a href="/">Documentation</a>
+      <a href="/guides/helloWorld">Guides</a>
+      <a href="/guides/install">Install</a>
+      <a href="https://github.com/litlang/lit">Source</a>
+      <a>Products</a>
+    </div>
+  </div>
+  <div id="content">
+    <div></div>
+    <div><h1 id="thelitsystemlanguage">The Lit System Language</h1>
 <p>Lit is a language to represent and deploy systems.</p>
 <p>Write your software in regular programming languages like Javascript then write .lit files that describe how your components fit together to form a system.  No infrastrucutre configuration or setup needed.  Lit compiles your normal code and .lit files into a .sys file, then it can deploy .sys files to any substrate including AWS, Azure, Docker containers, and single machines.</p>
 <h2 id="helloworldquickstart">Hello World / Quick Start</h2>
@@ -20,7 +41,7 @@
 <p>Create these two files in a directory, and then run:</p>
 <pre><code class="bash language-bash">  $ litc build ./HelloWorld.lit &amp;&amp; litc deploy ./HelloWorld.sys
 </code></pre>
-<h2 id="whatsasystemlanguage">What's a "system language"?</h2>
+<h1 id="whatsasystemlanguage">What's a "system language"?</h1>
 <p>Normal programming languages encode instructions for single computers.  A system language specifies how many computational components fit together and communicate to form a larger system which may involve many computers.  Lit is a special type of system language that describes stateless, event driven systems.  Common examples of this class of system are RESTful web services or the systems people are building with FAAS serverless technologies.</p>
 <h2 id="soitslikecloudformationterraformpuppetchefserverlessframeworketc">So its like CloudFormation, Terraform, Puppet, Chef, Serverless Framework, etc.?</h2>
 <p>The major difference, and it is a massive difference, is all of those technologies force you to specify details about what infrastructure you need to run your system.  Lit is a much higher level language and its compiler determines how to run your system without you specifying details.</p>
@@ -47,8 +68,11 @@
 <h2 id="howisthisallpossiblesoundstoogoodtobetrue">How is this all possible?  Sounds too good to be true.</h2>
 <p>Just as high level languages require the programmer to give up the fine grained control assembly affords, Lit forces the system designer to build in a certain way.  Thankfully, that way happens to be the same way people recognize as "best practice" today--stateless event based systems.  There is no way for a Lit function to save something to a file system--there is no concept of a file system in Lit.  But who today writes stuff to files on their servers?  And even if one component is stateful, all the other components can be built as a Lit system that sits alongside the stateful component running on traditional servers.</p>
 <p>Lit would not have been possible 10 years ago before the creation of functions as a service infrastructure.  Services like AWS Lambda provide the crucial bedrock abstraction over servers that Lit is built on top of.  These FAAS services remove two key problems of infrastructure: service availability and scaling.  Lit can do so much because its only concerned with the infrastructure problems that remain, which boil down to "what goes where", static configuration, and lifecycle management.  You can think of Lit as the realization and application of the potential of FAAS technology.</p>
-<h2 id="contributing">Contributing</h2>
+<h1 id="contributing">Contributing</h1>
 <p>This repository contains the source code for:
   1) The language's compiler [language/]
   2) The language's standard library [stdSources/]
-  3) The "runtime" on which systems built with Lit run [runtime/]</p>
+  3) The "runtime" on which systems built with Lit run [runtime/]</p></div>
+  </div>
+  <div id="footer"></div>
+</body>

@@ -34,7 +34,7 @@ Create these two files in a directory, and then run:
   $ litc build ./HelloWorld.lit && litc deploy ./HelloWorld.sys
 ```
 
-## What's a "system language"?
+# What's a "system language"?
 
 Normal programming languages encode instructions for single computers.  A system language specifies how many computational components fit together and communicate to form a larger system which may involve many computers.  Lit is a special type of system language that describes stateless, event driven systems.  Common examples of this class of system are RESTful web services or the systems people are building with FAAS serverless technologies.
 
@@ -75,7 +75,7 @@ Just as high level languages require the programmer to give up the fine grained 
 Lit would not have been possible 10 years ago before the creation of functions as a service infrastructure.  Services like AWS Lambda provide the crucial bedrock abstraction over servers that Lit is built on top of.  These FAAS services remove two key problems of infrastructure: service availability and scaling.  Lit can do so much because its only concerned with the infrastructure problems that remain, which boil down to "what goes where", static configuration, and lifecycle management.  You can think of Lit as the realization and application of the potential of FAAS technology.
 
 
-## Contributing
+# Contributing
 
 This repository contains the source code for:
   1) The language's compiler [language/]

@@ -48,7 +48,7 @@ async function transformMarkdown (markdownFilePath) {
 
 // build out a left side navigation panel
 function buildContents (markdownFiles) {
-  return '<h1>div</h1>';
+  return '';
 }
 
 function getTargetLocation (filePath) {
@@ -56,7 +56,32 @@ function getTargetLocation (filePath) {
 }
 
 function wrapInTemplate (html, contents) {
-  return contents + html;
+  return `
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+  <div id="header">
+    <div>
+      <img src="/litplaincrop.png" alt="Lit" height="40">
+      <a href="/">Documentation</a>
+      <a href="/guides/helloWorld">Guides</a>
+      <a href="/guides/install">Install</a>
+      <a href="https://github.com/litlang/lit">Source</a>
+      <a>Products</a>
+    </div>
+  </div>
+  <div id="content">
+    <div>${contents}</div>
+    <div>${html}</div>
+  </div>
+  <div id="footer"></div>
+</body>
+`;
 }
 
 // construct a contents from those files
