@@ -4,6 +4,7 @@ body {
   color: #333;
   position: relative;
   min-height: 100%;
+  padding-bottom: 300px;
 }
 
 h1 {
@@ -41,6 +42,7 @@ p, ul {
   height: 50px;
   background-color: black;
   overflow: hidden;
+  z-index: 1;
 }
 
 #header > div {
@@ -69,11 +71,14 @@ p, ul {
 }
 
 #header a:first-child {
-  margin-left: 10px;
+  margin-top: 5px;
+  margin-left: 20px;
+  padding: 0;
 }
 
 #header a:last-child {
   color: #eb4a00;
+  border-left: 3px solid #eb4a00;
 }
 
 #content {
@@ -83,16 +88,59 @@ p, ul {
 }
 
 #navigation {
-  width: 270px;
-  height: 100%;
+  width: 250px;
+  height: 90%;
   border-right: 10px solid #00AEEB;
-  background-color: black;
-  color: #eee;
+  color: #333;
   position: fixed;
-  left: 0;
-  top: 0;
+  left: 20;
+  top: 70;
   z-index: 1;
 }
+/*
+with navigation at 800px height
+#navigation::after {
+  content: '';
+  position: absolute;
+  margin-top: 508px;
+  border-left: 30px solid white;
+  border-top: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom: 30px solid transparent;
+}
+
+#navigation::before {
+  content: '';
+  position: absolute;
+  margin-top: -30px;
+  margin-left: 200px;
+  border-left: 30px solid transparent;
+  border-top: 30px solid transparent;
+  border-right: 30px solid white;
+  border-bottom: 30px solid transparent;
+}
+
+h1::before {
+  content: '';
+  position: absolute;
+  margin-top: 30px;
+  margin-left: -10px;
+  border-left: 12px solid white;
+  border-top: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  margin-left: -14px;
+  margin-top: -12px;
+  border-left: 12px solid transparent;
+  border-top: 12px solid transparent;
+  border-right: 12px solid white;
+  border-bottom: 12px solid transparent;
+}*/
 
 #navigation strong {
   padding-left: 10px;
@@ -112,19 +160,21 @@ p, ul {
 
 #navigation > div {
   margin-top: 7px;
-  border-top: 5px solid #00AEEB;
   padding-top: 10px;
 }
 
 .nav-page {
   display: block;
-  color: #eee;
+  color: #333;
   padding-left: 30px;
   text-decoration: none;
   margin-bottom: 7px;
   margin-top: 7px;
   font-size: 17px;
-  font-weight: 600;
+}
+
+.nav-page:hover {
+  color: #00AEEB;
 }
 
 .nav-page:hover::after {
