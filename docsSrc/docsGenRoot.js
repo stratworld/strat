@@ -13,7 +13,9 @@ const assets = stdPath.resolve(__dirname, './assets');
   const markdownFiles
     = await fileUtils.recursiveLs(markdown);
 
-  const contents = buildContents(markdownFiles);
+  const contents = buildContents(markdownFiles
+    .map(filepath => stdPath.relative(markdown, filepath))
+    .filter(file => file !== 'index.md'));
 
   try {
     await fileUtils.rimraf(docs);  
@@ -48,7 +50,37 @@ async function transformMarkdown (markdownFilePath) {
 
 // build out a left side navigation panel
 function buildContents (markdownFiles) {
-  return '';
+  const struct = markdownFiles
+    .sort()
+    .reduce((struct, nextFile) => {
+      const parts = nextFile.split('/');
+      const directory = parts[0];
+      const fileName = stdPath.basename(parts[1], '.md');
+      const link = `/${nextFile.replace('.md', '')}`;
+      if (struct[directory] === undefined){
+        struct[directory] = [];
+      }
+      struct[directory].push({
+        name: fileName,
+        link: link
+      });
+      return struct;
+    }, {});
+
+  return struct
+    .keys()
+    .map(directoryName => `
+    <div>
+    <strong>${directoryName}</strong>
+      <div>${createChildLinks(struct[directoryName])}</div>
+    </div>`)
+    .join('');
+}
+
+function createChildLinks (childrenLinks) {
+  return (childrenLinks || [])
+    .map(child => `<a class="nav-page" href="${child.link}">${child.name}</a>`)
+    .join('');
 }
 
 function getTargetLocation (filePath) {
@@ -67,16 +99,22 @@ function wrapInTemplate (html, contents) {
 <body>
   <div id="header">
     <div>
-      <img src="/litplaincrop.png" alt="Lit" height="40">
       <a href="/">Documentation</a>
-      <a href="/guides/helloWorld">Guides</a>
-      <a href="/guides/install">Install</a>
-      <a href="https://github.com/litlang/lit" target="_blank">Source</a>
+      <a href="/guides/Hello%20World">Guides</a>
+      <a href="/guides/Getting%20Started">Install</a>
+      <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
       <a>Products</a>
     </div>
   </div>
   <div id="content">
-    <div id="navigation">${contents}</div>
+    <div id="navigation">
+      <a href="/">
+        <img src="/litplaincrop.png" alt="Lit" height="65">
+      </a>
+      <div>
+        ${contents}
+      </div>
+      </div>
     <div id="doc">${html}</div>
   </div>
   <div id="footer"></div>

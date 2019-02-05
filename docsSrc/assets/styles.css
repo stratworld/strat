@@ -4,7 +4,6 @@ body {
   color: #333;
   position: relative;
   min-height: 100%;
-  padding-bottom: 320px;
 }
 
 h1 {
@@ -16,6 +15,7 @@ h1 {
   padding-right:10px;
   display: inline;
   letter-spacing: 1px;
+  font-size: 35px;
 }
 
 h2 {
@@ -58,7 +58,7 @@ p, ul {
   padding: 10px;
   cursor: pointer;
   float: left;
-  color: white;
+  color: #eee;
   text-decoration: none;
 }
 
@@ -68,10 +68,8 @@ p, ul {
   position: absolute;
 }
 
-#header img {
-  margin-top: 5px;
-  margin-right: 20px;
-  float: left;
+#header a:first-child {
+  margin-left: 10px;
 }
 
 #header a:last-child {
@@ -84,25 +82,55 @@ p, ul {
   padding-bottom: 10px;
 }
 
-#footer {
-  background-color: black;
-  color: white;
-  height: 300px;
-  width: 100%;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 10;
-}
-
 #navigation {
   width: 270px;
   height: 100%;
-  border-right: 10px solid black;
+  border-right: 10px solid #00AEEB;
+  background-color: black;
+  color: #eee;
   position: fixed;
   left: 0;
-  top: 50;
-  background-color: white;
+  top: 0;
+  z-index: 1;
+}
+
+#navigation strong {
+  padding-left: 10px;
+  height: 30px;
+  font-size: 17px;
+  display: block;
+  text-transform: uppercase;
+  line-height: 30px;
+  font-weight: 800;
+}
+
+#navigation img {
+  margin-top: 5px;
+  margin-right: 20px;
+  margin-left: 126px;
+}
+
+#navigation > div {
+  margin-top: 7px;
+  border-top: 5px solid #00AEEB;
+  padding-top: 10px;
+}
+
+.nav-page {
+  display: block;
+  color: #eee;
+  padding-left: 30px;
+  text-decoration: none;
+  margin-bottom: 7px;
+  margin-top: 7px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.nav-page:hover::after {
+  content: '->';
+  margin-left: 5px;
+  position: absolute;
 }
 
 #doc {
