@@ -71,13 +71,13 @@ function wrapInTemplate (html, contents) {
       <a href="/">Documentation</a>
       <a href="/guides/helloWorld">Guides</a>
       <a href="/guides/install">Install</a>
-      <a href="https://github.com/litlang/lit">Source</a>
+      <a href="https://github.com/litlang/lit" target="_blank">Source</a>
       <a>Products</a>
     </div>
   </div>
   <div id="content">
-    <div>${contents}</div>
-    <div>${html}</div>
+    <div id="navigation">${contents}</div>
+    <div id="doc">${html}</div>
   </div>
   <div id="footer"></div>
 </body>
