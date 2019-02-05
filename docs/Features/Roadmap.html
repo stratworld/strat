@@ -1,0 +1,102 @@
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+  <div id="header">
+    <div>
+      <a href="/">
+        <img src="/litplaincrop.png" alt="Lit" height="40">
+      </a>
+      <a href="/">Documentation</a>
+      <a href="/guides/Getting%20Started">Install</a>
+      <a href="/Features/Roadmap">Roadmap</a>
+      <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
+      <a>Products</a>
+    </div>
+  </div>
+  <div id="content">
+    <div id="navigation">
+      <div>
+        
+    <div>
+    <strong>Features</strong>
+      <div><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
+    </div>
+    <div>
+    <strong>Guides</strong>
+      <div><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
+    </div>
+    <div>
+    <strong>Sources</strong>
+      <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
+    </div>
+    <div>
+    <strong>Specification</strong>
+      <div><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
+    </div>
+      </div>
+      </div>
+    <div id="doc"><h1 id="roadmap">Roadmap</h1>
+<p>The following features are presented in rough priority order.  The work required varies greatly between epic, with some requiring language development expertise and others DevOps skills and experience with proprietary clouds.</p>
+<h1 id="shapestypesopenapiintegration">Shapes (types) &amp; OpenAPI Integration</h1>
+<p>A core responsibility of Lit is to help users describe and communicate events.  The way programming languages have historically addresed this need is with type systems.  Lit will have a type system for events, but typing events will be very different from typing in memory data structures.</p>
+<p>Events</p>
+<ul>
+<li>(1) Don't exist on a single machine--they are serialized by nature<ul>
+<li>(1.1) and they never contain behavior</li></ul></li>
+<li>(2) Are defined and consumed in different software applications<ul>
+<li>(2.1) and by different people (often 3rd parties)</li>
+<li>(2.2) and are versioned, deployed, and specified in different places</li>
+<li>(2.3) and change schemas at a different rate than single machine software</li></ul></li>
+<li>(3) Are often read and manipulated directly by software engineers</li>
+</ul>
+<p>Falling out of these charactaristics, Lit's type system should:</p>
+<ul>
+<li>A) Have a small delta between program text notation and serialized data representation, which can be assumed is JSON (1, 3)</li>
+<li>B) Be flexible in response to change (2)</li>
+<li>C) Be externalizable and have a separate lifespan than component software (2)</li>
+</ul>
+<p>Nobody has been particularly successful at addressing all 3 of these concerns--there's plenty of room for invention.  Thankfully, concern C runs in the same grain as the rest of Lit, which is a critical advantage over previous attempts which had types sit in the same ecosystem as component software.</p>
+<p>Its worth mentioning that traditional type algebra and much of type systems theory is not applicable to Lit because Lit functions don't invoke other Lit functions within Lit program text.  For example, if a program has the following functions:</p>
+<pre><code class="lit language-lit">  foo (int):string
+  bar ():int
+</code></pre>
+<p>There's no place for a Lit type checker to assert foo(bar()) is valid and bar(foo()) is not.  This doesn't mean Lit is beyond type theory--for instance, predicate types and sum types would be great additions:</p>
+<pre><code class="lit language-lit">Http { status &gt; 200 } -&gt; "./errorPage.html"
+
+Http { method: "get"|"post" } -&gt; myFunction
+</code></pre>
+<h2 id="priorart">Prior art</h2>
+<p>Engineers have made good headway with some of the challenges of describing events across organizations with the <a href="https://www.openapis.org/">OpenAPI Specification</a>.  Lit's type system notation shouldn't be YAML, but it can integrate with all of the other artifacts from the OAS ecosystem, and potentially produce an OAS YAML file.</p>
+<p>Clojure's <a href="https://clojure.org/guides/spec">Spec</a> shares many of the design goals of a Lit type system.</p>
+<h1 id="dependenciesincludes">Dependencies &amp; Includes</h1>
+<p>Like shapes, dependencies in Lit will require very different solutions than those in other languages.</p>
+<h1 id="substratesupport">Substrate Support</h1>
+<p>Any infrastructure that can satisfy the <a href="">function abstraction</a> is an eligible substrate.  For a substrate to be "complete", it must satisfy the <a href="">core infrastructure requirements</a> as well as implement each standard source.  At the moment, Azure is the highest priority new substrate and is under active development.</p>
+<h1 id="languagesupport">Language Support</h1>
+<p>Lit won't stay confined to javascript long term.  Below are common languages that Lit could support in the future.  For a language to be supported by Lit, it must have the following features:</p>
+<ul>
+<li>Basic SDK support for all major cloud providers</li>
+<li>Runtime support on serverless for all major cloud providers</li>
+</ul>
+<p>Languages that are aligned with Lit's performance tradeoffs and user experience biases are higher priority.</p>
+<h2 id="highprioritylanguages">High Priority Languages</h2>
+<ul>
+<li>Python</li>
+<li>Go* (requires shapes complete)</li>
+<li>JVM (requires shapes complete for Java &amp; Kotlin)</li>
+</ul>
+<h2 id="lowprioritylanguages">Low Priority Languages</h2>
+<ul>
+<li>.Net (if Azure substrate is completed this bumps up)</li>
+<li>Rust</li>
+</ul>
+<p>* Despite not having generics and being a "systems language" biased for performance, Go is a very popular language in the serverless space and enjoys rich support as well as the fastest cold start times.  While I don't think Go is the right tool for <em>any</em> job, I can't deny its priority for Lit's users.</p></div>
+  </div>
+  <div id="footer"></div>
+</body>

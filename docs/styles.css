@@ -8,7 +8,7 @@ body {
 }
 
 h1 {
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   color: #00AEEB;
   font-weight: 800;
   background-color: black;
@@ -52,7 +52,7 @@ p, ul {
 }
 
 #header a {
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   font-weight: 800;
   font-size: 17px;
   line-height: 30px;
@@ -97,57 +97,13 @@ p, ul {
   top: 70;
   z-index: 1;
 }
-/*
-with navigation at 800px height
-#navigation::after {
-  content: '';
-  position: absolute;
-  margin-top: 508px;
-  border-left: 30px solid white;
-  border-top: 30px solid transparent;
-  border-right: 30px solid transparent;
-  border-bottom: 30px solid transparent;
-}
-
-#navigation::before {
-  content: '';
-  position: absolute;
-  margin-top: -30px;
-  margin-left: 200px;
-  border-left: 30px solid transparent;
-  border-top: 30px solid transparent;
-  border-right: 30px solid white;
-  border-bottom: 30px solid transparent;
-}
-
-h1::before {
-  content: '';
-  position: absolute;
-  margin-top: 30px;
-  margin-left: -10px;
-  border-left: 12px solid white;
-  border-top: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 12px solid transparent;
-}
-
-h1::after {
-  content: '';
-  position: absolute;
-  margin-left: -14px;
-  margin-top: -12px;
-  border-left: 12px solid transparent;
-  border-top: 12px solid transparent;
-  border-right: 12px solid white;
-  border-bottom: 12px solid transparent;
-}*/
 
 #navigation strong {
   padding-left: 10px;
   height: 30px;
   font-size: 17px;
   display: block;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   line-height: 30px;
   font-weight: 800;
 }
