@@ -103,7 +103,7 @@ function wrapInTemplate (html, contents) {
         <img src="/litplaincrop.png" alt="Lit" height="40">
       </a>
       <a href="/">Documentation</a>
-      <a href="/guides/Getting%20Started">Install</a>
+      <a href="/Guides/Getting%20Started">Install</a>
       <a href="/Features/Roadmap">Roadmap</a>
       <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
       <a>Products</a>
@@ -114,7 +114,13 @@ function wrapInTemplate (html, contents) {
       <div>
         ${contents}
       </div>
+      <div id="contact-us">
+        <strong>Help -></strong>
+        <a href="mailto:support@lit.build">support@lit.build</a>
+        <strong>Feature Requests -></strong>
+        <a href="mailto:interest@lit.build">interest@lit.build</a>
       </div>
+    </div>
     <div id="doc">${html}</div>
   </div>
   <div id="footer"></div>

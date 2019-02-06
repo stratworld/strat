@@ -89,7 +89,7 @@ p, ul {
 
 #navigation {
   width: 250px;
-  height: 90%;
+  height: calc(100% - 90px);
   border-right: 10px solid #00AEEB;
   color: #333;
   position: fixed;
@@ -142,6 +142,20 @@ p, ul {
 #doc {
   margin-left: 280px;
   width: 700px;
+}
+
+#contact-us {
+  border-top: 5px solid #00AEEB;
+  width: 250px;
+  position: fixed;
+  left: 20;
+  bottom: 25;
+}
+
+#contact-us a {
+  color: #eb4a00;
+  font-weight: 600;
+  padding-left: 20px;
 }
 
 pre {

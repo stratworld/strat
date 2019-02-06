@@ -13,7 +13,7 @@
         <img src="/litplaincrop.png" alt="Lit" height="40">
       </a>
       <a href="/">Documentation</a>
-      <a href="/guides/Getting%20Started">Install</a>
+      <a href="/Guides/Getting%20Started">Install</a>
       <a href="/Features/Roadmap">Roadmap</a>
       <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
       <a>Products</a>
@@ -40,7 +40,13 @@
       <div><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
     </div>
       </div>
+      <div id="contact-us">
+        <strong>Help -></strong>
+        <a href="mailto:support@lit.build">support@lit.build</a>
+        <strong>Feature Requests -></strong>
+        <a href="mailto:interest@lit.build">interest@lit.build</a>
       </div>
+    </div>
     <div id="doc"><h1 id="roadmap">Roadmap</h1>
 <p>The following features are presented in rough priority order.  The work required varies greatly between epic, with some requiring language development expertise and others DevOps skills and experience with proprietary clouds.</p>
 <h1 id="shapestypesopenapiintegration">Shapes (types) &amp; OpenAPI Integration</h1>
@@ -75,7 +81,13 @@ Http { method: "get"|"post" } -&gt; myFunction
 <p>Engineers have made good headway with some of the challenges of describing events across organizations with the <a href="https://www.openapis.org/">OpenAPI Specification</a>.  Lit's type system notation shouldn't be YAML, but it can integrate with all of the other artifacts from the OAS ecosystem, and potentially produce an OAS YAML file.</p>
 <p>Clojure's <a href="https://clojure.org/guides/spec">Spec</a> shares many of the design goals of a Lit type system.</p>
 <h1 id="dependenciesincludes">Dependencies &amp; Includes</h1>
-<p>Like shapes, dependencies in Lit will require very different solutions than those in other languages.</p>
+<p>Like shapes, dependencies in Lit will require very different solutions than those in other languages.  There are two dependency stories in Lit:</p>
+<ul>
+<li>How to resolve source libraries</li>
+<li>How to resolve service dependencies</li>
+</ul>
+<p>Source libraries should be resolved in line with how other languages resolve libraries: pull down source code and make it available at compile time on the user's machine.</p>
+<p>Service dependencies present an entirely different problem.  Services are static and often have only a single "implementation" per environment.  The work being done on <a href="https://github.com/denoland/deno">Deno</a> for its module system looks promising.</p>
 <h1 id="substratesupport">Substrate Support</h1>
 <p>Any infrastructure that can satisfy the <a href="">function abstraction</a> is an eligible substrate.  For a substrate to be "complete", it must satisfy the <a href="">core infrastructure requirements</a> as well as implement each standard source.  At the moment, Azure is the highest priority new substrate and is under active development.</p>
 <h1 id="languagesupport">Language Support</h1>
