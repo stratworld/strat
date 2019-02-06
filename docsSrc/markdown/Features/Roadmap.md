@@ -48,7 +48,14 @@ Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goal
 
 # Dependencies & Includes
 
-Like shapes, dependencies in Lit will require very different solutions than those in other languages.
+Like shapes, dependencies in Lit will require very different solutions than those in other languages.  There are two dependency stories in Lit:
+  
+  - How to resolve source libraries
+  - How to resolve service dependencies
+
+Source libraries should be resolved in line with how other languages resolve libraries: pull down source code and make it available at compile time on the user's machine.
+
+Service dependencies present an entirely different problem.  Services are static and often have only a single "implementation" per environment.  The work being done on [Deno](https://github.com/denoland/deno) for its module system looks promising.
 
 # Substrate Support
 
