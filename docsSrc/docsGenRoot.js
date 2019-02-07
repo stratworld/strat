@@ -99,9 +99,6 @@ function wrapInTemplate (html, contents) {
 <body>
   <div id="header">
     <div>
-      <a href="/">
-        <img src="/litplaincrop.png" alt="Lit" height="40">
-      </a>
       <a href="/">Documentation</a>
       <a href="/Guides/Getting%20Started">Install</a>
       <a href="/Features/Roadmap">Roadmap</a>
@@ -111,7 +108,10 @@ function wrapInTemplate (html, contents) {
   </div>
   <div id="content">
     <div id="navigation">
-      <div>
+      <a href="/">
+        <img src="/litplaincrop.png" alt="Lit" height="55">
+      </a>
+      <div id="navigation-links">
         ${contents}
       </div>
       <div id="contact-us">

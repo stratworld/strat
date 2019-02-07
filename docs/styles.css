@@ -2,6 +2,7 @@ body {
   font-family: 'Work Sans', sans-serif;
   margin: 0;
   color: #333;
+  background-color: #efefef;
   position: relative;
   min-height: 100%;
   padding-bottom: 300px;
@@ -71,14 +72,13 @@ p, ul {
 }
 
 #header a:first-child {
-  margin-top: 5px;
   margin-left: 20px;
-  padding: 0;
 }
 
 #header a:last-child {
   color: #eb4a00;
-  border-left: 3px solid #eb4a00;
+  border-bottom: 3px solid #eb4a00;
+  padding-bottom: 0px;
 }
 
 #content {
@@ -91,7 +91,8 @@ p, ul {
   width: 250px;
   height: calc(100% - 90px);
   border-right: 10px solid #00AEEB;
-  color: #333;
+  color: #eee;
+  background-color: black;
   position: fixed;
   left: 20;
   top: 70;
@@ -109,19 +110,19 @@ p, ul {
 }
 
 #navigation img {
-  margin-top: 5px;
-  margin-right: 20px;
-  margin-left: 126px;
+  margin-top: 7px;
+  margin-left: 128px;
 }
 
-#navigation > div {
+#navigation-links {
+  border-top: 5px solid #00AEEB;
   margin-top: 7px;
   padding-top: 10px;
 }
 
 .nav-page {
   display: block;
-  color: #333;
+  color: #eee;
   padding-left: 30px;
   text-decoration: none;
   margin-bottom: 7px;
@@ -140,7 +141,7 @@ p, ul {
 }
 
 #doc {
-  margin-left: 280px;
+  margin-left: 290px;
   width: 700px;
 }
 
@@ -148,19 +149,22 @@ p, ul {
   border-top: 5px solid #00AEEB;
   width: 250px;
   position: fixed;
+  color: #eee;
   left: 20;
-  bottom: 25;
+  bottom: 20;
+  padding-bottom: 5px;
+  background-color: black;
 }
 
 #contact-us a {
-  color: #eb4a00;
+  color: #00AEEB;
   font-weight: 600;
   padding-left: 20px;
 }
 
 pre {
   padding: 10px;
-  background-color: #eee;
+  background-color: #ccc;
 }
 
 code {
