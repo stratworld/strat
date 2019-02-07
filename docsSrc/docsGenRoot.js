@@ -114,12 +114,12 @@ function wrapInTemplate (html, contents) {
       <div id="navigation-links">
         ${contents}
       </div>
-      <div id="contact-us">
-        <strong>Help -></strong>
-        <a href="mailto:support@lit.build">support@lit.build</a>
-        <strong>Feature Requests -></strong>
-        <a href="mailto:interest@lit.build">interest@lit.build</a>
-      </div>
+    </div>
+    <div id="contact-us">
+      <strong>Help -></strong>
+      <a href="mailto:support@lit.build">support@lit.build</a>
+      <strong>Feature Requests -></strong>
+      <a href="mailto:interest@lit.build">interest@lit.build</a>
     </div>
     <div id="doc">${html}</div>
   </div>

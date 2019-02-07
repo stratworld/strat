@@ -53,7 +53,7 @@ p, ul {
 }
 
 #header a {
-  /*text-transform: uppercase;*/
+  text-transform: uppercase;
   font-weight: 800;
   font-size: 17px;
   line-height: 30px;
@@ -96,15 +96,14 @@ p, ul {
   position: fixed;
   left: 20;
   top: 70;
-  z-index: 1;
 }
 
-#navigation strong {
+#navigation strong, #contact-us strong {
   padding-left: 10px;
   height: 30px;
   font-size: 17px;
   display: block;
-  /*text-transform: uppercase;*/
+  text-transform: uppercase;
   line-height: 30px;
   font-weight: 800;
 }
