@@ -127,12 +127,3 @@ function wrapInTemplate (html, contents) {
 </body>
 `;
 }
-
-// construct a contents from those files
-// read those files
-  // add contents
-  // add seo
-  // add header
-// remove the docs folder
-// build index file
-// copy out the readme index files in the same structure

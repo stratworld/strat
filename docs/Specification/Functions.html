@@ -1,0 +1,112 @@
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans:800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+</head>
+<body>
+  <div id="header">
+    <div>
+      <a href="/">Documentation</a>
+      <a href="/Guides/Getting%20Started">Install</a>
+      <a href="/Features/Roadmap">Roadmap</a>
+      <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
+      <a>Products</a>
+    </div>
+  </div>
+  <div id="content">
+    <div id="navigation">
+      <a href="/">
+        <img src="/litplaincrop.png" alt="Lit" height="55">
+      </a>
+      <div id="navigation-links">
+        
+    <div>
+    <strong>Features</strong>
+      <div><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
+    </div>
+    <div>
+    <strong>Guides</strong>
+      <div><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
+    </div>
+    <div>
+    <strong>Sources</strong>
+      <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
+    </div>
+    <div>
+    <strong>Specification</strong>
+      <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
+    </div>
+      </div>
+    </div>
+    <div id="contact-us">
+      <strong>Help -></strong>
+      <a href="mailto:support@lit.build">support@lit.build</a>
+      <strong>Feature Requests -></strong>
+      <a href="mailto:interest@lit.build">interest@lit.build</a>
+    </div>
+    <div id="doc"><h1 id="functions">Functions</h1>
+<p>Functions are the computational components of Lit, and they are the vehicle which runs user code in a Lit system.</p>
+<h1 id="functionswithinthelitlanguage">Functions within the Lit Language</h1>
+<p>Functions must be defined within a service block, and they follow the grammar nonterminals dispatch or function:</p>
+<pre><code>function
+  functionName STRING
+
+dispatch
+  events functionName? STRING
+  events IDENTIFIER "." IDENTIFIER  
+
+events
+  event+ "-&gt;"
+
+functionName
+  IDENTIFIER signature? "-&gt;"
+
+signature
+  "(" shape? ")" ":" shape
+</code></pre>
+<p>Examples:</p>
+<pre><code class="lit language-lit">foo ():any -&gt; "./foo.js"
+fooson -&gt; "./fooson.json"
+Http { method:"get" path:"/" } -&gt; "./fooson.json"
+Http { method:"get" path:"/" } -&gt; foo ():any -&gt; "./fooson.json"
+Http { method:"get" path:"/" } -&gt; foosonRequest -&gt; "./fooson.json"
+Http { method:"get" path:"/" } -&gt; OtherService.otherFoo
+</code></pre>
+<p>Functions without a signature are considered resources and have the same behavior as normal functions except they always produce the artifact's data as their result.</p>
+<p>The name of the function (the identifier preceding the signature) must be unique within a service, and the function's fully qualified name is a conjunction of a function name and its service name.  The syntax of a fully qualified name can change based on context, but within in the Lit language, it is represented as SERVICE<em>NAME "." FUNCTION</em>NAME.</p>
+<p>Type signatures are of the form "(" input ")" ":" output.  It should be noted that only a single input and output can be produced.  Functions that don't produce a return value should use the type void.</p>
+<p>Component software is written on a one-to-one basis with Lit functions, and users can expect component code to run isolated from previous invocations, subsequent invocations, and other component's invocations.  In practice this is very difficult, so hosts and substrates should inform the user in what circumstances this promise is unreasonable.</p>
+<h1 id="implementingfunctionsthefunctionabstraction">Implementing Functions: The Function Abstraction</h1>
+<p>A Lit function implementation must satisfy three broad requirements:</p>
+<p>1) The static name requirement: It must have an unchanging, reasonably scoped(*) name which can be used to resolve the function's implementation for the entirety of the function's life.  <em>This name must be knowable before the function exists, and any operation to create the function and assign it this name must succeed within normal operation</em>.  Examples:
+    - An absolute filepath on a single machine
+    - A URL
+    - An AWS Lambda function name
+    - An AWS bucket + item name
+  2) The scalability requirement: While executing n invocations concurrently, it must execute the n+1th invocation with the same latency profile as the first n for reasonable(*) values of n.
+  3) The resilliency requirement: A function cannot change its computation for an invocation based on previous invocations.</p>
+<p>*What is reasonable changes based on substrate context.  Any substrate should specify what the limits of "reasonable" for scope and scalability are.  For instance, the AWS substrate is scoped globally and has a very large (1M+ concurrent invocations) value of n, while the local substrate is scoped to a single machine with low values of n.</p>
+<p>These three requirements allow Lit to create a static networking layer between functions using only information available at compile time.  Then, this networking layer can be baked into the .sys file format and consumed by any substrate at deploy time.  Additionally, since substrates supply software to invoke functions, user code can deal with only the abstract notion of a function and let Lit's networking layer resolve implementation details determined at compile time.</p>
+<h2 id="implementingresources">Implementing Resources</h2>
+<p>From an abstract perspective, resources are just functions that don't need to execute.  From a practical perspective, this means implementing resources is much more trivial, and substrates should use different infrastructure for resources than functions.</p>
+<h1 id="functionsfromthecomponentperspective">Functions from the Component Perspective</h1>
+<p>Component software only deals with abstract functions, and the host satisfies the following two function interfaces.</p>
+<h2 id="thecallingfunctioninterface">The Calling Function Interface</h2>
+<p>For component software to invoke another function, the host must supply the following:</p>
+<p>1) A way to resolve a fully qualified function name (some conjunction of the function name and service name from the Lit text the function was defined in) to executable code in the hosts's programming environment.  For example, in the NodeJS host, a user would resolve ServiceA.foo by calling </p>
+<pre><code class="javascript language-javascript">    const foo = Lit('ServiceA-foo');
+</code></pre>
+<p>2) The executable code from 1 should accept a single event as input and potentially return a single event as output and should be asynchronous.  Continuing the NodeJS example</p>
+<pre><code class="javascript language-javascript">    const result = await foo(input);
+</code></pre>
+<p>Lit is not perscriptive in how a host fulfills these requirements--object oriented hosts may use classes and design patterns that look different than the javascript example above.</p>
+<h2 id="thecalleefunctioninterface">The Callee Function Interface</h2>
+<p>For component software to recieve events, it must satisfy the callee interface:</p>
+<p>1) Export a single function as an artifact
+  2) That function should accept a single argument event and may return a single event asynchronously (todo - what other stuff can we commit to supplying to ALL components ex: function implementation details, raw events, etc.).</p></div>
+  </div>
+  <div id="footer"></div>
+</body>

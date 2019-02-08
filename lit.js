@@ -44,25 +44,39 @@ if (process.argv[3] !== undefined) {
 
 const command = process.argv[2];
 
-var work;
-if (typeof stdinData === 'object') {
-  work = stdinData.then(data => compile(command, data, filename))
-} else if (typeof filename === 'string') {
-  work = defaultFs.cat(filename)
-    .then(data => compile(command, data, filename));
-} else {
-  console.error('Usages:')
-  console.error('    lit command filename');
-  console.error('    <output from a previous lit command> | lit command');
-  process.exit(127);
+if (command === '-v' || command === '--version') {
+  const packageJson = require('./package.json');
+  console.log(packageJson.version);
+  process.exit(0);
 }
 
-work
-  .then(finalResults => {
-    console.log(serializeAST(finalResults));
-    process.exit(0);
-  })
-  .catch(e => {
-    console.error(e);
-    process.exit(1);
-  });
+if (command === 'help' || command === '-h' || command === '--help') {
+  const help = defaultFs.cat(stdPath.resolve('./', 'docsSrc/markdown/Guides/Getting Started.md'))
+    .then(help => {
+      console.log(help.toString());
+      process.exit(0);
+    });
+} else {
+  var work;
+  if (typeof stdinData === 'object') {
+    work = stdinData.then(data => compile(command, data, filename))
+  } else if (typeof filename === 'string') {
+    work = defaultFs.cat(filename)
+      .then(data => compile(command, data, filename));
+  } else {
+    console.error('Usages:')
+    console.error('    lit command filename');
+    console.error('    <output from a previous lit command> | lit command');
+    process.exit(127);
+  }
+
+  work
+    .then(finalResults => {
+      console.log(serializeAST(finalResults));
+      process.exit(0);
+    })
+    .catch(e => {
+      console.error(e);
+      process.exit(1);
+    });
+}
