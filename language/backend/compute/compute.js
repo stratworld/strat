@@ -1,5 +1,5 @@
 const resources = require('../../../runtime/substrate/substrateFactory')().resources;
-module.exports = function (ir) {
+module.exports = deps => function (ir) {
   ir.hosts = ir.hosts.map(host => createCompute(host, ir.id))
   ir.scopes = getScopeWithCompute(ir);
 

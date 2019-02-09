@@ -1,7 +1,9 @@
 const ArchiveBuilder = require('../../../util/archiveBuilder');
 const stdPath = require('path');
 
-module.exports = function (sysFileBuffer) {
+module.exports = deps => ingest;
+
+function ingest (sysFileBuffer) {
   const sysFile = new ArchiveBuilder(sysFileBuffer);
   var ir;
   try {

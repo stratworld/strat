@@ -4,7 +4,7 @@ This guide will walk you through your first Lit system.  You'll create a Lit sys
 
 # Local Hello World
 
-1. 1) Create a file "HelloWorld.lit" and paste the following into it:
+Create a file "HelloWorld.lit" and paste the following into it:
 
 ```lit
 service HelloWorld {
@@ -16,19 +16,19 @@ service HelloWorld {
 }
 ```
 
-2. 2) Create a file "helloWorld.js" in the same directory and paste the following into it:
+Create a file "helloWorld.js" in the same directory and paste the following into it:
 
 ```javascript
 module.exports = () => `Hello World at ${Date.now()}!`
 ```
 
-3. 3) Build and deploy HelloWorld.lit:
+Build and deploy HelloWorld.lit:
 
 ```bash
 $ litc build ./HelloWorld.lit && litc deploy ./HelloWorld.sys
 ```
 
-4. 4) Navigate to [localhost:3000](http://localhost:3000) in your browser
+Navigate to [localhost:3000](http://localhost:3000) in your browser
 
 
 # The Basics
@@ -51,11 +51,11 @@ Here we declare a service HelloWorld.  All functions must reside within a servic
 ```
 include "Http"
 ```
-Including Http lets us recieve Http events and tells lit this is a web server.  You may notice that the include is within the service definition while most other languages put includes and exports at the top of a file.  In Lit you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](https://lit.build/Sources/Http) is a standard event source and part of the lit standard library.
+Including Http lets us recieve Http events and tells lit this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Lit you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](https://lit.build/Sources/Http) is a standard event source and part of the lit standard library.
 
 ### 
 ```
-Http { method: "get", path: "\*" } ->
+Http { method: "get", path: "*" } ->
 ```
 This is an "event description", and its semantics are determined by the Http event source.  The gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "All Http get requests should be sent to the following function".
 
@@ -85,11 +85,11 @@ The Http event source also created a web server using NodeJS's Http library, whi
 
 # AWS Hello World
 
-Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.
+Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files we'll be provisioning Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.
 
 1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.
 
-2) Change litconfig.json to be:
+2) Creaet a file called litconfig.json and paste the following in:
 
 ```json
 {
@@ -112,14 +112,12 @@ NOTE: everything within the "config" hash is passed into the [AWS.Config](https:
     - "secretAccessKey": "{your secret access key}"
 
   + B) Have lit use your shared ~/.aws/credentials file
-    - follow the instructions to create a shared credentials file [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).  Note: you may already have one--try
-    - ```bash
-    $ stat ~/.aws/credentials
-    ```
+    - follow the instructions to create a shared credentials file [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).  Note: you may already have one--try $ stat ~/.aws/credentials
+    - If you do use an aws credentials file, make sure its for your test account!
 
     NOTE: credentials provided through A override B.
 
-4) In the future, lit will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for lit to use when creating resources.  Create an IAM role with the following policies:
+4) In the future, lit will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for lit to use when creating resources.  Create an [IAM role](https://aws.amazon.com/iam/) with the following policies:
 
   + AWSLambdaFullAccess
   + AmazonS3FullAccess
@@ -158,7 +156,7 @@ Now, add this role's arn to litconfig.json at the path aws/preCreatedRole.  Your
 }
 ```
 
-5) Run lit deploy (we don't need to build again--we can use the same .sys file!)
+5) Run lit deploy (we don't need to build again--we can use the same .sys file)
 
 ```bash
   $ litc deploy ./HelloWorld.sys

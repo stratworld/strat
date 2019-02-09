@@ -1,8 +1,8 @@
 # Installing litc
 
-1. 1) Install NodeJS and NPM.
+1. Install [NodeJS and NPM](https://nodejs.org/) (node version > 9)
 
-2. 2) Install litc using NPM:
+2. Install litc using NPM:
 
   ```bash
   npm install -g litc

@@ -1,6 +1,6 @@
 const hoster = require('../../../runtime/host/hostFactory')();
 
-module.exports = function (ir) {
+module.exports = deps => function (ir) {
   return Promise.all(ir.hosts.map(host => {
     return createHost({
       host: host,

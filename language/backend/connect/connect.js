@@ -1,6 +1,6 @@
 const sdkInfo = require('../../../runtime/substrate/substrateFactory')().info;
 
-module.exports = ir => {
+module.exports = deps => ir => {
   const hostsWithEvents = ir.filter(host => host.events);
   return Promise.all(ir
     .filter(host => host.events)

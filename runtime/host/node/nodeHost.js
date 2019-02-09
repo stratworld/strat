@@ -4,10 +4,10 @@ const hostPrefab = stdPath.resolve(__dirname, 'prefab');
 const invocationsDir = 'node_modules/lit/invocations';
 const configDest = 'node_modules/lit/config.json';
 
-module.exports = function (hostWithScope) {
+module.exports = async function (hostWithScope) {
   const host = new NodeHost(hostWithScope);
-  host.build()
-  return R(host.data());
+  await host.build()
+  return host.data();
 };
 
 const NodeHost = function (config) {
@@ -16,8 +16,8 @@ const NodeHost = function (config) {
   this.scope = config.scope;
 };
 
-NodeHost.prototype.build = function () {
-  this.archiveBuilder.copyDirectory(hostPrefab);
+NodeHost.prototype.build = async function () {
+  await this.archiveBuilder.copyDirectory(hostPrefab);
 
   this.host.artifacts.forEach(artifact => {
     this.archiveBuilder.addDataAsFile(artifact.data, `${artifact.name}/index.js`);

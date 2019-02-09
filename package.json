@@ -5,7 +5,7 @@
   "main": "lit.js",
   "preferGlobal": true,
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/language/**/*.js --reporter spec"
+    "test": "./node_modules/mocha/bin/mocha test/language/**/*.js test/stdSources/**/*.js --reporter spec"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,8 @@
   "homepage": "https://github.com/CaptainCharlieGreen/LitSystemLanguage#readme",
   "dependencies": {
     "adm-zip": "^0.4.13",
-    "aws-sdk": "^2.373.0"
+    "aws-sdk": "^2.373.0",
+    "path-to-regexp": "^3.0.0"
   },
   "devDependencies": {
     "mocha": "^5.2.0",

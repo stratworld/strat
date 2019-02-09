@@ -39,6 +39,10 @@
     <strong>Specification</strong>
       <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
     </div>
+    <div>
+    <strong>User Guide</strong>
+      <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/litconfig">litconfig</a></div>
+    </div>
       </div>
     </div>
     <div id="contact-us">
@@ -48,35 +52,39 @@
       <a href="mailto:interest@lit.build">interest@lit.build</a>
     </div>
     <div id="doc"><h1 id="helloworld">Hello world</h1>
-<p>The source code for this guide can be found <a href="https://github.com/litlang/demo_hello_world">here</a>.</p>
-<p>1) Install <a href="">litc</a></p>
-<p>2) Clone this repository</p>
-<pre><code class="bash language-bash">  $ git clone git@github.com:CaptainCharlieGreen/lit_hello_world.git
+<p>This guide will walk you through your first Lit system.  You'll create a Lit system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install <a href="">litc</a>, lit's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.</p>
+<h1 id="localhelloworld">Local Hello World</h1>
+<p>Create a file "HelloWorld.lit" and paste the following into it:</p>
+<pre><code class="lit language-lit">service HelloWorld {
+  include "Http"
+
+  Http { method: "get", path: "*" } -&gt;
+    helloWorld ():any -&gt;
+      "./helloWorld.js"
+}
 </code></pre>
-<p>2) Run litc build in the cloned directory:</p>
-<pre><code class="bash language-bash">  $ litc build ./HelloWorld.lit
+<p>Create a file "helloWorld.js" in the same directory and paste the following into it:</p>
+<pre><code class="javascript language-javascript">module.exports = () =&gt; `Hello World at ${Date.now()}!`
 </code></pre>
-<p>4) Run litc deploy on the built .sys file:</p>
-<pre><code class="bash language-bash">  $ litc deploy ./HelloWorld.sys
+<p>Build and deploy HelloWorld.lit:</p>
+<pre><code class="bash language-bash">$ litc build ./HelloWorld.lit &amp;&amp; litc deploy ./HelloWorld.sys
 </code></pre>
-<p>5) Navigate to localhost:3000 in your browser, or use curl:</p>
-<pre><code class="bash language-bash">  $ curl localhost:3000
-</code></pre>
+<p>Navigate to <a href="http://localhost:3000">localhost:3000</a> in your browser</p>
 <h1 id="thebasics">The Basics</h1>
 <p>Lit is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.</p>
 <p>An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by lit's standard library.  Including Http tells lit that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.</p>
 <p>A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.</p>
-<p>The first step is to run lit build, which creates a .sys file, which is a deployable bundle of the entire system.  Sys files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that sys file to the "local" substrate defined in ligconfig.json.  We could also deploy that same sys file to the AWS substrate, but we'll keep things simple for now.</p>
+<p>The first step is to run lit build, which creates a .sys file, which is a deployable bundle of the entire system.  Sys files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sys file to your local computer.  We could also deploy that same .sys file to the AWS substrate, but we'll keep things simple for now.</p>
 <h2 id="linebylinebreakdown">Line by line breakdown</h2>
 <pre><code>service HelloWorld {
 </code></pre>
-<p>Here we declare a service HelloWorld.  All functions must reside within a service.</p>
+<p>Here we declare a service HelloWorld.  All functions must reside within a service.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Lit systems behaves like scope in a language like Java.</p>
 <h3 id=""> </h3>
 <pre><code>include "Http"
 </code></pre>
-<p>Including Http lets us recieve Http events and tells lit this is a web server</p>
+<p>Including Http lets us recieve Http events and tells lit this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Lit you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  <a href="https://lit.build/Sources/Http">Http</a> is a standard event source and part of the lit standard library.</p>
 <h3 id="-1"> </h3>
-<pre><code>Http { method: "get", path: "\*" } -&gt;
+<pre><code>Http { method: "get", path: "*" } -&gt;
 </code></pre>
 <p>This is an "event description", and its semantics are determined by the Http event source.  The gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "All Http get requests should be sent to the following function".</p>
 <h3 id="-2"> </h3>
@@ -86,20 +94,20 @@
 <h3 id="-3"> </h3>
 <pre><code>"./helloWorld.js"
 </code></pre>
-<p>This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution <a href="">here</a>.</p>
+<p>This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution can be found in the <a href="">functions section of the specification</a>.</p>
 <h2 id="whatdidthisdo">What did this do?</h2>
 <p>You may notice that new build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build_id}/HelloWorld-helloWorld/helloWorld.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the lit "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.</p>
 <p>The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  The other top level directory (HelloWorld-lit<em>generated</em>proxy_Http) was also built by the Http source to work with the web server to determine what code should be executed in response to what requests.</p>
-<p>All together:</p>
+<h3 id="alltogether">All together:</h3>
 <ul>
 <li>Http created a web server running on port 3000</li>
 <li>Http created a proxy function that receives all requests from that web server and routes requests to lit functions within the HelloWorld service</li>
 <li>The NodeJS host receives all get requests, invokes user code (helloWorld.js), and sends the responses back to the http proxy</li>
 </ul>
-<h1 id="aws">AWS</h1>
-<p>Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.</p>
+<h1 id="awshelloworld">AWS Hello World</h1>
+<p>Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files we'll be provisioning Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.</p>
 <p>1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.</p>
-<p>2) Change litconfig.json to be:</p>
+<p>2) Creaet a file called litconfig.json and paste the following in:</p>
 <pre><code class="json language-json">{
   "substrate": "aws",
   "aws": {
@@ -119,13 +127,11 @@
 <li>"secretAccessKey": "{your secret access key}"</li></ul></li>
 <li><p>B) Have lit use your shared ~/.aws/credentials file</p>
 <ul>
-<li>follow the instructions to create a shared credentials file <a href="https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html">here</a>.  Note: you may already have one--try</li>
-<li><code>bash
-$ stat ~/.aws/credentials
-</code></li></ul>
+<li>follow the instructions to create a shared credentials file <a href="https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html">here</a>.  Note: you may already have one--try $ stat ~/.aws/credentials</li>
+<li>If you do use an aws credentials file, make sure its for your test account!</li></ul>
 <p>NOTE: credentials provided through A override B.</p></li>
 </ul>
-<p>4) In the future, lit will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for lit to use when creating resources.  Create an IAM role with the following policies:</p>
+<p>4) In the future, lit will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for lit to use when creating resources.  Create an <a href="https://aws.amazon.com/iam/">IAM role</a> with the following policies:</p>
 <ul>
 <li>AWSLambdaFullAccess</li>
 <li>AmazonS3FullAccess</li>
@@ -159,7 +165,7 @@ $ stat ~/.aws/credentials
   }
 }
 </code></pre>
-<p>5) Run lit deploy (we don't need to build again--we can use the same .sys file!)</p>
+<p>5) Run lit deploy (we don't need to build again--we can use the same .sys file)</p>
 <pre><code class="bash language-bash">  $ litc deploy ./HelloWorld.sys
 </code></pre>
 <h2 id="checkitout">Check it out</h2>

@@ -1,4 +1,4 @@
-module.exports = function (resources) {
+module.exports = deps => function (resources) {
   return preDeploy(resources)
     .then(() => Promise.all(resources.map(resource => {
       return deploy(resource)

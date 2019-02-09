@@ -48,7 +48,7 @@ Component software is written on a one-to-one basis with Lit functions, and user
 
 A Lit function implementation must satisfy three broad requirements:
 
-  1. The static name requirement: It must have an unchanging, reasonably scoped(\*) name which can be used to resolve the function's implementation for the entirety of the function's life.  **This name must be knowable before the function exists, and any operation to create the function and assign it this name must succeed within normal operation**.  Examples:
+  1. The static name requirement: It must have an unchanging, unique name across a reasonable scope(\*) which can be used to resolve the function's implementation for the entirety of the function's life.  **This name must be knowable before the function exists, and any operation to create the function and assign it this name must succeed within normal operation**.  Examples:
 
     - An absolute filepath on a single machine
     - A URL
@@ -61,11 +61,11 @@ A Lit function implementation must satisfy three broad requirements:
 
 \*What is reasonable changes based on substrate context.  Any substrate should specify what the limits of "reasonable" for scope and scalability are.  For instance, the AWS substrate is scoped globally and has a very large (1M+ concurrent invocations) value of n, while the local substrate is scoped to a single machine with low values of n.
 
-These three requirements allow Lit to create a static networking layer between functions using only information available at compile time.  Then, this networking layer can be baked into the .sys file format and consumed by any substrate at deploy time.  Additionally, since substrates supply software to invoke functions, user code can deal with only the abstract notion of a function and let Lit's networking layer resolve implementation details determined at compile time.
+These three requirements allow Lit to create a static networking layer between functions using only information available at compile time.  Then, this networking layer can be baked into the .sys file format and consumed by any substrate at deploy time.  Additionally, since substrates supply software to invoke functions, user code can deal with only the abstract notion of a function and let Lit's networking layer resolve implementation details determined at compile and deploy time.
 
 ## Implementing Resources
 
-From an abstract perspective, resources are just functions that don't need to execute.  From a practical perspective, this means implementing resources is much more trivial, and substrates should use different infrastructure for resources than functions.
+From an abstract perspective, resources are just functions that don't need to execute.  From a practical perspective, this means implementing resources is much more trivial, and substrates should use different infrastructure for resources than functions.  The AWS substrate implements functions as Lambdas and resources as S3 items.
 
 # Functions from the Component Perspective
 
@@ -80,7 +80,7 @@ For component software to invoke another function, the host must supply the foll
     const foo = Lit('ServiceA-foo');
   ```
 
-  2) The executable code from 1 should accept a single event as input and potentially return a single event as output and should be asynchronous.  Continuing the NodeJS example
+  2) The executable code from 1 should accept up to a single event as input and return up to a single event as output and should be asynchronous.  Continuing the NodeJS example
   ```javascript
     const result = await foo(input);
   ``` 
