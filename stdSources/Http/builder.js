@@ -1,14 +1,23 @@
 const buildProxyArtifact = require('./buildProxyArtifact');
-const path = require('path');
+const stdPath = require('path');
 module.exports = function (httpEvents) {
   try {
     checkEvents((httpEvents || []));
   } catch(e) {
     return J(e);
   }
-  const tree = getTree((httpEvents || [])
-    .map(split)
-    .sort(pathLength));
+  const tree = (httpEvents || [])
+    .map(event => {
+      return {
+        function: event.functionName,
+        method: event.eventConfig.method,
+        path: event.eventConfig.path,
+        headers: getHeaders(event.artifact, event.isResource)
+      }
+    })
+  // getTree((httpEvents || [])
+  //   .map(split)
+  //   .sort(pathLength));
   return buildProxyArtifact(tree);
 }
 
@@ -58,37 +67,37 @@ function checkEvents (events) {
   }
 }
 
-function getTree (paths) {
-  var i = 0, c = 0;
-  const root = {};
-  var focus;
-  var path, chunk;
-  for(; i < paths.length; i++) {
-    path = paths[i];
-    focus = root;
-    c = 0;
-    for(; c < path.chunks.length; c++ /*heh*/) {
-      chunk = path.chunks[c];
-      if (focus.children === undefined) {
-        focus.children = {};
-      }
-      if (focus.children[chunk] === undefined) {
-        focus.children[chunk] = {};
-      }
-      focus = focus.children[chunk];
-    }
-    focus.methods = Object.assign(
-      (focus.methods || {}),
-      {
-        [path.method]: {
-          name: path.functionName,
-          headers: getHeaders(path.artifact, path.isResource)
-        }
-      });
-  }
+// function getTree (paths) {
+//   var i = 0, c = 0;
+//   const root = {};
+//   var focus;
+//   var path, chunk;
+//   for(; i < paths.length; i++) {
+//     path = paths[i];
+//     focus = root;
+//     c = 0;
+//     for(; c < path.chunks.length; c++ /*heh*/) {
+//       chunk = path.chunks[c];
+//       if (focus.children === undefined) {
+//         focus.children = {};
+//       }
+//       if (focus.children[chunk] === undefined) {
+//         focus.children[chunk] = {};
+//       }
+//       focus = focus.children[chunk];
+//     }
+//     focus.methods = Object.assign(
+//       (focus.methods || {}),
+//       {
+//         [path.method]: {
+//           name: path.functionName,
+//           headers: getHeaders(path.artifact, path.isResource)
+//         }
+//       });
+//   }
 
-  return root;
-}
+//   return root;
+// }
 
 function getHeaders (fileName, isResource) {
   if (!isResource) {
@@ -96,28 +105,28 @@ function getHeaders (fileName, isResource) {
       "Content-Type": "application/json"
     };
   }
-  const extension = path.extname(fileName);
+  const extension = stdPath.extname(fileName);
   return {
     'Content-Type': (contentTypes[extension] || contentTypes['.js'])
   };
 }
 
-function split (event) {
-  return {
-    functionName: event.functionName,
-    artifact: event.artifact,
-    isResource: event.isResource,
-    method: (event.eventConfig.method || '').toLowerCase(),
-    chunks: chunk(event.eventConfig.path)
-  };
-}
+// function split (event) {
+//   return {
+//     functionName: event.functionName,
+//     artifact: event.artifact,
+//     isResource: event.isResource,
+//     method: (event.eventConfig.method || '').toLowerCase(),
+//     chunks: chunk(event.eventConfig.path)
+//   };
+// }
 
-function chunk (pathString) {
-  return pathString
-      .split("/")
-      .filter(chunk => chunk !== '');
-}
+// function chunk (pathString) {
+//   return pathString
+//       .split("/")
+//       .filter(chunk => chunk !== '');
+// }
 
-function pathLength (A, B) {
-  return A.chunks.length - B.chunks.length;
-}
+// function pathLength (A, B) {
+//   return A.chunks.length - B.chunks.length;
+// }
