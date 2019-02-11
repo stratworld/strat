@@ -2,6 +2,43 @@
 
 The following features are presented in rough priority order.  The work required varies greatly between epic, with some requiring language development expertise and others DevOps skills and experience with proprietary clouds.
 
+# Dependencies & Includes
+
+Like shapes, dependencies in Lit will require very different solutions than those in other languages.  There are two dependency stories in Lit:
+  
+  - How to resolve source libraries
+  - How to resolve service dependencies
+
+Source libraries should be resolved in line with how other languages resolve libraries: pull down source code and make it available at compile time on the user's machine.
+
+Service dependencies present an entirely different problem.  Services are static and often have only a single "implementation" per environment.  The work being done on [Deno](https://github.com/denoland/deno) for its module system is exciting.  While they're trying to solve a more traditional module resolution problem, the idea of baking everything into a URL could work for Lit services.
+
+An important factor for dependencies is most of the time users will want to switch service dependency implementation based on environment ex: use a different database in integ and prod.  Right now I have two ideas for handling this: provide some switch mechanism in Lit text and resolve dependencies dynamically at compile time.
+  
+Here's a mock of a "switch" implementation based on "environment":
+
+```lit
+service Foo {
+  include "OtherService" from "otherService.com" in "prod"
+          "localMock.lit" in "dev"
+}
+```
+Now, what the hell "prod" and "dev" are is beyond me.  Maybe use "aws" and "local" instead?
+
+
+Or we could resolve dependencies dynamically.  Immagine a static url for a service: dependency-service.com/some-lit-based-path.  Lit code would depend on this like so:
+
+```lit
+service Foo {
+  include "OtherService" from "dependency-service.com/some-lit-based-path"
+}
+```
+Then at compile time litc reaches out and get the connection semantics for the remote service and stashes them in .sys.  Problems with this include:
+  
+  - The service may change between compile and deploy time.
+  - The target substrate, which is a significant input into service connection semantics,is not known at compile time.
+
+
 # Shapes (types) & OpenAPI Integration
 
 A core responsibility of Lit is to help users describe and communicate events.  The way programming languages have historically addresed this need is with type systems.  Lit will have a type system for events, but typing events will be very different from typing in memory data structures.
@@ -45,17 +82,14 @@ Engineers have made good headway with some of the challenges of describing event
 
 Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goals of a Lit type system.
 
+# Config Settings
 
-# Dependencies & Includes
+Right now the litconfig.json is very bare-bones.  This is great.  Config files suck.  A large feature set left out of Lit is fine-grained infrastructure configuration, which was intentional, but users will need it eventually, and litconfig is the perfect place to put them.  In Java, for example, if you want to set how much RAM the JVM should consume you use config files, and if you want to control the resources Lit uses you should use litconfig.  Some obvious use cases:
 
-Like shapes, dependencies in Lit will require very different solutions than those in other languages.  There are two dependency stories in Lit:
-  
-  - How to resolve source libraries
-  - How to resolve service dependencies
+  - I want a function to run by itself and not get collapsed from scope collapse, I should be able to specify in litconifig "hey don't modify this"
 
-Source libraries should be resolved in line with how other languages resolve libraries: pull down source code and make it available at compile time on the user's machine.
+  - I want to set fine-grained AWS config values like timeout and concurrency for specific resources.
 
-Service dependencies present an entirely different problem.  Services are static and often have only a single "implementation" per environment.  The work being done on [Deno](https://github.com/denoland/deno) for its module system looks promising.
 
 # Substrate Support
 
