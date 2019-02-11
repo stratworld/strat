@@ -51,7 +51,7 @@ Here we declare a service HelloWorld.  All functions must reside within a servic
 ```
 include "Http"
 ```
-Including Http lets us recieve Http events and tells lit this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Lit you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](https://lit.build/Sources/Http) is a standard event source and part of the lit standard library.
+Including Http lets us receive Http events and tells lit this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Lit you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](https://lit.build/Sources/Http) is a standard event source and part of the lit standard library.
 
 ### 
 ```
@@ -74,22 +74,22 @@ This is the final part of a function definition--the artifact.  This is the code
 
 ## What did this do?
 
-You may notice that new build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build_id}/HelloWorld-helloWorld/helloWorld.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the lit "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.
+You may notice that new lit_build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build_id}/HelloWorld.lit_generated_proxy_Http/HelloWorld.helloWorld/index.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the lit "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.
 
-The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  The other top level directory (HelloWorld-lit_generated_proxy_Http) was also built by the Http source to work with the web server to determine what code should be executed in response to what requests.
+The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some lit generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Lit can be found [here](https://lit.build/User%20Guide/Writing%20Custom%20Sources).
 
 ### All together:
   - Http created a web server running on port 3000
-  - Http created a proxy function that receives all requests from that web server and routes requests to lit functions within the HelloWorld service
-  - The NodeJS host receives all get requests, invokes user code (helloWorld.js), and sends the responses back to the http proxy
+  - Http created a proxy function that receives all requests from that web server and routes requests to Lit functions within the HelloWorld service
+  - The host receives all get requests, invokes user code (helloWorld.js), and sends the responses back to the http proxy
 
 # AWS Hello World
 
-Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files we'll be provisioning Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.
+Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files when litc runs, it will provision Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.
 
 1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.
 
-2) Creaet a file called litconfig.json and paste the following in:
+2) Create a file called litconfig.json and paste the following in:
 
 ```json
 {
