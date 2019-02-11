@@ -30,9 +30,27 @@ function ok (arg) {
   };
 }
 
+function notFound () {
+  return {
+    statusCode: 404,
+    headers: {},
+    isBase64Encoded: false,
+    body: 'not found'
+  };
+}
+
+function methodNotAllowed () {
+  return {
+    statusCode: 405,
+    headers: {},
+    isBase64Encoded: false,
+    body: 'method not allowed'
+  };
+}
+
 module.exports = [
   {
-    name: "thing",
+    name: "",
     dispatches: h([
       ["get", "*"]
     ]),
@@ -42,7 +60,17 @@ module.exports = [
     })
   },
   {
-    name: "thing2",
+    name: "post",
+    dispatches: h([
+      ["post", "/foo"]
+    ]),
+    event: e(["post", "/foo"]),
+    result: ok({
+      params: {}
+    })
+  },
+  {
+    name: "single parameter",
     dispatches: h([
       ["get", "/:foo"]
     ]),
@@ -54,7 +82,7 @@ module.exports = [
     })
   },
   {
-    name: "thing3",
+    name: "double parameter",
     dispatches: h([
       ["get", "/:foo/:bar"]
     ]),
@@ -67,7 +95,7 @@ module.exports = [
     })
   },
   {
-    name: "thing3",
+    name: "prefixed parameter",
     dispatches: h([
       ["get", "/root/:foo"]
     ]),
@@ -78,14 +106,58 @@ module.exports = [
       }
     })
   },
+  {
+    name: "postfixed slash",
+    dispatches: h([
+      ["get", "/foo/"]
+    ]),
+    event: e(["get", "/foo"]),
+    result: ok({
+      params: {}
+    })
+  },
+  {
+    name: "star in middle",
+    dispatches: h([
+      ["get", "/foo/*/bar"]
+    ]),
+    event: e(["get", "/foo/b/bar"]),
+    result: ok({
+      params: {}
+    })
+  },
+  {
+    name: "not found",
+    dispatches: h([
+      ["get", "/foo/"]
+    ]),
+    event: e(["get", "/jimbo"]),
+    result: notFound()
+  },
+  {
+    name: "not found param",
+    dispatches: h([
+      ["get", "/foo/:bar"]
+    ]),
+    event: e(["get", "/foo"]),
+    result: notFound()
+  },
+  {
+    name: "bad method",
+    dispatches: h([
+      ["get", "/foo"]
+    ]),
+    event: e(["post", "/foo"]),
+    result: methodNotAllowed()
+  },
+  {
+    name: "multiple dispatches",
+    dispatches: h([
+      ["get", "/foo"],
+      ["post", "/foo/bar"],
+      ["delete", "/foo"]
+    ]),
+    event: e(["delete", "/foo"]),
+    result: ok({ params: {} })
+  },
 ];
-
-/* todo:
-
-  make trailing / work
-  test different types of path params
-  test 404s
-  test 405s
-  test 500s
-
-*/

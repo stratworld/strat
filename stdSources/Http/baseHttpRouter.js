@@ -6,7 +6,10 @@ module.exports = function (event) {
   const matchedPaths = [];
   tree.forEach(branch => {
     const keys = [];
-    const re = pathToRegexp(branch.path.replace(/\*/g, '(.*)'), keys);
+    const cleanedPath = branch.path
+      .replace(/\*/g, '(.*)')
+      .replace(/\/$/g, '');
+    const re = pathToRegexp(cleanedPath, keys);
     const match = re.exec(path);
     if (match !== null) {
       var i = 0;
@@ -42,7 +45,7 @@ module.exports = function (event) {
     return Promise.resolve({
       statusCode: 405,
       isBase64Encoded: false,
-      headers: [],
+      headers: {},
       body: 'method not allowed'
     });
   }

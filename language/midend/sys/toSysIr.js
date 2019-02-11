@@ -109,7 +109,7 @@ function name (service, fn) {
   const fnName = typeof fn === 'string'
     ? fn
     : val(traverse(fn, ['functionName'])[0], 'name');
-  return `${serviceName}-${fnName}`;
+  return `${serviceName}.${fnName}`;
 }
 
 function isFunctionResource (fn) {
