@@ -1,4 +1,4 @@
-const ast = require('../../../../language/ast');
+const ast = require('../../../../litc/ast');
 const traverse = ast.traverse;
 const val = ast.val;
 

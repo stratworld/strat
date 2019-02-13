@@ -1,6 +1,6 @@
 # Functions
 
-Functions are the computational components of Lit, and they are the vehicle which runs user code in a Lit system.
+Functions are the computational components of Lit, and they are the vehicle which runs user code in a Lit system.  Broadly speaking, a function is a piece of infrastructure that accepts a bundle of code and executes it in response to an event.  This is an intentionally broad definition--much broader than the du jour "Functions as a Service" defintion.  Lit is a little more opinionated about what exactly can be a function in practice, and explicit documentation can be found in the "Implementing Functions: the Function Abstraction" section below.  What fits this definition may be surprising; things ranging from plain files to virtual machines to AWS Lambdas are acceptable function for Lit.
 
 # Functions within the Lit Language
 
@@ -37,16 +37,22 @@ Http { method:"get" path:"/" } -> OtherService.otherFoo
 
 Functions without a signature are considered resources and have the same behavior as normal functions except they always produce the artifact's data as their result.
 
-The name of the function (the identifier preceding the signature) must be unique within a service, and the function's fully qualified name is a conjunction of a function name and its service name.  The syntax of a fully qualified name can change based on context, but within in the Lit language, it is represented as SERVICENAME "." FUNCTIONNAME.
+The name of the function (the identifier preceding the signature) must be unique within a service, and the function's fully qualified name is a conjunction of a function name and its service name.  The syntax of a fully qualified name can change based on context, but within in the Lit language, it is represented as ```SERVICENAME "." FUNCTIONNAME```.  A function's name is used by other components when they wish to invoke the function.  Resources without function names cannot be invoked by components--they are only useful to respond to events.
 
-Type signatures are of the form "(" input ")" ":" output.  It should be noted that only a single input and output can be produced.  Functions that don't produce a return value should use the type void.
+Type signatures are of the form ```"(" input ")" ":" output```.  It should be noted that only a single input and output can be produced.  Functions that don't produce a return value should use the type void.
 
-Component software is written on a one-to-one basis with Lit functions, and users can expect component code to run isolated from previous invocations, subsequent invocations, and other component's invocations.  In practice this is very difficult, so hosts and substrates should inform the user in what circumstances this promise is unreasonable.
+Lit functions host a single piece of component software each, and users can expect component code to run isolated from previous invocations, subsequent invocations, and other functions' invocations.  In practice this is very difficult, so hosts and substrates should inform the user in which circumstances this promise is unreasonable.  Components should do their best to not cause lasting side effects within their execution context.  Examples of bad component behavior include:
+
+  - Assigning global variables that persist within the language runtime
+  - Using singletons to perserve state
+  - Writing to the file system
+
+All state that an application needs to keep should be kept outside of the Lit system and in stateful peripheral systems such as inside a database or a user's browser cookies.
 
 
 # Implementing Functions: The Function Abstraction
 
-A Lit function implementation must satisfy three broad requirements:
+A Lit function implementation must satisfy three requirements:
 
   1. The static name requirement: It must have an unchanging, unique name across a reasonable scope(\*) which can be used to resolve the function's implementation for the entirety of the function's life.  **This name must be knowable before the function exists, and any operation to create the function and assign it this name must succeed within normal operation**.  Examples:
 
@@ -57,15 +63,29 @@ A Lit function implementation must satisfy three broad requirements:
 
 
   2. The scalability requirement: While executing n invocations concurrently, it must execute the n+1th invocation with the same latency profile as the first n for reasonable(\*) values of n.
-  3. The resilliency requirement: A function cannot change its computation for an invocation based on previous invocations.
+  3. The resilience requirement: A function cannot change its computation for an invocation based on previous invocations.
 
 \*What is reasonable changes based on substrate context.  Any substrate should specify what the limits of "reasonable" for scope and scalability are.  For instance, the AWS substrate is scoped globally and has a very large (1M+ concurrent invocations) value of n, while the local substrate is scoped to a single machine with low values of n.
 
-These three requirements allow Lit to create a static networking layer between functions using only information available at compile time.  Then, this networking layer can be baked into the .sys file format and consumed by any substrate at deploy time.  Additionally, since substrates supply software to invoke functions, user code can deal with only the abstract notion of a function and let Lit's networking layer resolve implementation details determined at compile and deploy time.
+The term [high availability](https://en.wikipedia.org/wiki/High_availability) encapsulates the above requirements but is nebulous and can confer requirements that are not nessecary for Lit functions.
+
+The static name requirement allows Lit to create a static networking layer between functions using only information available at deploy time.  The scalability and resilience requirements ensure that that networking layer remains correct for the duration of a Lit system's lifetime.
+
+A notable ommision from these requirements are any message and event delivery guarantees which are common in definitions of availability.  The above requirements are required for Lit to construct a system--they don't confer any functionality guarantees.  If a substrate drops messages half the time, a Lit system built on top will too.  In a practical sense, this mean Lit assumes correct message delivery and doesn't have its own layer of network retries above whatever a substrate's SDK has.
 
 ## Implementing Resources
 
-From an abstract perspective, resources are just functions that don't need to execute.  From a practical perspective, this means implementing resources is much more trivial, and substrates should use different infrastructure for resources than functions.  The AWS substrate implements functions as Lambdas and resources as S3 items.
+From an abstract perspective, resources are just functions that don't actually execute code.  This means implementing resources is much simpler, and substrates should use different infrastructure for resources than functions.  The AWS substrate implements functions as Lambdas and resources as S3 items.
+
+## Examples of Function Implementations
+
+A discerning eye may have noticed that nearly everything can satisfy the above requirements given common values of n.  The static name requirement is easy to meet since URLs suffice and assigning a URL to a server is routine.  Daemons can restart services to meet the resilience requirement, and most users' business requirements for concurrency are easilly met with $10 per month (though they may not think so). Lit's value then, is allowing users to program to an abstraction that can scale without committing to scalable infrastructure.
+
+For n=1 and scoped to a local machine, a user's file system is an eligible Lit substrate.
+
+For 1 < n < 10000 single servers can run the local substrate with a daemon to operate production architecture.
+
+Only for very large concurrency requirements do users need Functions as a Service infrastructure like AWS Lambda.  However, users may find running their Lit systems on FAAS confers other benefits like reduced operational load and pay-as-you-go business models.
 
 # Functions from the Component Perspective
 

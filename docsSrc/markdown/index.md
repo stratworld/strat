@@ -73,11 +73,3 @@ And a reminder--the same .sys file you run in production can be deployed without
 Just as high level languages require the programmer to give up the fine grained control assembly affords, Lit forces the system designer to build in a certain way.  Thankfully, that way happens to be the same way people recognize as "best practice" today--stateless event based systems.  There is no way for a Lit function to save something to a file system--there is no concept of a file system in Lit.  But who today writes stuff to files on their servers?  And even if one component is stateful, all the other components can be built as a Lit system that sits alongside the stateful component running on traditional servers.
 
 Lit would not have been possible 10 years ago before the creation of functions as a service infrastructure.  Services like AWS Lambda provide the crucial bedrock abstraction over servers that Lit is built on top of.  These FAAS services remove two key problems of infrastructure: service availability and scaling.  Lit can do so much because its only concerned with the infrastructure problems that remain, which boil down to "what goes where", static configuration, and lifecycle management.  You can think of Lit as the realization and application of the potential of FAAS technology.
-
-
-# Contributing
-
-This repository contains the source code for:
-  1) The language's compiler [language/]
-  2) The language's standard library [stdSources/]
-  3) The "runtime" on which systems built with Lit run [runtime/]

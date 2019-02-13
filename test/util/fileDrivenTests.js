@@ -1,5 +1,5 @@
 const fsFactory = require('../mocks/mockFileSystem');
-const compileFactory = require('../language/compile');
+const compileFactory = require('../litc/compile');
 
 module.exports = function (cases, stop) {
   cases.forEach(testCase => {

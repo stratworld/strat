@@ -1,8 +1,11 @@
 const http = require('http');
 const path = require('path');
-const port = 3000;
 
-module.exports = function (events, implementation) {
+module.exports = function (events, implementation, sourceConfig) {
+  const port = sourceConfig !== undefined && sourceConfig.port !== undefined
+    ? sourceConfig.port
+    : 3000;
+
   const proxy = require(path.resolve(implementation, 'lit_generated_host_entry')).handler;
   function listener (request, response) {
     proxy({

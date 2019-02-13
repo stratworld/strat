@@ -1,6 +1,6 @@
 #! /usr/bin/node
 
-const compilerConstructor = require('./language/compiler');
+const compilerConstructor = require('./litc/compiler');
 const defaultFs = require('./util/fileSystem');
 const defaultLoader = require('./util/loader');
 const compiler = compilerConstructor({

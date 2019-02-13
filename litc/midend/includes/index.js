@@ -60,7 +60,7 @@ function traversal (ast) {
 
   return traverseDependencyGraph(ast.tokens.path)
     .then(() => R(AST('program', {
-          root: ast.tokens.path
+      root: ast.tokens.path
     }, asts.values())));
 }
 
@@ -82,7 +82,7 @@ function resolvePath (path, parentAst) {
       absolutePath = absolutePath + '.lit';
     }
   }
-  
+
   return exists(Object.assign(path, {
     value: absolutePath
   }), parentFile);
