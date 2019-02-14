@@ -60,7 +60,7 @@ function resolveArtifact (fn, declaredPath) {
     .catch(e => {
       return J({
         error: e,
-        msg: `${declaredPath} line ${getConfig(fn, 'artifact').line}
+        msg: `${declaredPath} line ${line(fn, 'artifact')}
 Failed to load file ${filePath}.`
       })
     })

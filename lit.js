@@ -3,9 +3,11 @@
 const compilerConstructor = require('./litc/compiler');
 const defaultFs = require('./util/fileSystem');
 const defaultLoader = require('./util/loader');
+const defaultInternet = require('./util/theInternet');
 const compiler = compilerConstructor({
   fs: defaultFs,
-  loader: defaultLoader
+  loader: defaultLoader,
+  internet: defaultInternet
 });
 const compile = compiler.runCommand;
 const serializeAST = compiler.serializeAST;

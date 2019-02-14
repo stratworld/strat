@@ -1,17 +1,21 @@
 const ast = require('../../ast');
 const AST = ast.build;
 const traverse = ast.traverse;
+const val = ast.val;
 const compilerConstructor = require('../../compiler');
 const stdPath = require('path');
 const stdSourcesPath = stdPath.resolve(__dirname, '../../../stdSources');
 
-var fs;
-var loader;
+const isUrl = string => {
+  const urlRegex = /^(https:|http:\/\/localhost).*/g;
+  return urlRegex.test(string);
+}
+
 var litStdPaths;
-module.exports = function (deps) {
-  fs = deps.fs;
-  loader = deps.loader;
-  const stdPathsPromise = fs.ls(stdSourcesPath)
+var deps;
+module.exports = function (injectedDeps) {
+  deps = injectedDeps;
+  const stdPathsPromise = deps.fs.ls(stdSourcesPath)
     .then(stdModules => stdModules
       .reduce((paths, stdModuleName) => {
         paths[stdModuleName] = stdPath.join(stdSourcesPath, stdModuleName, `${stdModuleName}.lit`);
@@ -27,55 +31,59 @@ module.exports = function (deps) {
   }
 }
 
-function traversal (ast) {
-  const asts = {};
+async function traversal (ast) {
+  const root = val(ast, 'path');
+  const asts = {
+    [root]: ast
+  };
 
-  function executeFrontend (fileName) {
-    if (fileName === ast.tokens.path.value) {
-      return R(ast);
-    }
-    return fs.cat(fileName)
-      .then(data => {
-        const compile = compilerConstructor({
-          loader: loader,
-          fs: fs
-        }).runCommand;
-        return compile('frontend', data.toString(), fileName);
-      });
+  const traversalStack = [root];
+
+  while (traversalStack.length > 0) {
+    const focus = traversalStack.pop();
+    const newEdgesOut = traverse(
+        asts[focus],
+        ['service', 'include'])
+      .map(includeAst => val(includeAst, 'path'))
+      .filter(edgePath => asts[edgePath] === undefined);
+
+    const resolvedEdges = await Promise.all(
+      newEdgesOut
+        .map(edgeName => {
+          const edgeFileName = getFileName(edgeName, focus);
+
+          return getData(edgeFileName)
+            .then(fileData => parseFile(fileData, edgeFileName))
+            .then(newAst => R({
+              name: edgeFileName,
+              ast: newAst
+            }));
+        })
+    );
+
+    resolvedEdges.forEach(newEdge => {
+      asts[newEdge.name] = newEdge.ast;
+      traversalStack.push(newEdge.name);
+    });
   }
 
-  function traverseDependencyGraph (path) {
-    if (asts[path.value] !== undefined) {
-      return R();
-    }
-    return executeFrontend(path.value)
-      .then(newAst => {
-        asts[path.value] = newAst;
-        const edgesOut = traverse(newAst, ['service', 'include', 'tokens', 'path']);
-        return Promise.all(edgesOut
-          .map(edgePath => resolvePath(edgePath, newAst)
-            .then(traverseDependencyGraph)));
-      });
-  }
-
-  return traverseDependencyGraph(ast.tokens.path)
-    .then(() => R(AST('program', {
-      root: ast.tokens.path
-    }, asts.values())));
+  return AST('program', {
+    root: root
+  }, asts.values());
 }
 
-//todo: add some kind of LITPATH resolution like Go and Node
-function resolvePath (path, parentAst) {
-  const parentFile = parentAst.tokens.path.value;
-  const parentDirectory = stdPath.dirname(parentFile);
+function getFileName (importString, declaredFile) {
+  if (isUrl(importString)) return importString;
+
+  const parentDirectory = stdPath.dirname(declaredFile);
   var absolutePath;
-  if (litStdPaths[path.value]) {
-    absolutePath = litStdPaths[path.value];
+  if (litStdPaths[importString]) {
+    absolutePath = litStdPaths[importString];
   } else {
-    if (!stdPath.isAbsolute(path.value)) {
-      absolutePath = stdPath.resolve(parentDirectory, path.value);
+    if (!stdPath.isAbsolute(importString)) {
+      absolutePath = stdPath.resolve(parentDirectory, importString);
     } else {
-      absolutePath = path.value;
+      absolutePath = importString;
     }
 
     if (stdPath.extname(absolutePath) === '') {
@@ -83,17 +91,16 @@ function resolvePath (path, parentAst) {
     }
   }
 
-  return exists(Object.assign(path, {
-    value: absolutePath
-  }), parentFile);
+  return absolutePath;
 }
 
-function exists (path, parentFileName) {
-  return fs.stat(path.value)
-    .then(() => R(path))
-    .catch(e => J({
-        msg: `File not found
-${parentFileName} line ${path.line} ${path.value} not found.`,
-        error: e
-      }));
+async function getData (importString) {
+  return isUrl(importString)
+    ? deps.internet.fetch(importString)
+    : deps.fs.cat(importString);
+}
+
+async function parseFile (buffer, fileName) {
+  const compile = compilerConstructor(deps).runCommand;
+  return compile('frontend', buffer.toString(), fileName);
 }
