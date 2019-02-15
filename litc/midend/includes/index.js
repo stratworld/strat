@@ -6,11 +6,6 @@ const compilerConstructor = require('../../compiler');
 const stdPath = require('path');
 const stdSourcesPath = stdPath.resolve(__dirname, '../../../stdSources');
 
-const isUrl = string => {
-  const urlRegex = /^(https:|http:\/\/localhost).*/g;
-  return urlRegex.test(string);
-}
-
 var litStdPaths;
 var deps;
 module.exports = function (injectedDeps) {
@@ -44,13 +39,23 @@ async function traversal (ast) {
     const newEdgesOut = traverse(
         asts[focus],
         ['service', 'include'])
-      .map(includeAst => val(includeAst, 'path'))
-      .filter(edgePath => asts[edgePath] === undefined);
+      .map(includeAst => {
+        return {
+          includeValue: val(includeAst, 'path'),
+          includeAst: includeAst
+        };
+      })
+      .filter(includeAstObj =>
+        asts[includeAstObj.includeValue] === undefined);
 
     const resolvedEdges = await Promise.all(
       newEdgesOut
-        .map(edgeName => {
-          const edgeFileName = getFileName(edgeName, focus);
+        .map(includeAstObj => {
+          const edgeFileName = getFileName(
+            includeAstObj.includeValue,
+            focus);
+
+          includeAstObj.includeAst.tokens.path.value = edgeFileName;
 
           return getData(edgeFileName)
             .then(fileData => parseFile(fileData, edgeFileName))
@@ -73,7 +78,7 @@ async function traversal (ast) {
 }
 
 function getFileName (importString, declaredFile) {
-  if (isUrl(importString)) return importString;
+  if (deps.internet.isUrl(importString)) return importString;
 
   const parentDirectory = stdPath.dirname(declaredFile);
   var absolutePath;
@@ -95,7 +100,7 @@ function getFileName (importString, declaredFile) {
 }
 
 async function getData (importString) {
-  return isUrl(importString)
+  return deps.internet.isUrl(importString)
     ? deps.internet.fetch(importString)
     : deps.fs.cat(importString);
 }

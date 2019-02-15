@@ -1,13 +1,13 @@
 const ast = require('../../ast');
 const stdPath = require('path');
-const promisify = require('util').promisify;
-const readFile = promisify(require('fs').readFile);
 const line = ast.line;
 const val = ast.val;
 const traverse = ast.traverse;
 const getConfig = ast.getConfig;
 
-module.exports = deps => ast => {
+var deps;
+module.exports = injectedDeps => ast => {
+  deps = injectedDeps;
   return Promise.all(traverse(ast, ['file']).map(file => {
     const functions = traverse(file, ['service', 'function']);
     const filePath = val(file, 'path');
@@ -22,36 +22,27 @@ module.exports = deps => ast => {
   .then(() => R(ast));
 };
 
-function getArtifact (fn, declaredPath) {
-  if (Buffer.isBuffer(fn.artifact)) {
-    return {
-      artifactType: 'buffer',
-      value: fn.artifact
-    };
-  }
-  const artifactValue = val(fn, 'artifact');
-  const filePath = stdPath.isAbsolute(artifactValue)
-    ? artifactValue
-    : stdPath.resolve(stdPath.dirname(declaredPath), artifactValue);
-  return {
-    artifactType: 'file',
-    value: filePath
-  };
-}
-
-function resolveArtifact (fn, declaredPath) {
+async function resolveArtifact (fn, declaredPath) {
   const artifact = getArtifact(fn, declaredPath);
   if (artifact.artifactType === 'buffer') {
-    return R({
+    return {
       data: artifact.value,
       type: '.js',
       path: 'bufferData.js'
-    });
+    };
+  }
+
+  if (artifact.artifactType === 'url') {
+    return {
+      data: await deps.internet.fetch(artifact.value),
+      type: stdPath.extname(artifact.value) || '.js',
+      path: artifact.value
+    };
   }
 
   const filePath = artifact.value;
   const type = stdPath.extname(filePath);
-  return readFile(filePath)
+  return deps.fs.cat(filePath)
     .then(data => R({
       data: data,
       type: type,
@@ -64,4 +55,27 @@ function resolveArtifact (fn, declaredPath) {
 Failed to load file ${filePath}.`
       })
     })
+}
+
+function getArtifact (fn, declaredPath) {
+  if (Buffer.isBuffer(fn.artifact)) {
+    return {
+      artifactType: 'buffer',
+      value: fn.artifact
+    };
+  }
+  const artifactValue = val(fn, 'artifact');
+  if (deps.internet.isUrl(artifactValue)) {
+    return {
+      artifactType: 'url',
+      value: artifactValue
+    };
+  }
+  const filePath = stdPath.isAbsolute(artifactValue)
+    ? artifactValue
+    : stdPath.resolve(stdPath.dirname(declaredPath), artifactValue);
+  return {
+    artifactType: 'file',
+    value: filePath
+  };
 }

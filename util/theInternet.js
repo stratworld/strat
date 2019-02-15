@@ -2,12 +2,16 @@ const https = require("https");
 const http = require("http");
 const url = require('url');
 
+function isUrl (string) {
+  const urlRegex = /^(https:|http:\/\/localhost).*/g;
+  return urlRegex.test(string);
+}
+
 // only allow http on localhost; everything else should be https
 function fetch (target) {
   return new Promise(function (resolve, reject) {
 
     const parsed = url.parse(target);
-    // console.log(parsed.protocol)
 
     (parsed.hostname === 'localhost' && parsed.protocol === 'http:'
       ? http
@@ -25,5 +29,6 @@ function fetch (target) {
 }
 
 module.exports = {
-  fetch: fetch
+  fetch: fetch,
+  isUrl: isUrl
 };
