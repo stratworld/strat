@@ -21,7 +21,8 @@ const TokenTypes = {
   //keywords
   SERVICE: sequence('service'),
   SOURCE: sequence('source'),
-  INCLUDE: sequence('include')
+  INCLUDE: sequence('include'),
+  PUBLIC: sequence('public')
 }
 
 function sequence (string) {

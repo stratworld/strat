@@ -65,17 +65,17 @@ function getArtifact (fn, declaredPath) {
     };
   }
   const artifactValue = val(fn, 'artifact');
-  if (deps.internet.isUrl(artifactValue)) {
-    return {
-      artifactType: 'url',
-      value: artifactValue
-    };
-  }
-  const filePath = stdPath.isAbsolute(artifactValue)
+  const urlContext = deps.internet.isUrl(declaredPath);
+  const pathResolver = urlContext
+    ? deps.internet.path
+    : stdPath;
+  const resolvedPath = pathResolver.isAbsolute(artifactValue)
     ? artifactValue
-    : stdPath.resolve(stdPath.dirname(declaredPath), artifactValue);
+    : pathResolver.resolve(
+      pathResolver.dirname(declaredPath),
+      artifactValue);
   return {
-    artifactType: 'file',
-    value: filePath
+    artifactType: (urlContext ? 'url' : 'file'),
+    value: resolvedPath
   };
 }

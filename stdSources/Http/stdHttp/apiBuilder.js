@@ -9,7 +9,7 @@ module.exports = function (events, implementation, sourceConfig) {
   const proxy = require(path.resolve(implementation, 'lit_generated_host_entry')).handler;
   function listener (request, response) {
     proxy({
-      path: request.url.replace(`/${events.service}`, ''),
+      path: request.url,
       httpMethod: request.method
     }, null, function (err, result) {
       format(err, result, response);

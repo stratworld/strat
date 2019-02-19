@@ -1,6 +1,7 @@
 const https = require("https");
 const http = require("http");
-const url = require('url');
+const { URL } = require('url');
+const stdPath = require('path');
 
 function isUrl (string) {
   const urlRegex = /^(https:|http:\/\/localhost).*/g;
@@ -11,7 +12,7 @@ function isUrl (string) {
 function fetch (target) {
   return new Promise(function (resolve, reject) {
 
-    const parsed = url.parse(target);
+    const parsed = new URL(target);
 
     (parsed.hostname === 'localhost' && parsed.protocol === 'http:'
       ? http
@@ -28,7 +29,26 @@ function fetch (target) {
   });
 }
 
+const path = {
+  dirname: function (url) {
+    const parsed = new URL(url);
+    return parsed.origin + stdPath.dirname(parsed.pathname);
+  },
+  resolve: function (baseUrl, relativePath) {
+    const parsed = new URL(url);
+    return parsed.origin + stdPath.resolve(parsed.pathname, relativePath);
+  },
+  extname: function (url) {
+    const parsed =  new URL(url);
+    return stdPath.extname(parsed.pathname);
+  },
+  isAbsolute: function (url) {
+    return isUrl(url);
+  }
+}
+
 module.exports = {
   fetch: fetch,
-  isUrl: isUrl
+  isUrl: isUrl,
+  path: path
 };

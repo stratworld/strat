@@ -3,13 +3,9 @@ const AST = require("../../ast").build;
 module.exports = function (T, error, descend) {
   return {
     file: () => {
-      var next;
-      if (T.match('SOURCE')) {
-        next = 'source';
-      } else {
-        T.consume('SERVICE');
-        next = 'service';
-      }
+      const next = T.match('SOURCE')
+        ? 'source'
+        : 'service';
       return AST('file', {}, descend(next));
     },
     source: () => {
@@ -20,6 +16,8 @@ module.exports = function (T, error, descend) {
       }, block);
     },
     service: () => {
+      const public = T.match('PUBLIC');
+      T.consume('SERVICE');
       const name = T.consume('IDENTIFIER');
       T.consume('LEFT_BRACE');
       const components = [];
@@ -35,7 +33,8 @@ module.exports = function (T, error, descend) {
       }
       T.advance();
       return AST('service', {
-        name: name
+        name: name,
+        public: public || undefined
       }, kvps, includes, components);
     },
     include: () => {
@@ -76,7 +75,8 @@ module.exports = function (T, error, descend) {
       if (T.peek().type === 'IDENTIFIER'
           && T.peek2().type === 'PERIOD') {
         return AST('dispatch', {}, events, descend('reference'));
-      } else if (T.peek().type === 'IDENTIFIER') {
+      } else if (T.peek().type === 'IDENTIFIER'
+        || T.peek().type === 'PUBLIC') {
         functionName = descend('functionName');
       }
       const artifact = T.consume('STRING');
@@ -108,6 +108,7 @@ module.exports = function (T, error, descend) {
       }, functionName);
     },
     functionName: () => {
+      const public = T.match('PUBLIC');
       const name = T.consume('IDENTIFIER');
       var signature;
       if (T.peek().type !== 'ARROW') {
@@ -115,7 +116,8 @@ module.exports = function (T, error, descend) {
       }
       T.consume('ARROW');
       return AST('functionName', {
-        name: name
+        name: name,
+        public: public || undefined
       }, signature);
     },
     signature: () => {

@@ -5,7 +5,7 @@ file
 service
   "service" IDENTIFIER '{' (component|include)* '}'
 
-source  
+source
   "source" IDENTIFIER block
 
 include
@@ -28,7 +28,7 @@ event
   IDENTIFIER block
 
 functionName
-  IDENTIFIER signature? "->"
+  "public"? IDENTIFIER signature? "->"
 
 signature
   "(" shape? ")" ":" shape

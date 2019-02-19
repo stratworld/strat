@@ -6,8 +6,7 @@ module.exports = function (tokens) {
 
   function match (...tokenTypes) {
     if (tokenTypes.filter(check).length > 0) {
-      advance();
-      return true;
+      return advance();
     }
     return false;
   }

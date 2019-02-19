@@ -78,20 +78,22 @@ async function traversal (ast) {
 }
 
 function getFileName (importString, declaredFile) {
-  if (deps.internet.isUrl(importString)) return importString;
+  const pathResolution = deps.internet.isUrl(declaredFile)
+    ? deps.internet.path
+    : stdPath;
 
-  const parentDirectory = stdPath.dirname(declaredFile);
+  const parentDirectory = pathResolution.dirname(declaredFile);
   var absolutePath;
   if (litStdPaths[importString]) {
     absolutePath = litStdPaths[importString];
   } else {
-    if (!stdPath.isAbsolute(importString)) {
-      absolutePath = stdPath.resolve(parentDirectory, importString);
+    if (!pathResolution.isAbsolute(importString)) {
+      absolutePath = pathResolution.resolve(parentDirectory, importString);
     } else {
       absolutePath = importString;
     }
 
-    if (stdPath.extname(absolutePath) === '') {
+    if (pathResolution.extname(absolutePath) === '') {
       absolutePath = absolutePath + '.lit';
     }
   }

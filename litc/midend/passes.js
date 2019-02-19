@@ -1,6 +1,7 @@
 module.exports = [
   // works with the AST
-  [ 'includes', 'midend/includes/index'],
+  [ 'includes', 'midend/includes/index' ],
+  [ 'public', 'midend/includes/public' ],
   [ 'names', 'midend/names/index'],
   [ 'namegen', 'midend/names/nameGen'],
   [ 'libinclude', 'midend/libs/include'],
