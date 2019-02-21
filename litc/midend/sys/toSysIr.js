@@ -36,6 +36,11 @@ function getHosts (ast) {
             scope: serviceName,
             artifacts: [
               {
+                declaration: {
+                  path: path,
+                  name: val(traverse(fn, ['functionName'])[0], 'name'),
+                  service: serviceName
+                },
                 name: name(service, fn),
                 ...fn.artifact
               }

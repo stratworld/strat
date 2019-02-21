@@ -35,7 +35,7 @@ const path = {
     return parsed.origin + stdPath.dirname(parsed.pathname);
   },
   resolve: function (baseUrl, relativePath) {
-    const parsed = new URL(url);
+    const parsed = new URL(baseUrl);
     return parsed.origin + stdPath.resolve(parsed.pathname, relativePath);
   },
   extname: function (url) {

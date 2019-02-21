@@ -17,6 +17,7 @@ function getScopeWithCompute (ir) {
       host.artifacts.forEach(artifact => {
         lookup[artifact.name] = {
           hostName: host.name,
+          declaration: artifact.declaration,
           ...host.compute
         };
       });

@@ -16,7 +16,6 @@ module.exports = function (T, error, descend) {
       }, block);
     },
     service: () => {
-      const public = T.match('PUBLIC');
       T.consume('SERVICE');
       const name = T.consume('IDENTIFIER');
       T.consume('LEFT_BRACE');
@@ -33,8 +32,7 @@ module.exports = function (T, error, descend) {
       }
       T.advance();
       return AST('service', {
-        name: name,
-        public: public || undefined
+        name: name
       }, kvps, includes, components);
     },
     include: () => {

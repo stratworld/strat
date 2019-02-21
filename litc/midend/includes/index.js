@@ -78,6 +78,8 @@ async function traversal (ast) {
 }
 
 function getFileName (importString, declaredFile) {
+  if (deps.internet.isUrl(importString)) return importString;
+
   const pathResolution = deps.internet.isUrl(declaredFile)
     ? deps.internet.path
     : stdPath;

@@ -1,5 +1,5 @@
 const Lit = require('lit');
 module.exports = (event, declaration) => {
-  console.log('here')
-  Lit(`this.${declaration.name.replace('public', '')}`)(event);
+  const target = Lit(`${declaration.service}.${declaration.name.replace('public', '')}`);
+  return target(event);
 };

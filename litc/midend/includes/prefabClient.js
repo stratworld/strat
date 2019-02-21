@@ -1,6 +1,8 @@
 const http = require("http");
 const { URL } = require('url');
 
+//this needs to be a hell of a lot more complex
+//todo: pay attention to content types
 function fetch (url) {
   return new Promise(function (resolve, reject) {
     http.get(url, res => {
@@ -17,10 +19,6 @@ function fetch (url) {
 }
 
 module.exports = (event, declaration) => {
-  const origin = (new URL(declaration.file)).origin;
-
-
-  // fuck I have no idea
-  // this needs to figure out where to call based on the service and function name
-  return fetch("http://localhost:3000/foo");
+  const origin = (new URL(declaration.path)).origin;
+  return fetch(`${origin}/lit/${declaration.service}/${declaration.name}`);
 };

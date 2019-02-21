@@ -54,6 +54,7 @@ NodeHost.prototype.getConfig = function () {
           newScope[functionName] = {
             service: 'onHost',
             config: {
+              declaration: this.scope[functionName].declaration,
               functionName: functionName,
               shouldntWrap: this.host.name === functionName
             }

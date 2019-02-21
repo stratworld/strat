@@ -4,7 +4,9 @@ const val = ast.val;
 const line = ast.line;
 const path = require('path');
 const policies = [
-  fileNameShouldMatchEntity,
+
+  // why?
+  // fileNameShouldMatchEntity,
   canOnlyIncludeANameOnce,
   namesCanOnlyBeDeclaredOnce,
   shapeNamesHaveBeenDeclared,
@@ -21,7 +23,7 @@ function assertNames (ast) {
   // policies are read only, synchronous, and throw on violation
   policies.forEach(policy => {
     const files = traverse(ast, ['file']);
-    files.forEach(file => policy(file));
+    files.forEach(file => policy(file, ast));
   });
   return ast;
 };
@@ -33,6 +35,12 @@ function assertNames (ast) {
 // Why make this restriction?
 //   -Makes it easier to search for implementations.
 //   -Makes includes simpler
+//
+// This is disabled because it doesn't jive with URL includes, which
+// are case insensitive.  Also, we shouldn't break compilation for
+// something that may not be under user control.
+// We could relax this for URL imports but then whats the point of
+// having it at all?
 function fileNameShouldMatchEntity (file) {
   const filePath = val(file, 'path');
   const fileName = path.basename(filePath, '.lit');
@@ -137,15 +145,34 @@ Event ${val(event, 'name')} is not included.`
   });
 }
 
-function canOnlyReferenceIncludedServices (file) {
-  const filePath = val(file, 'path');
-  const references = traverse(file, ['service', 'dispatch', 'reference']);
-  const includedServices = traverse(file, ['service', 'include'])
+function canOnlyReferenceIncludedServices (file, ast) {
+  const basenameToServiceName = traverse(ast, ['file'])
+    .filter(file => traverse(file, ['service'])[0] !== undefined)
+    .reduce((lookup, file) => {
+      lookup[path.basename(val(file, 'path'), '.lit')]
+        = val(traverse(file, ['service'])[0], 'name');
+      return lookup;
+    }, {});
+
+
+  //get all the include basenames from this file
+  const includeBasenames = traverse(file, ['service', 'include'])
     .map(include => path.basename(val(include, 'path'), '.lit'))
     .constantMapping(true);
+
+  //find the services that each include resolved to
+  const resolvedServiceNames = basenameToServiceName
+    .keys()
+    .filter(basename => includeBasenames[basename] !== undefined)
+    .map(basename => basenameToServiceName[basename])
+    .constantMapping(true);
+
+  const filePath = val(file, 'path');
+  const references = traverse(file, ['service', 'dispatch', 'reference']);
+
   references.forEach(reference => {
     const referenceService = val(reference, 'service');
-    if (!includedServices[referenceService]) {
+    if (!resolvedServiceNames[referenceService]) {
       throw {
         errorCode: 'E_NAMES_UNDECLARED',
         error: 'Unincluded service reference',

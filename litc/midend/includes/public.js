@@ -23,7 +23,6 @@ module.exports = dependencies => async function (ast) {
 
   //Make sure we've fetched Http
   //This is a little strange but we've already run includes
-  //todo: only do this if we need to;
   const httpInclude = traverse(ast, ['file', 'source'])
     .filter(source => val(source, 'name') === "Http")
     [0];
@@ -91,19 +90,15 @@ async function addProxyResources (service) {
     publicFunctions.flatmap(fn => createFunctionDispatch(serviceName, fn))
     );
   //change their artifacts to be the binary data from ./proxy.js
-  await Promise.all(newFunctionDispatches.map(
-    async dispatch => setDispatchArtifact(
-      dispatch,
-      await deps.fs.cat(stdPath.resolve(__dirname, './prefabProxy.js')))));
+  const proxyJs = await deps.fs.cat(stdPath.resolve(__dirname, './prefabProxy.js'));
+  newFunctionDispatches.map(
+    dispatch => setDispatchArtifact(dispatch, proxyJs));
 
+  //add all the new dispatches to the original serivice
   service.dispatch = (service.dispatch || [])
     .concat(newFunctionDispatches)
     .concat(publicServiceDispatch)
     .concat(clientDispatch);
-  // console.log(JSON.stringify(newFunctionDispatches, null, 2))
-  // service name (factors into path)
-  // functionNameAst
-  // artifact ()
 }
 
 const httpIncludeAST = build('include', {
@@ -114,12 +109,12 @@ const httpIncludeAST = build('include', {
 });
 
 function createPublicService (serviceName, publicFunctionNameAsts) {
-  const foo = `service ${serviceName} {
+  const text = `service ${serviceName} {
   ${publicFunctionNameAsts
     .map(fnAst => createFunctionString(fnAst, './client.js'))
     .join('\n  ')}
 }`;
-  return Buffer.from(foo);
+  return Buffer.from(text);
 }
 
 function createFunctionString (functionNameAst, artifact) {
