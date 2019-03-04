@@ -1,4 +1,4 @@
-const Lit = require('lit');
+const Strat = require('strat');
 module.exports = function (event) {
   const method = event.httpMethod;
   const path = event.path;
@@ -64,7 +64,7 @@ module.exports = function (event) {
     });
   }
 
-  return Lit(matchedMethod.branch.function)({
+  return Strat(matchedMethod.branch.function)({
     body: body,
     params: matchedMethod.params
   })

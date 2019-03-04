@@ -1,0 +1,6 @@
+{
+  "substrate": "local",
+  "local": {
+    "directory": "./svs_build"
+  }
+}

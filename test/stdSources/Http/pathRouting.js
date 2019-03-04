@@ -9,8 +9,8 @@ describe('Http paths', () => {
 
       // nasty
       const newBuilder = builderData
-        .replace(/const Lit.*;/g, '')
-        .replace(/Lit\(.*\)/g, '(event => Promise.resolve(event))')
+        .replace(/const Strat.*;/g, '')
+        .replace(/Strat\(.*\)/g, '(event => Promise.resolve(event))')
         .replace(/module\.exports/g, 'proxyModule');
       var proxyModule;
       eval(newBuilder);

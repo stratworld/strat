@@ -6,7 +6,7 @@ module.exports = function (events, implementation, sourceConfig) {
     ? sourceConfig.port
     : 3000;
 
-  const proxy = require(path.resolve(implementation, 'lit_generated_host_entry')).handler;
+  const proxy = require(path.resolve(implementation, 'strat_generated_host_entry')).handler;
   function listener (request, response) {
     proxy({
       path: request.url,

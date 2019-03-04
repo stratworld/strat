@@ -2,24 +2,22 @@
 
 1. Install [NodeJS and NPM](https://nodejs.org/) (node version > 9)
 
-2. Install litc using NPM:
+2. Install stratc using NPM:
 
   ```bash
-  npm install -g litc
+  npm install -g stratc
   ```
 
 
-## Exhaustive Command Reference
+## Exhaustive stratc Command Reference
 
-You'll need three commands to use litc:
+  - {.st file}
+    - compiles the file and builds a .saf file
+    - EX: $ stratc ./HelloWorld.st
 
-  - build {.lit file}
-    - compiles the file and builds a .sys file
-    - EX: $ lit build ./HelloWorld.lit
-
-  - deploy {.sys file}
-    - reads the .sys file and creates running infrastructure
-    - EX: $ lit build ./HelloWorld.sys
+  - {.saf file}
+    - reads the .saf file and creates running infrastructure
+    - EX: $ stratc ./HelloWorld.saf
 
   - -v or --version
-    - prints the version of litc
+    - prints the version of stratc
