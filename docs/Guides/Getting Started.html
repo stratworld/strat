@@ -41,7 +41,7 @@
     </div>
     <div>
     <strong>User Guide</strong>
-      <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/litconfig">litconfig</a></div>
+      <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/stratconfig">stratconfig</a></div>
     </div>
       </div>
     </div>
@@ -51,27 +51,26 @@
       <strong>Feature Requests -></strong>
       <a href="mailto:interest@lit.build">interest@lit.build</a>
     </div>
-    <div id="doc"><h1 id="installinglitc">Installing litc</h1>
+    <div id="doc"><h1 id="installingstratc">Installing stratc</h1>
 <ol>
 <li><p>Install <a href="https://nodejs.org/">NodeJS and NPM</a> (node version &gt; 9)</p></li>
-<li><p>Install litc using NPM:</p></li>
+<li><p>Install stratc using NPM:</p></li>
 </ol>
-<pre><code class="bash language-bash">  npm install -g litc
+<pre><code class="bash language-bash">  npm install -g stratc
 </code></pre>
-<h2 id="exhaustivecommandreference">Exhaustive Command Reference</h2>
-<p>You'll need three commands to use litc:</p>
+<h2 id="exhaustivestratccommandreference">Exhaustive stratc Command Reference</h2>
 <ul>
-<li><p>build {.lit file}</p>
+<li><p>{.st file}</p>
 <ul>
-<li>compiles the file and builds a .sys file</li>
-<li>EX: $ lit build ./HelloWorld.lit</li></ul></li>
-<li><p>deploy {.sys file}</p>
+<li>compiles the file and builds a .saf file</li>
+<li>EX: $ stratc ./HelloWorld.st</li></ul></li>
+<li><p>{.saf file}</p>
 <ul>
-<li>reads the .sys file and creates running infrastructure</li>
-<li>EX: $ lit build ./HelloWorld.sys</li></ul></li>
+<li>reads the .saf file and creates running infrastructure</li>
+<li>EX: $ stratc ./HelloWorld.saf</li></ul></li>
 <li><p>-v or --version</p>
 <ul>
-<li>prints the version of litc</li></ul></li>
+<li>prints the version of stratc</li></ul></li>
 </ul></div>
   </div>
   <div id="footer"></div>

@@ -1,3 +1,0 @@
-# litconfig.json
-
-todo

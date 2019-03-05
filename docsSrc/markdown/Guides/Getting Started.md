@@ -1,4 +1,4 @@
-# Installing litc
+# Installing stratc
 
 1. Install [NodeJS and NPM](https://nodejs.org/) (node version > 9)
 

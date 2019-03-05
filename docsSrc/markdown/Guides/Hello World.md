@@ -1,12 +1,12 @@
 # Hello world
 
-This guide will walk you through your first Lit system.  You'll create a Lit system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install [litc]("https://lit.build/Guides/Getting%20Started"), lit's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.
+This guide will walk you through your first Strat system.  You'll create a Strat system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install [stratc]("https://lit.build/Guides/Getting%20Started"), Strat's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.
 
 # Local Hello World
 
-Create a file "HelloWorld.lit" and paste the following into it:
+Create a file "HelloWorld.st" and paste the following into it:
 
-```lit
+```strat
 service HelloWorld {
   include "Http"
 
@@ -22,10 +22,10 @@ Create a file "helloWorld.js" in the same directory and paste the following into
 module.exports = () => `Hello World at ${Date.now()}!`
 ```
 
-Build and deploy HelloWorld.lit:
+Build and deploy HelloWorld.st:
 
 ```bash
-$ litc build ./HelloWorld.lit && litc deploy ./HelloWorld.sys
+$ stratc ./HelloWorld.st && stratc ./HelloWorld.saf
 ```
 
 Navigate to [localhost:3000](http://localhost:3000) in your browser
@@ -33,25 +33,25 @@ Navigate to [localhost:3000](http://localhost:3000) in your browser
 
 # The Basics
 
-Lit is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.
+Strat is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.
 
-An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by lit's standard library.  Including Http tells lit that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.
+An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.
 
 A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.
 
-The first step is to run lit build, which creates a .sys file, which is a deployable bundle of the entire system.  Sys files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sys file to your local computer.  We could also deploy that same .sys file to the AWS substrate, but we'll keep things simple for now.
+The first step is to run stratc on , which creates a .saf file, which is a deployable bundle of the entire system.  Saf files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .saf file to your local computer.  We could also deploy that same .saf file to the AWS substrate, but we'll keep things simple for now.
 
 ## Line by line breakdown
 ```
 service HelloWorld {
 ```
-Here we declare a service HelloWorld.  All functions must reside within a service.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Lit systems behaves like scope in a language like Java.
+Here we declare a service HelloWorld.  All functions must reside within a service.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Strat systems behaves like scope in a language like Java.
 
 ### 
 ```
 include "Http"
 ```
-Including Http lets us receive Http events and tells lit this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Lit you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](https://lit.build/Sources/Http) is a standard event source and part of the lit standard library.
+Including Http lets us receive Http events and tells Strat this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Strat you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](https://lit.build/Sources/Http) is a standard event source and part of the Strat standard library.
 
 ### 
 ```
@@ -63,7 +63,7 @@ This is an "event description", and its semantics are determined by the Http eve
 ```
 helloWorld ():any ->
 ```
-This is a function signature, complete with a function name, input type within the parens (in this case, no input type), and output type after the colon.  Types are not implemented yet in lit, so this function returns the any type while in the future it will return "string".
+This is a function signature, complete with a function name, input type within the parens (in this case, no input type), and output type after the colon.  Types are not implemented yet in Strat, so this function returns the any type while in the future it will return "string".
 
 ### 
 ```
@@ -74,22 +74,22 @@ This is the final part of a function definition--the artifact.  This is the code
 
 ## What did this do?
 
-You may notice that new lit_build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build_id}/HelloWorld.lit_generated_proxy_Http/HelloWorld.helloWorld/index.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the lit "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.
+You may notice that new strat_build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build_id}/HelloWorld.strat_generated_proxy_Http/HelloWorld.helloWorld/index.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the Strat "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.
 
-The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some lit generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Lit can be found [here](https://lit.build/User%20Guide/Writing%20Custom%20Sources).
+The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some Strat generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Strat can be found [here](https://lit.build/User%20Guide/Writing%20Custom%20Sources).
 
 ### All together:
   - Http created a web server running on port 3000
-  - Http created a proxy function that receives all requests from that web server and routes requests to Lit functions within the HelloWorld service
+  - Http created a proxy function that receives all requests from that web server and routes requests to Strat functions within the HelloWorld service
   - The host receives all get requests, invokes user code (helloWorld.js), and sends the responses back to the http proxy
 
 # AWS Hello World
 
-Now that you're acquainted with the basics of lit, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files when litc runs, it will provision Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.
+Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files when stratc runs, it will provision Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.
 
 1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.
 
-2) Create a file called litconfig.json and paste the following in:
+2) Create a file called stratconfig.json and paste the following in:
 
 ```json
 {
@@ -104,20 +104,20 @@ Now that you're acquainted with the basics of lit, lets do something more exciti
 ```
 NOTE: everything within the "config" hash is passed into the [AWS.Config](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html) method of the AWS SDK, so you can add and change things as needed (for instance, you can change the region to "us-west-1").
 
-3) Lit will need to create resources on your AWS account and will need credentials to do that.  There are two ways it can access those credentials.  You need to do at least one of the following:
+3) Strat will need to create resources on your AWS account and will need credentials to do that.  There are two ways it can access those credentials.  You need to do at least one of the following:
 
-  + A) Supply AWS credentials within the litconfig.json
-    - add these two properties to the config hash in litconfig.json:
+  + A) Supply AWS credentials within the stratconfig.json
+    - add these two properties to the config hash in stratconfig.json:
     - "accessKeyId": "{your access key id}",
     - "secretAccessKey": "{your secret access key}"
 
-  + B) Have lit use your shared ~/.aws/credentials file
+  + B) Have Strat use your shared ~/.aws/credentials file
     - follow the instructions to create a shared credentials file [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).  Note: you may already have one--try $ stat ~/.aws/credentials
     - If you do use an aws credentials file, make sure its for your test account!
 
     NOTE: credentials provided through A override B.
 
-4) In the future, lit will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for lit to use when creating resources.  Create an [IAM role](https://aws.amazon.com/iam/) with the following policies:
+4) In the future, Strat will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for Strat to use when creating resources.  Create an [IAM role](https://aws.amazon.com/iam/) with the following policies:
 
   + AWSLambdaFullAccess
   + AmazonS3FullAccess
@@ -142,7 +142,7 @@ And make sure the role is assumable by Lambda and ApiGateway:
 }
 ```
 
-Now, add this role's arn to litconfig.json at the path aws/preCreatedRole.  Your litconfig.json should look like this:
+Now, add this role's arn to stratconfig.json at the path aws/preCreatedRole.  Your stratconfig.json should look like this:
 
 ```json
 {
@@ -156,14 +156,14 @@ Now, add this role's arn to litconfig.json at the path aws/preCreatedRole.  Your
 }
 ```
 
-5) Run lit deploy (we don't need to build again--we can use the same .sys file)
+5) Run stratc (we don't need to build again--we can use the same .saf file)
 
 ```bash
-  $ litc deploy ./HelloWorld.sys
+  $ stratc ./HelloWorld.saf
 ```
 
 ## Check it out
 
 Inside your AWS console you can see lit created a single lambda function and an APIGateway API called "HelloWorld".  You can invoke the system by navigating to the url APIGateway generates for you.  You can find this under the stages tab on the left of the APIGateway console for HelloWorld.
 
-If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in lit [here](https://github.com/CaptainCharlieGreen/lit_demo).
+If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat [here](https://github.com/CaptainCharlieGreen/lit_demo).

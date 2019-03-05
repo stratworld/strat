@@ -1,16 +1,16 @@
 # Writing Custom Sources
 
-An event source's job is to bridge the outside world into Lit systems through events.  Some common events like Http and Cron are provided by the Lit standard library, but users may wish to create custom event sources to use more exotic infrastructure or to create custom domain based events.
+An event source's job is to bridge the outside world into Strat systems through events.  Some common events like Http and Cron are provided by the Strat standard library, but users may wish to create custom event sources to use more exotic infrastructure or to create custom domain based events.
 
 There several facets of an event source and they have a role to play at compile time, deploy time, and runtime.
 
 # Compile Time Responsibilities
 
-While litc is compiling it needs to build a system that can handle your events.  To do this, litc creates new proxy functions that will recieve your events at runtime.  These proxy functions don't host user code, they host code from the event source and their job at runtime is to interpret events, format them into Lit friendly data formats if needed, and route events to the correct functions.  Proxy functions are entirely new functions within the service where their source is included, though they rarely incur overhead as they're optimized away with the [scope collapse optimization](https://lit.build/litc/Scope%20Collapse).  litc creates a proxy function for each service which includes your source, and invokes your builder for each service with just the events declared within that service.
+While stratc is compiling it needs to build a system that can handle your events.  To do this, stratc creates new proxy functions that will recieve your events at runtime.  These proxy functions don't host user code, they host code from the event source and their job at runtime is to interpret events, format them into Strat friendly data formats if needed, and route events to the correct functions.  Proxy functions are entirely new functions within the service where their source is included, though they rarely incur overhead as they're optimized away with the [scope collapse optimization](https://lit.build/stratc/Scope%20Collapse).  stratc creates a proxy function for each service which includes your source, and invokes your builder for each service with just the events declared within that service.
 
-Your source must make a javascript builder module available to litc:
+Your source must make a javascript builder module available to stratc:
 
-```lit
+```strat
 source MySource {
   builder: "./myBuilder.js"
 }
@@ -28,8 +28,8 @@ The function you export from your builder will be called with an array of dispat
     //The name of the event source
     eventName: string
 
-    //The config hash from the lit text
-    eventConfig: { ... the string:string map as it appears in the lit text ... },
+    //The config hash from the strat text
+    eventConfig: { ... the string:string map as it appears in the strat text ... },
 
     //The fully qualified function name ex: "ServiceA.foo"
     functionName: string,
@@ -47,7 +47,7 @@ Example:
 
 Given the service:
 
-```lit
+```strat
 service Foo {
   include "MySource"
 

@@ -1,0 +1,3 @@
+# stratconfig.json
+
+todo

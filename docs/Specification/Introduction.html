@@ -41,7 +41,7 @@
     </div>
     <div>
     <strong>User Guide</strong>
-      <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/litconfig">litconfig</a></div>
+      <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/stratconfig">stratconfig</a></div>
     </div>
       </div>
     </div>
@@ -53,11 +53,11 @@
     </div>
     <div id="doc"><h1 id="introduction">Introduction</h1>
 <p>This spec is a work in progress.</p>
-<h1 id="divisionswithinlit">Divisions within Lit</h1>
-<p>Lit is comprised of five pieces of software:</p>
+<h1 id="divisionswithinstrat">Divisions within Strat</h1>
+<p>Strat is comprised of five pieces of software:</p>
 <ol>
-<li>The compiler takes Lit program text and component artifacts and produces a .sys file</li>
-<li>The deployer takes a .sys file and produces running infrastructure</li>
+<li>The compiler takes Strat program text and component artifacts and produces a .saf file</li>
+<li>The deployer takes a .saf file and produces running infrastructure</li>
 <li>The substrate informs the deployer how to create infrastructure at deploy time and informs the host how to invoke functions at runtime</li>
 <li>The host runs alongside component software and sends and recieves events for its component</li>
 <li>Event sources inform the deployer what infrastructure must be created for their particular event type and are responsible for routing events to functions at runtime.</li>

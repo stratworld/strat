@@ -60,6 +60,7 @@ Object.prototype.purge = function () {
 
 const crypto = require('crypto');
 
+//not meant to be secure
 Object.prototype.hash = function () {
   const shasum = crypto.createHash('sha1');
   shasum.update(JSON.stringify(this));
@@ -68,9 +69,7 @@ Object.prototype.hash = function () {
 
 module.exports = truncateBuffersStringify;
 
-// 1) Buffers are annoying when serialized
-// 2) 'stringify' is an obnoxious name
-// 3) ', null, 2' is obnoxious
+//Buffers are annoying when serialized
 function truncateBuffersStringify (object) {
   return JSON.stringify(object, bufferCleaner, 2);
 }
