@@ -71,7 +71,7 @@ function buildContents (markdownFiles) {
     .keys()
     .map(directoryName => `
     <div class="group">
-    <strong>${directoryName}</strong>
+    <div  class="heading">${directoryName}</div>
       <div>${createChildLinks(struct[directoryName])}</div>
     </div>`)
     .join('');
@@ -99,55 +99,21 @@ function wrapInTemplate (html, contents) {
 <body>
   <div id="navbar" class="navigation">
     <div id="logo">Strat</div>
-    <a href="">Documentation</a>
-    <a href="">Install</a>
-    <a href="">Roadmap</a>
-    <a href="">Source</a>
-    <a class="stratosphere" href="">Stratosphere</a>
-    <a href="">Contact</a>
+    <a href="/" class="heading">Documentation</a>
+    <a href="/Guides/Getting%20Started" class="heading">Install</a>
+    <a href="/Features/Roadmap" class="heading">Roadmap</a>
+    <a href="https://github.com/stratworld/strat" target="_blank" class="heading">Source</a>
+    <a class="stratosphere heading" href="/Stratosphere.html">Stratosphere</a>
+    <a href="mailto:interest@strat.world" class="heading">Contact</a>
   </div>
   <div class="row">
     <div id="menu" class="navigation">${contents}</div>
     <div id="document">${html}</div>
   </div>
   <div id="footer" class="row navigation">
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
+    <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>
+    <a class="navigation" href="mailto:help@strat.world">help@strat.world</a>
   </div>
 </body>
 `;
 }
-
-
-/*
-<body>
-  <div id="header">
-    <div>
-      <a href="/">Documentation</a>
-      <a href="/Guides/Getting%20Started">Install</a>
-      <a href="/Features/Roadmap">Roadmap</a>
-      <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
-      <a>Stratosphere</a>
-    </div>
-  </div>
-  <div id="content">
-    <div id="navigation">
-      <div id="navigation-links">
-        ${contents}
-      </div>
-    </div>
-    <div id="contact-us">
-      <strong>Help -></strong>
-      <a href="mailto:support@lit.build">support@lit.build</a>
-      <strong>Feature Requests -></strong>
-      <a href="mailto:interest@lit.build">interest@lit.build</a>
-    </div>
-    <div id="doc">${html}</div>
-  </div>
-  <div id="footer"></div>
-</body>
-*/

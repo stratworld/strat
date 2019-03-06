@@ -9,40 +9,40 @@
 <body>
   <div id="navbar" class="navigation">
     <div id="logo">Strat</div>
-    <a href="">Documentation</a>
-    <a href="">Install</a>
-    <a href="">Roadmap</a>
-    <a href="">Source</a>
-    <a class="stratosphere" href="">Stratosphere</a>
-    <a href="">Contact</a>
+    <a href="/" class="heading">Documentation</a>
+    <a href="/Guides/Getting%20Started" class="heading">Install</a>
+    <a href="/Features/Roadmap" class="heading">Roadmap</a>
+    <a href="https://github.com/stratworld/strat" target="_blank" class="heading">Source</a>
+    <a class="stratosphere heading" href="/Stratosphere.html">Stratosphere</a>
+    <a href="mailto:interest@strat.world" class="heading">Contact</a>
   </div>
   <div class="row">
     <div id="menu" class="navigation">
     <div class="group">
-    <strong>Features</strong>
+    <div  class="heading">Features</div>
       <div><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
     </div>
     <div class="group">
-    <strong>Guides</strong>
+    <div  class="heading">Guides</div>
       <div><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
-    <strong>Sources</strong>
+    <div  class="heading">Sources</div>
       <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
     </div>
     <div class="group">
-    <strong>Specification</strong>
+    <div  class="heading">Specification</div>
       <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
     </div>
     <div class="group">
-    <strong>User Guide</strong>
+    <div  class="heading">User Guide</div>
       <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/stratconfig">stratconfig</a></div>
     </div></div>
     <div id="document"><h1 id="writingcustomsources">Writing Custom Sources</h1>
 <p>An event source's job is to bridge the outside world into Strat systems through events.  Some common events like Http and Cron are provided by the Strat standard library, but users may wish to create custom event sources to use more exotic infrastructure or to create custom domain based events.</p>
 <p>There several facets of an event source and they have a role to play at compile time, deploy time, and runtime.</p>
 <h1 id="compiletimeresponsibilities">Compile Time Responsibilities</h1>
-<p>While stratc is compiling it needs to build a system that can handle your events.  To do this, stratc creates new proxy functions that will recieve your events at runtime.  These proxy functions don't host user code, they host code from the event source and their job at runtime is to interpret events, format them into Strat friendly data formats if needed, and route events to the correct functions.  Proxy functions are entirely new functions within the service where their source is included, though they rarely incur overhead as they're optimized away with the <a href="https://lit.build/stratc/Scope%20Collapse">scope collapse optimization</a>.  stratc creates a proxy function for each service which includes your source, and invokes your builder for each service with just the events declared within that service.</p>
+<p>While stratc is compiling it needs to build a system that can handle your events.  To do this, stratc creates new proxy functions that will recieve your events at runtime.  These proxy functions don't host user code, they host code from the event source and their job at runtime is to interpret events, format them into Strat friendly data formats if needed, and route events to the correct functions.  Proxy functions are entirely new functions within the service where their source is included, though they rarely incur overhead as they're optimized away with the <a href="../stratc/Scope%20Collapse">scope collapse optimization</a>.  stratc creates a proxy function for each service which includes your source, and invokes your builder for each service with just the events declared within that service.</p>
 <p>Your source must make a javascript builder module available to stratc:</p>
 <pre><code class="strat language-strat">source MySource {
   builder: "./myBuilder.js"
@@ -122,11 +122,7 @@
 <p>todo</p></div>
   </div>
   <div id="footer" class="row navigation">
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
+    <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>
+    <a class="navigation" href="mailto:help@strat.world">help@strat.world</a>
   </div>
 </body>

@@ -9,37 +9,37 @@
 <body>
   <div id="navbar" class="navigation">
     <div id="logo">Strat</div>
-    <a href="">Documentation</a>
-    <a href="">Install</a>
-    <a href="">Roadmap</a>
-    <a href="">Source</a>
-    <a class="stratosphere" href="">Stratosphere</a>
-    <a href="">Contact</a>
+    <a href="/" class="heading">Documentation</a>
+    <a href="/Guides/Getting%20Started" class="heading">Install</a>
+    <a href="/Features/Roadmap" class="heading">Roadmap</a>
+    <a href="https://github.com/stratworld/strat" target="_blank" class="heading">Source</a>
+    <a class="stratosphere heading" href="/Stratosphere.html">Stratosphere</a>
+    <a href="mailto:interest@strat.world" class="heading">Contact</a>
   </div>
   <div class="row">
     <div id="menu" class="navigation">
     <div class="group">
-    <strong>Features</strong>
+    <div  class="heading">Features</div>
       <div><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
     </div>
     <div class="group">
-    <strong>Guides</strong>
+    <div  class="heading">Guides</div>
       <div><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
-    <strong>Sources</strong>
+    <div  class="heading">Sources</div>
       <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
     </div>
     <div class="group">
-    <strong>Specification</strong>
+    <div  class="heading">Specification</div>
       <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
     </div>
     <div class="group">
-    <strong>User Guide</strong>
+    <div  class="heading">User Guide</div>
       <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/stratconfig">stratconfig</a></div>
     </div></div>
     <div id="document"><h1 id="helloworld">Hello world</h1>
-<p>This guide will walk you through your first Strat system.  You'll create a Strat system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install <a href="">stratc</a>, Strat's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.</p>
+<p>This guide will walk you through your first Strat system.  You'll create a Strat system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install <a href="./Getting%20Started">stratc</a>, Strat's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.</p>
 <h1 id="localhelloworld">Local Hello World</h1>
 <p>Create a file "HelloWorld.st" and paste the following into it:</p>
 <pre><code class="strat language-strat">service HelloWorld {
@@ -69,7 +69,7 @@
 <h3 id=""> </h3>
 <pre><code>include "Http"
 </code></pre>
-<p>Including Http lets us receive Http events and tells Strat this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Strat you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  <a href="https://lit.build/Sources/Http">Http</a> is a standard event source and part of the Strat standard library.</p>
+<p>Including Http lets us receive Http events and tells Strat this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Strat you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  <a href="../Sources/Http">Http</a> is a standard event source and part of the Strat standard library.</p>
 <h3 id="-1"> </h3>
 <pre><code>Http { method: "get", path: "*" } -&gt;
 </code></pre>
@@ -81,10 +81,10 @@
 <h3 id="-3"> </h3>
 <pre><code>"./helloWorld.js"
 </code></pre>
-<p>This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution can be found in the <a href="">functions section of the specification</a>.</p>
+<p>This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution can be found in the <a href="../Specification/Functions">functions section of the specification</a>.</p>
 <h2 id="whatdidthisdo">What did this do?</h2>
 <p>You may notice that new strat<em>build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build</em>id}/HelloWorld.strat<em>generated</em>proxy_Http/HelloWorld.helloWorld/index.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the Strat "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.</p>
-<p>The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some Strat generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Strat can be found <a href="https://lit.build/User%20Guide/Writing%20Custom%20Sources">here</a>.</p>
+<p>The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some Strat generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Strat can be found <a href="../User%20Guide/Writing%20Custom%20Sources">here</a>.</p>
 <h3 id="alltogether">All together:</h3>
 <ul>
 <li>Http created a web server running on port 3000</li>
@@ -160,11 +160,7 @@
 <p>If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat <a href="https://github.com/CaptainCharlieGreen/lit_demo">here</a>.</p></div>
   </div>
   <div id="footer" class="row navigation">
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
-    <a>contact</a>
+    <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>
+    <a class="navigation" href="mailto:help@strat.world">help@strat.world</a>
   </div>
 </body>

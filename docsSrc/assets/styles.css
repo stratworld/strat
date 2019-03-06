@@ -28,6 +28,7 @@ body {
 .navigation a {
   padding-right: 30px;
   text-decoration: none;
+  color: var(--black);
 }
 
 .navigation a:hover {
@@ -40,17 +41,21 @@ body {
   background-color: var(--lemon);
 }
 
+.heading {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+}
+
 #navbar a {
-  color: var(--black);
   padding-top: 13px;
   padding-bottom: 10px;
   padding-left: 20px;
-  font-weight:700;
-  font-size: 18px;
 }
 
 #navbar a.stratosphere {
   color: var(--accent);
+  font-weight: bold;
 }
 
 #logo {
@@ -73,6 +78,7 @@ body {
   flex: 20%;
   min-width: 250px;
   max-width: 300px;
+  padding-top: 21px;
 }
 
 .group {
@@ -84,12 +90,11 @@ body {
   padding-top: 3px;
   padding-left: 10px;
   display: block;
-  color: var(--black);
 }
 
 #document {
   flex: 80%;
-  min-height: calc(100% - 135px);
+  min-height: calc(100% - 96px);
   padding-left: 20px;
   padding-right: 20px;
   max-width: 700px;
@@ -121,5 +126,8 @@ body {
 }
 
 #footer a {
-  padding: 30px;
+  padding-top: 13px;
+  padding-bottom: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
 }

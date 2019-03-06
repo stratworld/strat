@@ -56,7 +56,7 @@ Right now the stratconifg.json is very bare-bones.  This is great.  Config files
 
 # Substrate Support
 
-Any infrastructure that can satisfy the [function abstraction]("/Specification/Function%20Infrastructure") is an eligible substrate.  For a substrate to be "complete", it must satisfy the [core infrastructure requirements]("/Specification/Infrastructure") as well as implement each standard source.  At the moment, Azure is the highest priority new substrate and is under active development.
+Any infrastructure that can satisfy the [function abstraction](../Specification/Function%20Infrastructure) is an eligible substrate.  For a substrate to be "complete", it must satisfy the [core infrastructure requirements](../Specification/Infrastructure) as well as implement each standard source.  At the moment, Azure is the highest priority new substrate and is under active development.
 
 # Language Support
 
