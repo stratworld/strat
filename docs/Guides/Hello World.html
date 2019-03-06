@@ -7,51 +7,38 @@
   <link rel="stylesheet" type="text/css" href="/styles.css">
 </head>
 <body>
-  <div id="header">
-    <div>
-      <a href="/">Documentation</a>
-      <a href="/Guides/Getting%20Started">Install</a>
-      <a href="/Features/Roadmap">Roadmap</a>
-      <a href="https://github.com/litlang/lit" target="_blank">GitHub</a>
-      <a>Products</a>
-    </div>
+  <div id="navbar" class="navigation">
+    <div id="logo">Strat</div>
+    <a href="">Documentation</a>
+    <a href="">Install</a>
+    <a href="">Roadmap</a>
+    <a href="">Source</a>
+    <a class="stratosphere" href="">Stratosphere</a>
+    <a href="">Contact</a>
   </div>
-  <div id="content">
-    <div id="navigation">
-      <a href="/">
-        <img src="/litplaincrop.png" alt="Lit" height="55">
-      </a>
-      <div id="navigation-links">
-        
-    <div>
+  <div class="row">
+    <div id="menu" class="navigation">
+    <div class="group">
     <strong>Features</strong>
       <div><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
     </div>
-    <div>
+    <div class="group">
     <strong>Guides</strong>
       <div><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
-    <div>
+    <div class="group">
     <strong>Sources</strong>
       <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
     </div>
-    <div>
+    <div class="group">
     <strong>Specification</strong>
       <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a></div>
     </div>
-    <div>
+    <div class="group">
     <strong>User Guide</strong>
       <div><a class="nav-page" href="/User Guide/Writing Custom Sources">Writing Custom Sources</a><a class="nav-page" href="/User Guide/stratconfig">stratconfig</a></div>
-    </div>
-      </div>
-    </div>
-    <div id="contact-us">
-      <strong>Help -></strong>
-      <a href="mailto:support@lit.build">support@lit.build</a>
-      <strong>Feature Requests -></strong>
-      <a href="mailto:interest@lit.build">interest@lit.build</a>
-    </div>
-    <div id="doc"><h1 id="helloworld">Hello world</h1>
+    </div></div>
+    <div id="document"><h1 id="helloworld">Hello world</h1>
 <p>This guide will walk you through your first Strat system.  You'll create a Strat system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install <a href="">stratc</a>, Strat's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.</p>
 <h1 id="localhelloworld">Local Hello World</h1>
 <p>Create a file "HelloWorld.st" and paste the following into it:</p>
@@ -172,5 +159,12 @@
 <p>Inside your AWS console you can see lit created a single lambda function and an APIGateway API called "HelloWorld".  You can invoke the system by navigating to the url APIGateway generates for you.  You can find this under the stages tab on the left of the APIGateway console for HelloWorld.</p>
 <p>If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat <a href="https://github.com/CaptainCharlieGreen/lit_demo">here</a>.</p></div>
   </div>
-  <div id="footer"></div>
+  <div id="footer" class="row navigation">
+    <a>contact</a>
+    <a>contact</a>
+    <a>contact</a>
+    <a>contact</a>
+    <a>contact</a>
+    <a>contact</a>
+  </div>
 </body>

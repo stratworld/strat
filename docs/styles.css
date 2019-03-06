@@ -1,170 +1,125 @@
+:root {
+  /*#fefae1*/
+  --white: white;
+  --black: black;
+  --accent: deepskyblue;
+  --lemon: #feffef;
+}
+
+var(--offwhite)
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: 'Work Sans', sans-serif;
   margin: 0;
-  color: #333;
-  position: relative;
-  min-height: 100%;
-  padding-bottom: 300px;
+  font-family: 'Work Sans', sans-serif;
+/*  font-size: 16px;*/
+  background-color: var(--white);
 }
 
-h1 {
-  /*text-transform: uppercase;*/
-  color: #00AEEB;
-  font-weight: 800;
-  background-color: black;
-  padding-left:10px;
-  padding-right:10px;
-  display: inline;
-  letter-spacing: 1px;
-  font-size: 35px;
+.navigation a:hover::after {
+  content: '->';
+  position: absolute;
+  margin-left: 3px;
 }
 
-h2 {
-  font-weight: 600;
-  font-size: 25px;
-}
-
-strong {
-  font-weight: 600;
-}
-
-p, ul {
-  font-size: 18px;
-  line-height: 160%;
-  letter-spacing: -.8;
-}
-
-#header {
-  width: 100%;
-  position: fixed;
-  left: 0;
-  right: 0;
-  height: 50px;
-  background-color: black;
-  overflow: hidden;
-  z-index: 1;
-}
-
-#header > div {
-  max-width: 800px;
-  margin-left: 280px;
-  margin-right: auto;
-}
-
-#header a {
-  text-transform: uppercase;
-  font-weight: 800;
-  font-size: 17px;
-  line-height: 30px;
-  margin-right: 20px;
-  padding: 10px;
-  cursor: pointer;
-  float: left;
-  color: #eee;
+.navigation a {
+  padding-right: 30px;
   text-decoration: none;
 }
 
-#header a:hover::after {
-  content: '->';
-  margin-left: 5px;
-  position: absolute;
+.navigation a:hover {
+  text-decoration: underline;
 }
 
-#header a:first-child {
-  margin-left: 20px;
+#navbar {
+  display: flex;
+  border-bottom: 3px solid var(--black);
+  background-color: var(--lemon);
 }
 
-#header a:last-child {
-  color: #eb4a00;
-  border-bottom: 3px solid #eb4a00;
-  padding-bottom: 0px;
-}
-
-#content {
-  padding-top: 70px;
-  padding-left: 20px;
+#navbar a {
+  color: var(--black);
+  padding-top: 13px;
   padding-bottom: 10px;
-}
-
-#navigation {
-  width: 250px;
-  height: calc(100% - 90px);
-  border-right: 10px solid #00AEEB;
-  color: #eee;
-  background-color: black;
-  position: fixed;
-  left: 20;
-  top: 70;
-}
-
-#navigation strong, #contact-us strong {
-  padding-left: 10px;
-  height: 30px;
-  font-size: 17px;
-  display: block;
-  text-transform: uppercase;
-  line-height: 30px;
-  font-weight: 800;
-}
-
-#navigation img {
-  margin-top: 7px;
-  margin-left: 128px;
-}
-
-#navigation-links {
-  border-top: 5px solid #00AEEB;
-  margin-top: 7px;
-  padding-top: 10px;
-}
-
-.nav-page {
-  display: block;
-  color: #eee;
-  padding-left: 30px;
-  text-decoration: none;
-  margin-bottom: 7px;
-  margin-top: 7px;
-  font-size: 17px;
-}
-
-.nav-page:hover {
-  color: #00AEEB;
-}
-
-.nav-page:hover::after {
-  content: '->';
-  margin-left: 5px;
-  position: absolute;
-}
-
-#doc {
-  margin-left: 290px;
-  width: 700px;
-}
-
-#contact-us {
-  border-top: 5px solid #00AEEB;
-  width: 250px;
-  position: fixed;
-  color: #eee;
-  left: 20;
-  bottom: 20;
-  padding-bottom: 5px;
-  background-color: black;
-}
-
-#contact-us a {
-  color: #00AEEB;
-  font-weight: 600;
   padding-left: 20px;
+  font-weight:700;
+  font-size: 18px;
 }
 
-pre {
-  padding: 10px;
-  background-color: #ccc;
+#navbar a.stratosphere {
+  color: var(--accent);
 }
 
-code {
-  font-family: 'Inconsolata', monospace;
+#logo {
+  font-size: 30px;
+  font-weight: 900;
+  text-transform: uppercase;
+  background-color: var(--accent);
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#menu {
+  flex: 20%;
+  min-width: 250px;
+  max-width: 300px;
+}
+
+.group {
+  padding-left:10px;
+  margin-top: 5px;
+}
+
+.group a {
+  padding-top: 3px;
+  padding-left: 10px;
+  display: block;
+  color: var(--black);
+}
+
+#document {
+  flex: 80%;
+  min-height: calc(100% - 135px);
+  padding-left: 20px;
+  padding-right: 20px;
+  max-width: 700px;
+  background-color: var(--white);
+}
+
+#document pre {
+  padding: 20px;
+  border: 1px solid var(--black);
+  background-color: var(--lemon);
+}
+
+#document a {
+  color: var(--accent);
+}
+
+#document h1 {
+  border-bottom: 3px solid var(--accent);
+  padding-left: 3px;
+}
+
+#document p, #document li {
+  line-height: 22px;
+}
+
+#footer {
+  border-top: 3px solid var(--black);
+  background-color: var(--lemon);
+}
+
+#footer a {
+  padding: 30px;
 }
