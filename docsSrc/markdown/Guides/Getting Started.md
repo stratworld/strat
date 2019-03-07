@@ -15,9 +15,9 @@
     - compiles the file and builds a .saf file
     - EX: $ stratc ./HelloWorld.st
 
-  - {.saf file}
-    - reads the .saf file and creates running infrastructure
-    - EX: $ stratc ./HelloWorld.saf
+  - {.sa file}
+    - reads the .sa file and creates running infrastructure
+    - EX: $ stratc ./HelloWorld.sa
 
   - -v or --version
     - prints the version of stratc

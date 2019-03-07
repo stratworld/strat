@@ -54,14 +54,14 @@
 <pre><code class="javascript language-javascript">module.exports = () =&gt; `Hello World at ${Date.now()}!`
 </code></pre>
 <p>Build and deploy HelloWorld.st:</p>
-<pre><code class="bash language-bash">$ stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.saf
+<pre><code class="bash language-bash">$ stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
 </code></pre>
 <p>Navigate to <a href="http://localhost:3000">localhost:3000</a> in your browser</p>
 <h1 id="thebasics">The Basics</h1>
 <p>Strat is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.</p>
 <p>An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.</p>
 <p>A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.</p>
-<p>The first step is to run stratc on , which creates a .saf file, which is a deployable bundle of the entire system.  Saf files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .saf file to your local computer.  We could also deploy that same .saf file to the AWS substrate, but we'll keep things simple for now.</p>
+<p>The first step is to run stratc on , which creates a .sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.</p>
 <h2 id="linebylinebreakdown">Line by line breakdown</h2>
 <pre><code>service HelloWorld {
 </code></pre>
@@ -152,8 +152,8 @@
   }
 }
 </code></pre>
-<p>5) Run stratc (we don't need to build again--we can use the same .saf file)</p>
-<pre><code class="bash language-bash">  $ stratc ./HelloWorld.saf
+<p>5) Run stratc (we don't need to build again--we can use the same .sa file)</p>
+<pre><code class="bash language-bash">  $ stratc ./HelloWorld.sa
 </code></pre>
 <h2 id="checkitout">Check it out</h2>
 <p>Inside your AWS console you can see lit created a single lambda function and an APIGateway API called "HelloWorld".  You can invoke the system by navigating to the url APIGateway generates for you.  You can find this under the stages tab on the left of the APIGateway console for HelloWorld.</p>

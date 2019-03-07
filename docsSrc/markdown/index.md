@@ -2,7 +2,7 @@
 
 Strat is a language to represent and deploy portable cloud systems.
 
-Compile your system componets and .st files into system artifact files.  Then, deploy those .saf files to any strat virtual substrate (SVS) implementation.  Strat does for cloud infrastructure what Java does for computers.
+Compile your system componets and .st files into system artifact (.sa) files.  Then, deploy those .sa files to any strat virtual substrate (SVS) implementation.  Strat does for cloud infrastructure what Java does for computers.
 
 Currently supported SVS implementations:
 

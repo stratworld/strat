@@ -25,7 +25,7 @@ module.exports = () => `Hello World at ${Date.now()}!`
 Build and deploy HelloWorld.st:
 
 ```bash
-$ stratc ./HelloWorld.st && stratc ./HelloWorld.saf
+$ stratc ./HelloWorld.st && stratc ./HelloWorld.sa
 ```
 
 Navigate to [localhost:3000](http://localhost:3000) in your browser
@@ -39,7 +39,7 @@ An "event" is a single piece of serialized data that is passed into your system.
 
 A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.
 
-The first step is to run stratc on , which creates a .saf file, which is a deployable bundle of the entire system.  Saf files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .saf file to your local computer.  We could also deploy that same .saf file to the AWS substrate, but we'll keep things simple for now.
+The first step is to run stratc on , which creates a .sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.
 
 ## Line by line breakdown
 ```
@@ -156,10 +156,10 @@ Now, add this role's arn to stratconfig.json at the path aws/preCreatedRole.  Yo
 }
 ```
 
-5) Run stratc (we don't need to build again--we can use the same .saf file)
+5) Run stratc (we don't need to build again--we can use the same .sa file)
 
 ```bash
-  $ stratc ./HelloWorld.saf
+  $ stratc ./HelloWorld.sa
 ```
 
 ## Check it out

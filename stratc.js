@@ -56,7 +56,7 @@ if (typeof command === 'string' && filename === undefined) {
   if (command.indexOf('.st') > 0) {
     filename = command;
     command = 'build';
-  } else if (command.indexOf('.saf') > 0) {
+  } else if (command.indexOf('.sa') > 0) {
     filename = command;
     command = 'deploy';
   }
