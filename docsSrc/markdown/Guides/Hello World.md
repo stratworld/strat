@@ -39,7 +39,7 @@ An "event" is a single piece of serialized data that is passed into your system.
 
 A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.
 
-The first step is to run stratc on , which creates a .sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.
+The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.
 
 ## Line by line breakdown
 ```
@@ -51,9 +51,9 @@ Here we declare a service HelloWorld.  All functions must reside within a servic
 ```
 include "Http"
 ```
-Including Http lets us receive Http events and tells Strat this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Strat you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  [Http](../Sources/Http) is a standard event source and part of the Strat standard library.
+Including Http lets us receive Http events and tells Strat this is a web server.  [Http](../Sources/Http) is a standard event source and part of the Strat standard library.
 
-### 
+###
 ```
 Http { method: "get", path: "*" } ->
 ```
@@ -70,18 +70,6 @@ This is a function signature, complete with a function name, input type within t
 "./helloWorld.js"
 ```
 This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs...somewhere...more on code execution can be found in the [functions section of the specification](../Specification/Functions).
-
-
-## What did this do?
-
-You may notice that new strat_build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build_id}/HelloWorld.strat_generated_proxy_Http/HelloWorld.helloWorld/index.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the Strat "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.
-
-The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some Strat generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Strat can be found [here](../User%20Guide/Writing%20Custom%20Sources).
-
-### All together:
-  - Http created a web server running on port 3000
-  - Http created a proxy function that receives all requests from that web server and routes requests to Strat functions within the HelloWorld service
-  - The host receives all get requests, invokes user code (helloWorld.js), and sends the responses back to the http proxy
 
 # AWS Hello World
 

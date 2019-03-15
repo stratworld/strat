@@ -19,10 +19,11 @@ function generateName (dispatch) {
   const eventName = val(firstEvent, 'name');
   const eventConfig = kvpsToMap(traverse(dispatch, ['event', 'kvp']));
 
-  const name = {
+  const nameHash = {
     name: eventName,
     config: eventConfig
   }.hash();
+  const name = `anonymousResource#${nameHash.substr(0,8)}`;
 
   dispatch.functionName = [nameAst(name)];
 }

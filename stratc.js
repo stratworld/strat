@@ -1,6 +1,7 @@
 #! /usr/bin/node
 
 const compilerConstructor = require('./stratc/compiler');
+const localSVS = require('./svs/local');
 const defaultFs = require('./util/fileSystem');
 const defaultLoader = require('./util/loader');
 const defaultInternet = require('./util/theInternet');
@@ -72,6 +73,9 @@ if (command === 'help' || command === '-h' || command === '--help') {
   var work;
   if (typeof stdinData === 'object') {
     work = stdinData.then(data => compile(command, data, filename))
+  } else if (command === 'deploy') {
+    work = defaultFs.cat(filename)
+      .then(localSVS);
   } else if (typeof filename === 'string') {
     work = defaultFs.cat(filename)
       .then(data => compile(command, data, filename));

@@ -61,7 +61,7 @@
 <p>Strat is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.</p>
 <p>An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.</p>
 <p>A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.</p>
-<p>The first step is to run stratc on , which creates a .sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.</p>
+<p>The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.</p>
 <h2 id="linebylinebreakdown">Line by line breakdown</h2>
 <pre><code>service HelloWorld {
 </code></pre>
@@ -69,8 +69,8 @@
 <h3 id=""> </h3>
 <pre><code>include "Http"
 </code></pre>
-<p>Including Http lets us receive Http events and tells Strat this is a web server.  You may notice that the include is within the service definition while most other languages put includes and imports at the top of the file.  In Strat you place includes within services to show that including Http modifies the HelloWorld service and shows includes play by the same scope and access control rules as functions.  <a href="../Sources/Http">Http</a> is a standard event source and part of the Strat standard library.</p>
-<h3 id="-1"> </h3>
+<p>Including Http lets us receive Http events and tells Strat this is a web server.  <a href="../Sources/Http">Http</a> is a standard event source and part of the Strat standard library.</p>
+<h2 id="-1">#</h2>
 <pre><code>Http { method: "get", path: "*" } -&gt;
 </code></pre>
 <p>This is an "event description", and its semantics are determined by the Http event source.  The gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "All Http get requests should be sent to the following function".</p>
@@ -82,15 +82,6 @@
 <pre><code>"./helloWorld.js"
 </code></pre>
 <p>This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution can be found in the <a href="../Specification/Functions">functions section of the specification</a>.</p>
-<h2 id="whatdidthisdo">What did this do?</h2>
-<p>You may notice that new strat<em>build/ directory--feel free to poke around.  You can find our friendly helloWorld.js file copied to build/{build</em>id}/HelloWorld.strat<em>generated</em>proxy_Http/HelloWorld.helloWorld/index.js with a bunch of stuff copied around it.  That stuff is the "host", which is a part of the Strat "runtime".  The host's job is to interface with whatever infrastructure your code is running on and move events to and from your code.</p>
-<p>The Http event source also created a web server using NodeJS's Http library, which is what you're visiting when you navigate to localhost:3000.  You may notice that the top-level directory is some Strat generated proxy.  This is a proxy function created by Http to receive http events.  More on events and how they work within Strat can be found <a href="../User%20Guide/Writing%20Custom%20Sources">here</a>.</p>
-<h3 id="alltogether">All together:</h3>
-<ul>
-<li>Http created a web server running on port 3000</li>
-<li>Http created a proxy function that receives all requests from that web server and routes requests to Strat functions within the HelloWorld service</li>
-<li>The host receives all get requests, invokes user code (helloWorld.js), and sends the responses back to the http proxy</li>
-</ul>
 <h1 id="awshelloworld">AWS Hello World</h1>
 <p>Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files when stratc runs, it will provision Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.</p>
 <p>1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.</p>
