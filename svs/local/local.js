@@ -1,5 +1,5 @@
 const nodeEval = require('node-eval');
-const Archive = require('../util/archiveBuilder');
+const Archive = require('../../util/archiveBuilder');
 const stdPath = require('path');
 const Http = require('./Http');
 
@@ -25,7 +25,7 @@ function getRegistry (archive, ir) {
       const artifact = artifactTuple[1];
       const runtime = artifactTuple[0];
       lookup[artifact.name] = (runtime === undefined
-        ? loadResource : loadFunction)(artifact, archive);
+        ? loadResource: loadFunction)(artifact, archive);
       return lookup;
     }, {});
 }

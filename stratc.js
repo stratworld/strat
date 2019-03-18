@@ -1,7 +1,7 @@
 #! /usr/bin/node
 
 const compilerConstructor = require('./stratc/compiler');
-const localSVS = require('./svs/local');
+const localSVS = require('./svs/local/local');
 const defaultFs = require('./util/fileSystem');
 const defaultLoader = require('./util/loader');
 const defaultInternet = require('./util/theInternet');
