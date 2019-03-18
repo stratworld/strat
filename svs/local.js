@@ -46,7 +46,11 @@ function loadFunction (artifactConfig, archive) {
   const invokableFunction = nodeEval(modifiedScript, `./${filePath}`);
 
   return event => {
-    return invokableFunction(event, artifactConfig.declaration);
+    const result = invokableFunction(event, artifactConfig.declaration);
+    return typeof result === 'object'
+      && typeof result.then === 'function'
+      ? result
+      : Promise.resolve(result);
   };
 }
 
