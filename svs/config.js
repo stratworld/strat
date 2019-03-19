@@ -16,5 +16,5 @@ module.exports = () => {
   if (fs.existsSync(potentialConfigFile)) {
     return require(potentialConfigFile);
   }
-  return require('./defaultConfig.json');
+  return { substrate: 'local' };
 };

@@ -68,21 +68,27 @@ module.exports = function (event) {
     body: body,
     params: matchedMethod.params
   })
-  .then(response => Promise.resolve({
-    statusCode: 200,
-    headers: matchedMethod.branch.headers,
-    isBase64Encoded: false,
-    body: typeof response === 'string' ? response : JSON.stringify(response),
-  }))
+  .then(response => {
+    const body = (matchedMethod.branch.headers || {})
+      ["Content-Type"] === 'application/json'
+        ? JSON.stringify(response)
+        : response;
+    return Promise.resolve({
+      statusCode: 200,
+      headers: matchedMethod.branch.headers,
+      isBase64Encoded: false,
+      body: body,
+    })
+  })
   .catch(e => {
     return Promise.resolve({
       // if we didn't like it its a bad request!
       // could 500 here, but that's a little dramatic
       // its not me, its you!
-      statusCode: 400,
+      statusCode: 500,
       headers: {},
       isBase64Encoded: false,
-      body: e
+      body: e.toString()
     })
   });
 };

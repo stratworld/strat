@@ -2,7 +2,6 @@ const serializeAST = require('../util/jsExtensions');
 const stdPath = require('path');
 const frontend = passify(require('./frontend/passes'));
 const midend = passify(require('./midend/passes'));
-const backend = passify(require('./backend/passes'));
 const errorFormat = require('./errors');
 
 function passify (passTuple) {
@@ -17,15 +16,12 @@ function passify (passTuple) {
 
 const everything = []
   .concat(frontend)
-  .concat(midend)
-  .concat(backend);
+  .concat(midend);
 
 const prebuiltSegments = {
   frontend: frontend,
   midend: midend,
-  backend: backend,
-  build: frontend.concat(midend),
-  deploy: backend
+  build: frontend.concat(midend)
 };
 
 function getSegment (start, stop) {
