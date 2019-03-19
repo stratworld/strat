@@ -45,6 +45,10 @@ Engineers have made good headway with some of the challenges of describing event
 
 Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goals of a Strat type system.
 
+# Foreign Source/Service Interface
+
+Strat needs a way for developers to add source and service libraries that expose more exotic infrastructure that a particular substrate provides.  This problem is analagous to foreign function interfaces in normal languages.
+
 # Config Settings
 
 Right now the stratconifg.json is very bare-bones.  This is great.  Config files suck.  A large feature set left out of Strat is fine-grained infrastructure configuration, which was intentional, but users will need it eventually, and stratconifg is the perfect place to put them.  In Java, for example, if you want to set how much RAM the JVM should consume you use config files, and if you want to control the resources Strat uses you should use stratconifg.  Some obvious use cases:
