@@ -69,10 +69,12 @@ module.exports = function (event) {
     params: matchedMethod.params
   })
   .then(response => {
-    const body = (matchedMethod.branch.headers || {})
-      ["Content-Type"] === 'application/json'
+    const contentType = (matchedMethod.branch.headers
+      || {})["Content-Type"];
+    var body = contentType === 'application/json'
         ? JSON.stringify(response)
         : response;
+    body = apiGatewayHack(event, body, contentType);
     return Promise.resolve({
       statusCode: 200,
       headers: matchedMethod.branch.headers,
@@ -92,3 +94,28 @@ module.exports = function (event) {
     })
   });
 };
+
+/*
+  AWS APIGateway's development stages insert the stage name as
+  a path section.  EX: .execute-api.us-west-2.amazonaws.com/Client
+
+  This is hell and completely breaks html imports like:
+    <link rel="stylesheet" type="text/css" href="root.css">
+
+  I have figured out two workarounds for this:
+    A) duplicate every html import and deal with the 403s:
+      1) <link rel="stylesheet" type="text/css" href="root.css">
+      2) <link rel="stylesheet" type="text/css" href="Client/root.css">
+    B) rewrite the html to include a base href 
+
+  This is a function that does B.  Its awful and I hate it.
+*/
+function apiGatewayHack (event, body, contentType) {
+  if (contentType !== 'text/html'
+    || event === undefined
+    || event.requestContext === undefined
+    || event.path === event.requestContext.path) {
+    return body;
+  }
+  return body.replace('<head>', `<head><base href="https://${event.requestContext.domainName}${event.requestContext.path}/">`);
+}

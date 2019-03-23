@@ -25,7 +25,17 @@ function bootstrapStrat (injectedIr, reg) {
 }
 
 function runtimeStrat (callerName) {
-  return function (dependency) {
+  function resolve (dependency, stopRecurse) {
+    // if a user requires a strat dep as part of its script initialization
+    // we delay the resolution until they attempt to invoke the dependency
+    if (scopeLookup === undefined && !stopRecurse) {
+      return function (...args) {
+        return resolve(dependency, true)(...args);
+      }
+    }
+    if (scopeLookup === undefined && stopRecurse) {
+      throw `${callerName} attempted to invoke ${dependency} outside of its exported handler.  Strat dependencies can only be invoked inside exported handlers.`;
+    }
     const callerScope = scopeLookup[callerName];
     //todo: refine this; the 4th branch is a system failure not a user error
     if (callerScope === undefined
@@ -37,4 +47,5 @@ function runtimeStrat (callerName) {
 
     return registry[dependency];
   }
+  return resolve;
 };
