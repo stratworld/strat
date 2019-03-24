@@ -1,6 +1,6 @@
 /*
 file
-  (service|source)
+  (service|source)*
 
 service
   "service" IDENTIFIER '{' (component|include)* '}'

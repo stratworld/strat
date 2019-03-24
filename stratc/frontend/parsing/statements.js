@@ -3,10 +3,17 @@ const AST = require("../../ast").build;
 module.exports = function (T, error, descend) {
   return {
     file: () => {
-      const next = T.match('SOURCE')
-        ? 'source'
-        : 'service';
-      return AST('file', {}, descend(next));
+      const children = {
+        source: [],
+        service: []
+      };
+      while(!T.atEnd()) {
+        const next = T.match('SOURCE')
+          ? 'source'
+          : 'service';
+        children[next].push(descend(next));
+      }
+      return AST('file', {}, children.source, children.service);
     },
     source: () => {
       const name = T.consume('IDENTIFIER');

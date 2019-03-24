@@ -46,22 +46,43 @@ function getHosts (ast) {
         })
     })
 }
+/*
+A function is in scope for a function declared inside service A if:
+  1) it is also declared within service A
+  2) it is declared in the same file in another service
+  3) it is declared in services in files included in service A
 
+The objective of this function is to generate the scope lookup:
+  {
+    scopeName: {
+      functionName: true
+    } 
+  }
+*/
 function getScopes (ast) {
-  return traverse(ast, ['file', 'service'])
-    .reduce((scopes, service) => {
-      const serviceName = val(service, 'name');
-      const declaredFunctions = traverse(service, ['function'])
-        .map(fn => name(serviceName, fn));
-      const includedFunctions = resolve(ast, traverse(service, ['include']))
-        .flatmap(resolvedFile => traverse(resolvedFile, ['service']))
-        .flatmap(service => traverse(service, ['function'])
-          .map(fn => name(service, fn)))
+  const filePathsToBaseScopes = traverse(ast, ['file'])
+    .reduce((lookup, file) => {
+      const services = traverse(file, ['service']);
+      const baseScopeForFile = services
+        .flatmap(getFunctionNamesFromService);
+      lookup[val(file, 'path')] = baseScopeForFile;
+      return lookup;
+    }, {});
 
-      scopes[serviceName] = declaredFunctions
-        .concat(includedFunctions)
+  return traverse(ast, ['file'])
+    .flatmap(file => traverse(file, ['service'])
+      .map(service => [val(file, 'path'), service]))
+    .map(filePathAndService => {
+      const baseScope = filePathsToBaseScopes[filePathAndService[0]];
+      const service = filePathAndService[1];
+      const includedScopes = traverse(service, ['include'])
+        .flatmap(include => filePathsToBaseScopes[val(include, 'path')]);
+      return [val(service, 'name'), baseScope.concat(includedScopes)];
+    })
+    .reduce((allScopes, serviceScope) => {
+      allScopes[serviceScope[0]] = serviceScope[1]
         .constantMapping(true);
-      return scopes;
+      return allScopes;
     }, {});
 }
 
@@ -125,4 +146,9 @@ function getRuntime (fn, path) {
       msg: `${path} line ${fnLine}
 Function ${val(fn, 'name')} can't be executed--only artifacts with a ".js" extension can be executed`
     };
+}
+
+function getFunctionNamesFromService (service) {
+  return traverse(service, ['function'])
+    .map(fn => name(service, fn));
 }

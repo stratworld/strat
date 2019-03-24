@@ -8,7 +8,7 @@ const policies = [
   namesCanOnlyBeDeclaredOnce,
   shapeNamesHaveBeenDeclared,
   eventsMustHaveBeenIncluded,
-  canOnlyReferenceIncludedServices,
+  canOnlyReferenceServicesInScope,
   
   //todo: requires refactor of this file
   //referencesPointToRealFunctions
@@ -61,7 +61,12 @@ ${val(entity, 'name')} should be declared in a file named ${val(entity, 'name')}
 // The upside here is it makes includes and using them dramatically simpler
 // This is also a restriction that can be lifted later
 function canOnlyIncludeANameOnce (file) {
-  checkDupNames(traverse(file, ['service|source', 'include']), val(file, 'path'));
+  const topLevelEntities = traverse(file, ['service|source']);
+
+  topLevelEntities.forEach(entity => {
+    checkDupNames(traverse(entity, ['include'])
+      .concat(topLevelEntities) , val(file, 'path'));  
+  })
 }
 
 function checkDupNames (entities, filepath) {
@@ -83,10 +88,14 @@ ${entityName} is already declared on line ${existingNameTokens[entityName].line}
 }
 
 function namesCanOnlyBeDeclaredOnce (file) {
-  const functions = getFunctions(file);
-  const functionsAndIncludes = functions
-    .concat(traverse(file, ['service|source', 'include']))
-  checkDupNames(functionsAndIncludes, val(file, 'path'));
+  const topLevelEntities = traverse(file, ['service|source']);
+  checkDupNames(topLevelEntities, val(file, 'path'));
+  topLevelEntities.forEach(entity => {
+    checkDupNames(
+      traverse(entity, ['include'])
+        .concat(traverse(entity, ['function|dispatch', 'functionName']))
+      , val(file, 'path'));
+  });
 }
 
 const allowedShapes = {
@@ -142,40 +151,41 @@ Event ${val(event, 'name')} is not included.`
   });
 }
 
-function canOnlyReferenceIncludedServices (file, ast) {
-  const basenameToServiceName = traverse(ast, ['file'])
-    .filter(file => traverse(file, ['service'])[0] !== undefined)
-    .reduce((lookup, file) => {
-      lookup[path.basename(val(file, 'path'), '.st')]
-        = val(traverse(file, ['service'])[0], 'name');
+function canOnlyReferenceServicesInScope (file, ast) {
+  const servicesInFile = traverse(file, ['service']);
+  const filePath = val(file, 'path');
+  const serviceNamesInFile = servicesInFile.map(service => val(service, 'name'));
+
+  // { basename: [ serviceNames] }
+  const baseNamesToServiceNames = traverse(ast, ['file'])
+    .filter(file => traverse(file, ['service']).length > 0)
+    .reduce((lookup, fileWithServices) => {
+      lookup[path.basename(val(fileWithServices, 'path'), '.st')]
+        = traverse(fileWithServices, ['service']).map(service => val(service, 'name'));
       return lookup;
     }, {});
 
+  servicesInFile.forEach(service => {
+    const allIncludedServices = traverse(service, ['include'])
+      .map(include => path.basename(val(include, 'path'), '.st'))
+      .flatmap(includeBaseName => baseNamesToServiceNames[includeBaseName]);
 
-  //get all the include basenames from this file
-  const includeBasenames = traverse(file, ['service', 'include'])
-    .map(include => path.basename(val(include, 'path'), '.st'))
-    .constantMapping(true);
+    const servicesInScope = serviceNamesInFile
+      .concat(allIncludedServices)
+      .constantMapping(true);
 
-  //find the services that each include resolved to
-  const resolvedServiceNames = basenameToServiceName
-    .keys()
-    .filter(basename => includeBasenames[basename] !== undefined)
-    .map(basename => basenameToServiceName[basename])
-    .constantMapping(true);
+    const references = traverse(service, ['dispatch', 'reference']);
 
-  const filePath = val(file, 'path');
-  const references = traverse(file, ['service', 'dispatch', 'reference']);
-
-  references.forEach(reference => {
-    const referenceService = val(reference, 'service');
-    if (!resolvedServiceNames[referenceService]) {
-      throw {
-        errorCode: 'E_NAMES_UNDECLARED',
-        error: 'Unincluded service reference',
-        msg: `${filePath} line ${line(reference, 'service')}
-Service ${referenceService} is not included.`
+    references.forEach(reference => {
+      const referenceService = val(reference, 'service');
+      if (!servicesInScope[referenceService]) {
+        throw {
+          errorCode: 'E_NAMES_UNDECLARED',
+          error: 'Unincluded service reference',
+          msg: `${filePath} line ${line(reference, 'service')}
+  Service ${referenceService} is not included.`
+        }
       }
-    }
+    });
   });
 }
