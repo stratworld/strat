@@ -11,13 +11,13 @@ module.exports = function (tokens) {
     return false;
   }
 
-  function consume (desiredType, errorMsg) {
+  function consume (desiredType) {
     if (check(desiredType)) return advance();
     throw {
-      token: peek(),
-      msg: (errorMsg === undefined)
-        ? `expected ${getName(desiredType)}`
-        : errorMsg
+      stratCode: "E_UNEXPECTED_TOKEN",
+      message: `Unexpected token ${peek().value}
+Expected ${getName(desiredType)}`,
+      line: peek().line
     };
   }
 

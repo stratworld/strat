@@ -16,8 +16,8 @@ function bootstrapStrat (injectedIr, reg) {
   registry = reg;
   ir = injectedIr;
   scopeLookup = ir.hosts
-    .flatmap(host => host.artifacts
-      .map(artifact => [host.scope, artifact.name]))
+    .flatmap(host => host.artifacts)
+    .map(artifact => [artifact.scope, artifact.name])
     .reduce((lookup, artifactTuple) => {
       lookup[artifactTuple[1]] = artifactTuple[0];
       return lookup;
@@ -26,6 +26,7 @@ function bootstrapStrat (injectedIr, reg) {
 
 function runtimeStrat (callerName) {
   function resolve (dependency, stopRecurse) {
+
     // if a user requires a strat dep as part of its script initialization
     // we delay the resolution until they attempt to invoke the dependency
     if (scopeLookup === undefined && !stopRecurse) {
@@ -37,6 +38,7 @@ function runtimeStrat (callerName) {
       throw `${callerName} attempted to invoke ${dependency} outside of its exported handler.  Strat dependencies can only be invoked inside exported handlers.`;
     }
     const callerScope = scopeLookup[callerName];
+
     //todo: refine this; the 4th branch is a system failure not a user error
     if (callerScope === undefined
       || ir.scopes[callerScope] === undefined

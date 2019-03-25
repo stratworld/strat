@@ -50,11 +50,12 @@ async function resolveArtifact (fn, declaredPath) {
     }))
     .catch(e => {
       return J({
-        error: e,
-        msg: `${declaredPath} line ${line(fn, 'artifact')}
-Failed to load file ${filePath}.`
+        stratCode: 'E_INVALID_ARTIFACT',
+        message: `Failed to load file ${filePath}: ${e.message}`,
+        file: declaredPath,
+        line: line(fn, 'artifact')
       })
-    })
+    });
 }
 
 function getArtifact (fn, declaredPath) {

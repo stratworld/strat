@@ -13,7 +13,7 @@ module.exports = async function (hostWithScope) {
 const NodeHost = function (config) {
   this.archiveBuilder = new ArchiveBuilder();
   this.host = config.host;
-  this.scope = config.scope;
+  this.scopes = config.scopes;
 };
 
 NodeHost.prototype.build = async function () {
@@ -29,8 +29,9 @@ NodeHost.prototype.build = async function () {
 };
 
 NodeHost.prototype.copyInvocations = function () {
-  const invocations = this.scope
+  const invocations = this.scopes
     .values()
+    .flatmap(scope => scope.values())
     .reduce((invocations, dependency) => {
       invocations[dependency.service] = dependency.invoke;
       return invocations;
@@ -45,31 +46,45 @@ NodeHost.prototype.copyInvocations = function () {
 };
 
 NodeHost.prototype.getConfig = function () {
+  const hostName = this.host.name;
   const config = {
-    defaultFunction: this.host.name,
-    scope: this.scope
-      .keys()
-      .reduce((newScope, functionName) => {
-        if (this.scope[functionName].hostName === this.host.name) {
-          newScope[functionName] = {
-            service: 'onHost',
-            config: {
-              declaration: this.scope[functionName].declaration,
-              functionName: functionName,
-              shouldntWrap: this.host.name === functionName
-            }
-          }
-        } else {
-          newScope[functionName] = {
-            service: this.scope[functionName].service,
-            config: this.scope[functionName].config
-          }
-        }
-        return newScope;
-      }, {})
+    defaultFunction: hostName,
+    scopes: this.buildScopes(hostName)
   };
   return Buffer.from(JSON.stringify(config));
 };
+
+NodeHost.prototype.buildScopes = function (hostName) {
+  return this.scopes
+    .keys()
+    .reduce((newScopes, scopeName) => {
+      newScopes[scopeName] = buildScope(this.scopes[scopeName], hostName);
+      return newScopes;
+    }, {});
+}
+
+function buildScope (scope, hostName) {
+  return scope
+    .keys()
+    .reduce((newScope, functionName) => {
+      if (scope[functionName].hostName === hostName) {
+        newScope[functionName] = {
+          service: 'onHost',
+          config: {
+            declaration: scope[functionName].declaration,
+            functionName: functionName,
+            shouldntWrap: hostName === functionName
+          }
+        }
+      } else {
+        newScope[functionName] = {
+          service: scope[functionName].service,
+          config: scope[functionName].config
+        }
+      }
+      return newScope;
+    }, {});
+}
 
 NodeHost.prototype.data = function () {
   return this.archiveBuilder.data();

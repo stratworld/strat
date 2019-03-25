@@ -12,7 +12,16 @@ function parse (tokens) {
 		};
 	}
 
-	const descend = next => Grammar[next]();
+	const descend = next => {
+		try {
+			return Grammar[next]();	
+		} catch (e) {
+			throw {
+				file: tokens.path,
+				...e
+			};
+		}
+	};
 	const Statements = require('./statements')(tokenFeed, error, descend);
 	const Grammar = require('./grammar')(Statements);
 

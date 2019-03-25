@@ -29,7 +29,6 @@ function getHosts (ast) {
             runtime: (isFunctionResource(fn)
               ? undefined
               : getRuntime(fn, path)),
-            scope: serviceName,
             artifacts: [
               {
                 declaration: {
@@ -37,6 +36,7 @@ function getHosts (ast) {
                   name: val(traverse(fn, ['functionName'])[0], 'name'),
                   service: serviceName
                 },
+                scope: serviceName,
                 name: name(service, fn),
                 ...fn.artifact
               }
@@ -76,7 +76,10 @@ function getScopes (ast) {
       const baseScope = filePathsToBaseScopes[filePathAndService[0]];
       const service = filePathAndService[1];
       const includedScopes = traverse(service, ['include'])
-        .flatmap(include => filePathsToBaseScopes[val(include, 'path')]);
+        .flatmap(include => filePathsToBaseScopes[val(include, 'path')])
+        // in the case where we codegen an import (public keyword) there
+        // is no included file, so we remove them here
+        .purge();
       return [val(service, 'name'), baseScope.concat(includedScopes)];
     })
     .reduce((allScopes, serviceScope) => {
@@ -142,9 +145,10 @@ function getRuntime (fn, path) {
   if (fn.artifact.type === '.js');
     return "node";
   throw {
-      error: 'Invalid function',
-      msg: `${path} line ${fnLine}
-Function ${val(fn, 'name')} can't be executed--only artifacts with a ".js" extension can be executed`
+      stratCode: 'E_UNSUPPORTED_RUNTIME',
+      msg: `Function ${val(fn, 'name')} can't be executed--only artifacts with a ".js" extension can be executed`,
+      file: path,
+      line: fnLine
     };
 }
 

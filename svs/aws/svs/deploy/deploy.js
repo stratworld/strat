@@ -19,10 +19,15 @@ function preDeploy (resources) {
 
   return Promise.all(preCreateResources
     .keys()
-    .map(resourceService =>
+    .map(resourceService => 
       require(preCreateResources[resourceService])
         (resources
-          .filter(resource => resource.compute.service === resourceService))));
+          .filter(resource => resource.compute.service === resourceService))))
+    .catch(e => {
+      if (e.code === 'BucketAlreadyOwnedByYou') {
+        throw `This system artifact file is already deployed to AWS and cannot be deployed again.`;
+      }
+    })
 }
 
 function deploy (resource) {

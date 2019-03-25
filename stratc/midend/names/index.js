@@ -18,10 +18,20 @@ module.exports = () => assertNames;
 
 function assertNames (ast) {
   // policies are read only, synchronous, and throw on violation
+  const errors = [];
   policies.forEach(policy => {
     const files = traverse(ast, ['file']);
-    files.forEach(file => policy(file, ast));
+    files.forEach(file => {
+      try {
+        policy(file, ast);
+      } catch (e) {
+        errors.push(e);
+      }
+    });
   });
+  if (errors.length > 0) {
+    throw errors;
+  }
   return ast;
 };
 
@@ -45,10 +55,11 @@ function fileNameShouldMatchEntity (file) {
   if (entity !== undefined) {
     if (val(entity, 'name') !== fileName) {
       throw {
-        errorCode: 'E_NAMES_MISMATCH',
+        stratCode: 'E_NAMES_MISMATCH',
         error: 'Naming violation',
-        msg: `${filePath} line ${line(entity, 'name')}
-${val(entity, 'name')} should be declared in a file named ${val(entity, 'name')}.st`
+        message: `${val(entity, 'name')} should be declared in a file named ${val(entity, 'name')}.st`,
+        file: filePath,
+        line: line(entity, 'name')
       }
     }
   };
@@ -69,17 +80,17 @@ function canOnlyIncludeANameOnce (file) {
   })
 }
 
-function checkDupNames (entities, filepath) {
+function checkDupNames (entities, filePath) {
   const existingNameTokens = {};
   entities.forEach(entity => {
     const entityPathToken = (entity.tokens.path || entity.tokens.name);
     const entityName = path.basename(entityPathToken.value, '.st');
     if (existingNameTokens[entityName] !== undefined) {
       throw {
-        errorCode: 'E_NAMES_DUPLICATE',
-        error: 'Naming violation',
-        msg: `${filepath} line ${entityPathToken.line}
-${entityName} is already declared on line ${existingNameTokens[entityName].line}`
+        stratCode: 'E_NAMES_DUPLICATE',
+        message: `${entityName} is already declared on line ${existingNameTokens[entityName].line}`,
+        file: filePath,
+        line: entityPathToken.line
       }
     } else {
       existingNameTokens[entityName] = entityPathToken;
@@ -113,11 +124,11 @@ function shapeNamesHaveBeenDeclared (file) {
     shapes.forEach(shape => {
       if (!allowedShapes[val(shape, 'name')]) {
         throw {
-          errorCode: 'E_NAMES_UNDECLARED',
-          error: 'Undeclared shape',
-          msg: `${filePath} line ${line(shape, 'name')}
-${val(shape, 'name')} is undefined.  Only ${allowedShapes
-  .keys().map(s => `'${s}'`).join(', ')} are allowed shapes.`
+          stratCode: 'E_NAMES_UNDECLARED',
+          message: `${val(shape, 'name')} is undefined.  Only ${allowedShapes
+  .keys().map(s => `'${s}'`).join(', ')} are allowed shapes.`,
+          file: filePath,
+          line: line(shape, 'name')
         }
       }
     })
@@ -142,10 +153,10 @@ function eventsMustHaveBeenIncluded (file) {
     const filePath = val(file, 'path');
     if (!includeNames[val(event, 'name')]) {
       throw {
-        errorCode: 'E_NAMES_UNDECLARED',
-        error: 'Undeclared event',
-        msg: `${filePath} line ${line(event, 'name')}
-Event ${val(event, 'name')} is not included.`
+        stratCode: 'E_NAMES_UNDECLARED',
+        message: `Event ${val(event, 'name')} is not included.`,
+        file: filePath,
+        line: line(event, 'name')
       };
     }
   });
@@ -180,10 +191,10 @@ function canOnlyReferenceServicesInScope (file, ast) {
       const referenceService = val(reference, 'service');
       if (!servicesInScope[referenceService]) {
         throw {
-          errorCode: 'E_NAMES_UNDECLARED',
-          error: 'Unincluded service reference',
-          msg: `${filePath} line ${line(reference, 'service')}
-  Service ${referenceService} is not included.`
+          stratCode: 'E_NAMES_UNDECLARED',
+          msg: `Service ${referenceService} is not included.`,
+          file: filePath,
+          line: line(reference, 'service')
         }
       }
     });

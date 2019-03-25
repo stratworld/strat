@@ -57,7 +57,7 @@ async function traversal (ast) {
 
           includeAstObj.includeAst.tokens.path.value = edgeFileName;
 
-          return getData(edgeFileName)
+          return getData(edgeFileName, focus, includeAstObj.includeAst.tokens.path.line)
             .then(fileData => parseFile(fileData, edgeFileName))
             .then(newAst => R({
               name: edgeFileName,
@@ -103,10 +103,19 @@ function getFileName (importString, declaredFile) {
   return absolutePath;
 }
 
-async function getData (importString) {
-  return deps.internet.isUrl(importString)
-    ? deps.internet.fetch(importString)
-    : deps.fs.cat(importString);
+async function getData (importString, declaredFile, declaredLine) {
+  try {
+    return deps.internet.isUrl(importString)
+      ? await deps.internet.fetch(importString)
+      : await deps.fs.cat(importString);
+    } catch (e) {
+      throw {
+        stratCode: 'E_NO_ENTITY',
+        message: `Unable to load ${importString}`,
+        file: declaredFile,
+        line: declaredLine
+      };
+    }
 }
 
 async function parseFile (buffer, fileName) {

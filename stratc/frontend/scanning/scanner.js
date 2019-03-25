@@ -44,14 +44,17 @@ function cleanTokens (tokens) {
 function checkTokens (tokens, filename) {
   const errorTokens = (tokens || [])
     .filter(token => token.valid === false)
+    .map(token => {
+      return {
+        stratCode: "E_INVALID_TOKEN",
+        message: `Invalid token ${token.value}`,
+        file: filename,
+        line: token.line
+      };
+    });
 
   if (errorTokens.length > 0) {
-    //todo: make a vehicle for these
-    throw {
-      error: 'Invalid tokens',
-      filename: filename,
-      tokens: errorTokens
-    };
+    throw errorTokens;
   }
 }
 

@@ -91,7 +91,11 @@ if (command === 'help' || command === '-h' || command === '--help') {
       process.exit(0);
     })
     .catch(e => {
-      console.error(e);
+      if (Array.isArray(e)) {
+        console.error(e.filter(error => !error.printed));
+      } else if (!e.printed) {
+        console.error(e);
+      }
       process.exit(1);
     });
 }

@@ -30,17 +30,19 @@ function getIncluder (fileWithSource) {
 
   if (artifactBuilder === undefined) {
     throw {
-      error: 'Invalid event source',
-      msg: `${fileWithSourcePath} line ${nameLine}
-Event sources must supply a 'artifactBuilder' key in their config.`
+      stratCode: 'E_INVALID_SOURCE',
+      message: `Event sources must supply an 'artifactBuilder' key in their config.`,
+      file: fileWithSourcePath,
+      line: nameLine
     };
   }
   const builder = requirePath(fileWithSource, artifactBuilder);
   if (typeof builder !== 'function') {
     throw {
-      error: 'Invalid event source',
-      msg: `${fileWithSourcePath} line ${nameLine}
-Export of ${artifactBuilder.value} is not a function.`
+      stratCode: 'E_INVALID_SOURCE',
+      message: `Export of ${artifactBuilder.value} is not a function.`,
+      file: fileWithSourcePath,
+      line: nameLine
     }
   }
   return builder;
@@ -59,10 +61,10 @@ function requirePath (declaredFile, pathToken) {
     return require(absolutePath);
   } catch (e) {
     throw {
-      error: 'File not found',
-      msg: `${val(declaredFile, 'path')} line ${pathToken.line}
-Failed to load ${pathToken.value}
-${e.stack}`
+      stratCode: 'E_NO_ENTITY',
+      message: `Failed to load ${pathToken.value}`,
+      file: val(declaredFile, 'path'),
+      line: pathToken.line
     }
   }
 }

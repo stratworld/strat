@@ -52,8 +52,8 @@ function executeIncluders (serviceEventBundle, includers) {
     .map(eventName => {
 
       const error = e => J({
-        error: e,
-        msg: `Failed to run ${eventName}.`
+        stratCode: 'E_SOURCE_FAILURE',
+        message: `Failed to run ${eventName}: ${e.message}`
       });
 
       try {

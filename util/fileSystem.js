@@ -4,5 +4,5 @@ const promisify = require('util').promisify;
 module.exports = {
   stat: promisify(fs.stat),
   ls: promisify(fs.readdir),
-  cat: promisify(fs.readFile) 
+  cat: promisify(fs.readFile)
 };

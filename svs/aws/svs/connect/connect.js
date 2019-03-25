@@ -30,7 +30,8 @@ function connectHost (host) {
         sdkInfo,
         {
           events: events,
-          service: host.scope,
+          //TODO: totally wrong:
+          service: host.artifacts[0].scope,
           role: host.role
         },
         host.implementation,
