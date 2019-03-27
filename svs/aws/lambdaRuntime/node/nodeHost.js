@@ -49,6 +49,7 @@ NodeHost.prototype.getConfig = function () {
   const hostName = this.host.name;
   const config = {
     defaultFunction: hostName,
+    defaultScope: this.host.artifacts[0].scope,
     scopes: this.buildScopes(hostName)
   };
   return Buffer.from(JSON.stringify(config));

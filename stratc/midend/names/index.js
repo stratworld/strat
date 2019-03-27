@@ -192,7 +192,7 @@ function canOnlyReferenceServicesInScope (file, ast) {
       if (!servicesInScope[referenceService]) {
         throw {
           stratCode: 'E_NAMES_UNDECLARED',
-          msg: `Service ${referenceService} is not included.`,
+          message: `Service ${referenceService} is not included.`,
           file: filePath,
           line: line(reference, 'service')
         }
