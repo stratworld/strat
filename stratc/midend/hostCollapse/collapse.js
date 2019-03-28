@@ -1,42 +1,13 @@
 /*
-Host collapse optimization
 
-Observations:
-  Network hops are somewhat expensive (1-5ms)
-  Cold starts are extremely expensive (100ms+)
-  Loading heavy dependencies (aws-sdk) is extremely expensive (10ms+)
+  1) Rename isomorphic scopes (done in scopereduce)
+  2) Create a host for each scope for each event in that scope
+    EX, if a scope has 3 functions and 2 events, the result hosts will be:
+      1 host with the proxy for a single event, and between 0 >= n >= 3 of
+        the 3 natural functions declared in that scope
+      1 host with the proxy for the other event and 3 - n of the 3
+        natural functions declared in that scope
 
-Goal:
-  Reduce all of the above by running functions on close-to-hand (the same) invocations.
-
-Assertion:
-  If two functions are inside a scope together, its better to run them on the same host
-
-Assumption:
-  There will be things that prevent running two functions on the same lambda.
-    - their hosts are different languages
-    - their host would be over capacity
-    - they have different permission roles
-    - only one type of event can be received by a host.  The host can't know which
-      function to send the event to if there are more than one event types
-
-  Potential reason in the future:
-    - the user specifies the function should be isolated
-
-Assumption:
-  Functions will be well behaved:
-    - They don't write to the filesystem
-    - They don't declare global variables
-  How can we force or mitigate these restrictions?
-  User code probably won't do this but their deps might.
-
-Tactics:
-  Given two hosts A and B, combine them if:
-    (1) They share the same runtime
-    (2) at least one function in A shares a scope with at least one function in B.
-    (3) at most one of A and B receives events
-  The graph of functions will be a connected graph because of how includes work, so we can ignore (2).
-  Scopes remain unchanged
 */
 
 module.exports = deps => ir => {
@@ -48,21 +19,14 @@ function collapseHosts (hosts) {
   return hosts
     .sort(httpHostsFirst)
     .reduce((newHosts, nextHost) => {
-      const hostForRuntime = newHosts[nextHost.runtime];
-      if (nextHost.runtime === undefined) {
-        // if the host doesn't have a runtime, don't collapse it
-        newHosts[nextHost.name] = nextHost;
-      } else if (hostForRuntime === undefined) {
-        // never seen this runtime, its where we'll collapse hosts of this runtime
-        newHosts[nextHost.runtime] = nextHost;
-      } else if (hostForRuntime.events.length > 0
-        && nextHost.events.length > 0) {
-        // seen this runtime but conflicting receivers
-        // we won't add functions to this host, so just add it
-        newHosts[nextHost.name] = nextHost;
+      const hostHash = nextHost.runtime !== undefined
+        ? `${nextHost.runtime}${nextHost.artifacts[0].scope}`
+        : nextHost.name;
+      if (newHosts[hostHash] && nextHost.eventType === undefined) {
+          newHosts[hostHash].artifacts = newHosts[hostHash].artifacts
+            .concat(nextHost.artifacts);
       } else {
-        // seen this runtime and its eligible to collapse
-        hostForRuntime.artifacts.push(nextHost.artifacts[0]);
+        newHosts[hostHash] = nextHost;
       }
       return newHosts;
     }, {})

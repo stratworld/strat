@@ -1,29 +1,78 @@
 # The Strat Cloud Language
 
-Strat is a language to represent and deploy portable cloud systems.
+Strat is a language to represent and deploy portable cloud systems.  Strat is the first "infrastructure as high level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's what the future looks like:
 
-Compile your system componets and .st files into system artifact (.sa) files.  Then, deploy those .sa files to any strat virtual substrate (SVS) implementation.  Strat does for cloud infrastructure what Java does for computers.
+Create HelloWorld.st:
+```st
+service HelloWorld {
+  include "Http"
 
-Currently supported SVS implementations:
+  Http { method: "get", path: "*" } -> "Hello World!"
+}
+```
+Then in your terminal ([requires npm](https://nodejs.org/en/)):
+```sh
+npm install -g stratc
+stratc ./HelloWorld.st && stratc ./HelloWorld.sa
+```
+See it at [localhost:3000](http://localhost:3000).
 
-  - AWS (using Lambda, APIGateway, S3, etc.)
-  - Single computers
-  - Azure (under development)
+### Is it containers? Serverless? VMs?
 
-## Strat is infrastructure as high level code
+All of the above.  With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments anymore.  The Strat compiler figures out how to host your system for you.  You write your system components as simple functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.
 
-Rather than specifying explicit infrastructure details like you would in Terraform, CloudFormation, or Serverless Framework, in Strat you declare an end state and Strat builds your system for you.  Those technologies call themselves "infrastructure as code"--really they're infrastructure as assembly, and Strat is infrastructure as high level code.
+### Better infrastructure than what you're building by hand
 
-The Strat compiler is smart.  It can optimize your infrastructure to save on latency and hosting costs.  It builds roles and access control based on the same block scope you're used to in regular languages, and it can incorporate 3rd party services into your system as seemlessly as importing a library.
+Just how language compilers like gcc and Javac optimize your code, __Strat's compiler stratc optimizes your infrastructure to be:__
 
-## Reclaim local development
+  - __more secure__ by building the narrowest custom access control for every component in your system
+  - __faster__ by hosting components on optimal infrastructure, whether that's a container or APIGateway backed by lambda.
+  - __cheaper to operate__ by sharing resources like lambda invocations between what would be discrete components in hand-rolled architectures.
+  - __free from human error__ by performing static analysis and compiling your infrastructure code.
 
-While portability between cloud providers like AWS and Azure is valuable,
-strat believes the most important portability story is that between developer machine and production hardware.  As such, strat ships with a local SVS implementation that works on consumer Linux, OSX, and Windows systems.
+### Portabilty is back
 
-This means you can build a product locally then host it on the cloud with no code or behavior changes.
+Real quick, lets run that hello world system on AWS.
+
+If you don't have a burner AWS account already, make one and set up your [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+
+Run in your terminal
+```
+stratc ./HelloWorld.sa --aws
+```
+See it at the APIGateway URL logged in the console.
+
+Strat's portability focus is on getting predictable system behavior between development and production hardware.  The days of testing Lambdas in production are over.  If cloud providers are the new hardware vendors Strat is the new Java.
+
+### Quit writing surface area code
+
+You know all that innane connection logic you have to write to get service A to talk to service B?  What about service authentication stuff?  Struggling with 3rd party APIs, or even the api to the service you wrote a year ago?  This is all surface area code--the stuff that connects software components together.  As our software components get smaller and more numerous, the amount of surface area code we write grows exponentially.  Strat fights back by abstracting over connection logic by using smart defaults and conventions.  It can also hook into best practice solutions like the [OpenAPI initiative](https://www.openapis.org/).  Here's how a service connects to another in Strat:
+
+Books.st:
+```st
+service Books {
+  include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st"
+  getBooks ():any -> "./getBooks.js"
+}
+```
+
+getBooks.js:
+```javascript
+const Strat = require('strat');
+const getSales = Strat('Sales.getSales');
+const sales = await getSales()
+```
+
+# "Just"ice
+
+I say "just" a lot: "just do this" or "it just works!" or "I just want a server!".  The modern DevOps landscape overindexes on power and configurability over simplicity and "just-works-iness".  What's the customer value of setting up and operating [Consul](https://www.hashicorp.com/products/consul) for your CRUD application?  Don't get me wrong, the modern cloud is an engineering marvel and you'd be crazy not to run your systems on it, but now that its been around for a while its not unreasonable to demand higher user experience standards--yaml config files don't cut it anymore.
+
+Ruby on Rails showed the world most people can get by fine with "just" the basics and convention.  Strat has traditional language influences (ML, Javascript, Java, etc.), but perhaps its most important influence is the philosophical legacy set by RoR.
 
 
-[Get started](https://lit.build/Guides/Getting%20Started)
 
-[Documentation](https://lit.build/)
+#### Like what you see?  Continue to the [Hello World deep dive](./Guides/Hello%20World) or build an [N-tier bookstore](./Guides/Bookstore).
+
+### Contributing
+
+Strat is an ambitious project--if you're interested in working on Strat or its ecosystem, send an email to [interest@strat.world](mailto:interest@strat.world);

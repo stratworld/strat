@@ -65,7 +65,7 @@ function getFunctionInfo (functionAst, serviceName) {
   }
   const functionNameAst = traverse(functionAst, ['functionName'])[0];
   return {
-    artifact: stdPath.basename(val(functionAst, 'artifact')),
+    artifact: functionAst.artifact,
     isResource: getIsResource(functionNameAst),
     functionName: qualifyFunctionName(
       serviceName,

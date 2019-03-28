@@ -58,6 +58,12 @@ Object.prototype.purge = function () {
   return this;
 }
 
+Object.prototype.intersect = function (other) {
+  return Object.keys(this)
+    .filter(key => other[key] !== undefined)
+    .constantMapping(true);
+}
+
 const crypto = require('crypto');
 
 //not meant to be secure

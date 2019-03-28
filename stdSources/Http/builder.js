@@ -29,7 +29,8 @@ const contentTypes = {
   '.html': 'text/html',
   '.js': 'application/javascript',
   '.css': 'text/css',
-  '.json': 'application/json'
+  '.json': 'application/json',
+  '.txt': 'text/plain'
 };
 
 // Http events must have: method, path
@@ -64,13 +65,14 @@ function checkEvents (events) {
   }
 }
 
-function getHeaders (fileName, isResource) {
+function getHeaders (artifact, isResource) {
   if (!isResource) {
     return {
       "Content-Type": "application/json"
     };
   }
-  const extension = stdPath.extname(fileName);
+  const extension = artifact.type;
+
   return {
     'Content-Type': (contentTypes[extension] || contentTypes['.js'])
   };

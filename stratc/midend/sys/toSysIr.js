@@ -24,8 +24,10 @@ function getHosts (ast) {
       return traverse(service, ['function'])
         .map(fn => {
           const fnName = name(service, fn);
+          const events = getProxyEvents(proxyNameLookup, fnName);
           return {
             name: fnName,
+            eventType: events.map(event => event.type)[0],
             runtime: (isFunctionResource(fn)
               ? undefined
               : getRuntime(fn, path)),
@@ -41,7 +43,7 @@ function getHosts (ast) {
                 ...fn.artifact
               }
             ],
-            events: getProxyEvents(proxyNameLookup, fnName)
+            events: events
           }
         })
     })

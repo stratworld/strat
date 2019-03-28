@@ -9,14 +9,18 @@ var deps;
 module.exports = injectedDeps => ast => {
   deps = injectedDeps;
   return Promise.all(traverse(ast, ['file']).map(file => {
-    const functions = traverse(file, ['service', 'function']);
+    const functions = traverse(file, ['service', 'function'])
+      .concat(traverse(file, ['service', 'dispatch']));
     const filePath = val(file, 'path');
     return Promise.all(functions
       .map(fn => {
-        return resolveArtifact(fn, filePath)
-          .then(artifact => {
-            fn.artifact = artifact;
-          });
+        //don't do anything with references
+        return traverse(fn, ['reference']).length === 0
+          ? resolveArtifact(fn, filePath)
+            .then(artifact => {
+              fn.artifact = artifact;
+            })
+          : R();
       }));
   }))
   .then(() => R(ast));
@@ -29,6 +33,14 @@ async function resolveArtifact (fn, declaredPath) {
       data: artifact.value,
       type: '.js',
       path: 'bufferData.js'
+    };
+  }
+
+  if (artifact.artifactType === 'string') {
+    return {
+      data: artifact.value,
+      type: '.txt',
+      path: 'constant.txt'
     };
   }
 
@@ -66,6 +78,14 @@ function getArtifact (fn, declaredPath) {
     };
   }
   const artifactValue = val(fn, 'artifact');
+  //everything that is not a relative path is interepreted
+  //as a constant string
+  if (artifactValue[0] !== '.') {
+    return {
+      artifactType: 'string',
+      value: artifactValue
+    };
+  }
   const urlContext = deps.internet.isUrl(declaredPath);
   const pathResolver = urlContext
     ? deps.internet.path

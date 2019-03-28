@@ -17,7 +17,7 @@ function formatError (e) {
     return formatStratError(e);
   }
   return `Internal stratc failure:
-${JSON.stringify(e, null, 2)}`;
+${e.stack}`;
 }
 
 function formatStratError (e) {

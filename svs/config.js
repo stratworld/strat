@@ -1,7 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 
+const svsNames = {
+  '--aws': 'aws',
+  '--local': 'local'
+};
+
 module.exports = () => {
+  var svsOverride = svsNames[process.argv[2]];
   var potentialConfigFile;
   var lookedLocation;
   if (typeof process.argv[3] === 'string') {
@@ -14,7 +20,17 @@ module.exports = () => {
     potentialConfigFile = path.resolve(process.cwd(), 'svs.json');
   }
   if (fs.existsSync(potentialConfigFile)) {
-    return require(potentialConfigFile);
+    const config = require(potentialConfigFile);
+    return svsOverride !== undefined
+      ? Object.assign(config, { substrate: svsOverride })
+      : config;
   }
-  return { substrate: 'local' };
+  return {
+    substrate: svsOverride || 'local',
+    aws: {
+      config: {
+        region: 'us-west-2'
+      }
+    }
+  };
 };

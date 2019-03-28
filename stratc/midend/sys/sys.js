@@ -3,6 +3,9 @@ const ArchiveBuilder = require('../../../util/archiveBuilder');
 const writeFile = require('util').promisify(require('fs').writeFile);
 
 module.exports = deps => (ir, filename) => {
+  if (filename === undefined) {
+    return ir;
+  }
   const targetName = `${stdPath.basename(filename, '.st')}.sa`;
   return writeFile(targetName, buildSysArchive(ir))
     .then(() => `Successfully created ${targetName}`);

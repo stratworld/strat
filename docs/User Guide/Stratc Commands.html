@@ -36,10 +36,27 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/stratconfig">stratconfig</a></div>
+      <div><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="stratconfigjson">stratconfig.json</h1>
-<p>todo</p></div>
+    <div id="document"><h2 id="stratccommandreference">stratc Command Reference</h2>
+<ul>
+<li><p>{.st file}</p>
+<ul>
+<li>compiles the file and builds a .saf file</li>
+<li>EX: $ stratc ./HelloWorld.st</li></ul></li>
+<li><p>{.sa file}</p>
+<ul>
+<li>reads the .sa file and creates running infrastructure</li>
+<li>EX: $ stratc ./HelloWorld.sa</li></ul></li>
+<li><p>-v or --version</p>
+<ul>
+<li>prints the version of stratc</li></ul></li>
+<li><p>--{svs implementation} {.sa file}</p>
+<ul>
+<li>reads the .sa file and runs it on the specified SVS implementation</li>
+<li>valid svs implementations: [aws, local]</li>
+<li>EX: $ stratc --aws ./HelloWorld.sa</li></ul></li>
+</ul></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

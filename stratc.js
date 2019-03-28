@@ -63,6 +63,10 @@ if (typeof command === 'string' && filename === undefined) {
   }
 }
 
+if (command === '--aws' || command === '--local') {
+  command = 'deploy';
+}
+
 if (command === 'help' || command === '-h' || command === '--help') {
   const help = defaultFs.cat(stdPath.resolve(__dirname, 'docsSrc/markdown/Guides/Getting Started.md'))
     .then(help => {
