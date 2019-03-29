@@ -17,28 +17,26 @@ stratc ./HelloWorld.st && stratc ./HelloWorld.sa
 ```
 See it at [localhost:3000](http://localhost:3000).
 
-### Is it containers? Serverless? VMs?
-
-All of the above.  With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments anymore.  The Strat compiler figures out how to host your system for you.  You write your system components as simple functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.
+With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments anymore.  The Strat compiler figures out how to host your system for you.  You write your system components as simple functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.
 
 ### Better infrastructure than what you're building by hand
 
-Just how language compilers like gcc and Javac optimize your code, __Strat's compiler stratc optimizes your infrastructure to be:__
+Just how language compilers like gcc and Javac optimize your code, __Strat's compiler optimizes your infrastructure to be:__
 
-  - __more secure__ by building the narrowest custom access control for every component in your system
+  - __more secure__ by building the narrowest access control for every component in your system
   - __faster__ by hosting components on optimal infrastructure, whether that's a container or APIGateway backed by lambda.
-  - __cheaper to operate__ by sharing resources like lambda invocations between what would be discrete components in hand-rolled architectures.
+  - __cheaper__ by sharing resources like lambda invocations between what would be discrete components in hand-rolled architectures.
   - __free from human error__ by performing static analysis and compiling your infrastructure code.
 
 ### Portabilty is back
 
-Real quick, lets run that hello world system on AWS.
+Lets run that hello world system on AWS.
 
 If you don't have a burner AWS account already, make one and set up your [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
 
 Run in your terminal
 ```
-stratc ./HelloWorld.sa --aws
+stratc --aws ./HelloWorld.sa
 ```
 See it at the APIGateway URL logged in the console.
 
@@ -60,14 +58,14 @@ getBooks.js:
 ```javascript
 const Strat = require('strat');
 const getSales = Strat('Sales.getSales');
-const sales = await getSales()
+const sales = await getSales();
 ```
 
 # "Just"ice
 
-I say "just" a lot: "just do this" or "it just works!" or "I just want a server!".  The modern DevOps landscape overindexes on power and configurability over simplicity and "just-works-iness".  What's the customer value of setting up and operating [Consul](https://www.hashicorp.com/products/consul) for your CRUD application?  Don't get me wrong, the modern cloud is an engineering marvel and you'd be crazy not to run your systems on it, but now that its been around for a while its not unreasonable to demand higher user experience standards--yaml config files don't cut it anymore.
+We say "just" a lot: "just do this" or "it just works!" or "I just want a server!".  The modern DevOps landscape overindexes on power and configurability over simplicity and "just-works-iness".  What's the customer value of setting up and operating [Consul](https://www.hashicorp.com/products/consul) for your CRUD application?  Don't get us wrong, the modern cloud is an engineering marvel and you'd be crazy not to run your systems on it, but now that its been around for a while its not unreasonable to demand higher user experience standards--yaml config files don't cut it anymore.
 
-Ruby on Rails showed the world most people can get by fine with "just" the basics and convention.  Strat has traditional language influences (ML, Javascript, Java, etc.), but perhaps its most important influence is the philosophical legacy set by RoR.
+Ruby on Rails showed the world most people can get by fine with "just" the basics and convention.  Strat has traditional language influences (ML, Javascript, Java, etc.), but perhaps its most important influence is the philosophical legacy left by Rails.
 
 
 

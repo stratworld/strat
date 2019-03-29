@@ -1,5 +1,6 @@
 const roles = require('../../awsResources/iam/iam');
-module.exports = function (ir) {
-  ir.roles = roles(ir);
+
+module.exports = async function (ir) {
+  ir.roles = await roles(ir);
   return ir;
 }
