@@ -8,6 +8,7 @@ module.exports = function (ir) {
     }).then(data => R({
       data: data,
       role: ir.roles[host.artifacts[0].scope],
+      connectRole: host.connectRole,
       runtime: host.runtime,
       events: host.events,
       ...host

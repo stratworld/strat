@@ -4,5 +4,5 @@ module.exports = [
   ['roles', 'svs/roles/roles'],
   ['buildhost', 'svs/host/host'],
   ['deploy', 'svs/deploy/deploy'],
-  // ['connect', 'svs/connect/connect']
+  ['connect', 'svs/connect/connect']
 ];

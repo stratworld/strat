@@ -46,9 +46,14 @@ module.exports = async function (ir) {
             ? getS3Info(targetHost)
             : getLambdaInfo(targetHost)
         });
-
-      const role = await createRole(hostRoleInfo, targetHosts);
-      return [host.artifacts[0].scope, role];
+//{"Sid":"sns","Effect":"Allow","Principal":{"Service":"sns.amazonaws.com"},"Action":"lambda:InvokeFunction","Resource":"arn:aws:lambda:us-east-2:123456789012:function:my-function"}
+      const roles = await Promise.all([
+        createRuntimeRole(hostRoleInfo, targetHosts),
+        createConnectRole(
+          Object.assign(hostRoleInfo, { arn: "*" }), host.events)
+      ]);
+      host.connectRole = roles[1];
+      return [host.artifacts[0].scope, roles[0]];
     }));
 
   return roleTuples
@@ -58,8 +63,31 @@ module.exports = async function (ir) {
     }, {});
 }
 
-async function createRole (host, targetHosts) {
-  console.log(`Creating role ${host.name}`);
+async function createConnectRole (host, events) {
+  const eventType = events[0].type;
+  const roleName = `${host.name}${eventType}`;
+  const assumeService = eventType === 'Http'
+    ? 'apigateway.amazonaws.com'
+    : undefined;
+
+  return createRole(assumeService, roleName, [{
+    arn: host.arn,
+    action: host.serviceInvoke
+  }]);
+}
+
+async function createRuntimeRole (host, targetHosts) {
+  return createRole(host.service, host.name, targetHosts
+    .map(target => {
+      return {
+        action: target.serviceInvoke,
+        arn: target.arn
+      };
+    }));
+}
+
+async function createRole (assumeService, roleName, targets) {
+  console.log(`Creating role ${roleName}`);
   var createRoleParams = {
     AssumeRolePolicyDocument: JSON.stringify({
       "Version": "2012-10-17",
@@ -67,14 +95,14 @@ async function createRole (host, targetHosts) {
         {
           "Effect": "Allow",
           "Principal": {
-            "Service": [ host.service ]
+            "Service": [ assumeService ]
           },
           "Action": "sts:AssumeRole"
         }
       ]
     }), 
     Path: "/", 
-    RoleName: host.name
+    RoleName: roleName
   };
 
   const role = await new Promise(function (resolve, reject) {
@@ -86,24 +114,24 @@ async function createRole (host, targetHosts) {
 
   const policies = {
     Version: "2012-10-17",
-    Statement: (targetHosts || [])
-      .map(host => {
+    Statement: (targets || [])
+      .map(target => {
         return {
           Effect:"Allow",
-          Action: [ host.serviceInvoke ],
-          Resource: host.arn
+          Action: [ target.action ],
+          Resource: target.arn
         }
       })
   };
 
   const putPolicyParams = {
     PolicyDocument: JSON.stringify(policies),
-    PolicyName: `${host.name}invocations`, 
-    RoleName: host.name
+    PolicyName: `${roleName}invocations`, 
+    RoleName: roleName
   };
   
-  console.log(`Allowing ${host.name} to invoke:
-  ${targetHosts.map(host => host.name).join('\n  ')}`);
+  console.log(`Allowing ${roleName} to invoke:
+  ${targets.map(target => target.arn).join('\n  ')}`);
 
   await new Promise(function (resolve, reject) {
     IAM.putRolePolicy(putPolicyParams, (e, r) => {
