@@ -35,43 +35,71 @@ Array.prototype.first = function (predicate) {
     : this[0];
 }
 
-Object.prototype.values = function () {
-  return Object.keys(this).map(key => this[key]);
-}
+Object.defineProperty(Object.prototype, 'values',{
+  value: function() {
+    return Object.keys(this).map(key => this[key]);
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Object.prototype.keys = function () {
-  return Object.keys(this);
-}
+Object.defineProperty(Object.prototype, 'keys',{
+  value: function() {
+    return Object.keys(this);
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Object.prototype.pairs = function () {
-  return Object.keys(this)
-    .map(key => [key, this[key]]);
-};
+Object.defineProperty(Object.prototype, 'pairs',{
+  value: function() {
+    return Object.keys(this)
+      .map(key => [key, this[key]]);
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Object.prototype.purge = function () {
-  Object.keys(this)
-    .forEach(key => {
-      if (this[key] === undefined) {
-        delete this[key];
-      }
-    });
-  return this;
-}
+Object.defineProperty(Object.prototype, 'purge',{
+  value: function() {
+    Object.keys(this)
+      .forEach(key => {
+        if (this[key] === undefined) {
+          delete this[key];
+        }
+      });
+    return this;
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Object.prototype.intersect = function (other) {
-  return Object.keys(this)
-    .filter(key => other[key] !== undefined)
-    .constantMapping(true);
-}
+Object.defineProperty(Object.prototype, 'intersect',{
+  value: function() {
+    return Object.keys(this)
+      .filter(key => other[key] !== undefined)
+      .constantMapping(true);
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
 const crypto = require('crypto');
-
-//not meant to be secure
-Object.prototype.hash = function () {
-  const shasum = crypto.createHash('sha1');
-  shasum.update(JSON.stringify(this));
-  return shasum.digest('hex');
-}
+Object.defineProperty(Object.prototype, 'hash',{
+  value: function() {
+    const shasum = crypto.createHash('sha1');
+    shasum.update(JSON.stringify(this));
+    return shasum.digest('hex');
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
 module.exports = truncateBuffersStringify;
 

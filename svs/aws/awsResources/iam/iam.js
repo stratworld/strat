@@ -7,10 +7,11 @@ const AWS = require('aws-sdk');
 const IAM = new AWS.IAM();
 
 module.exports = async function (ir) {
-
   const account = await getAccountId();
   const fnArn = getFunctionArner(account);
   const s3Object = getS3ObjectArner(account, ir.id);
+
+  const additionalPerms = getAdditionalPerms(ir);
 
   function getS3Info (host) {
     const name = `${host.compute.config.Bucket}-${host.compute.config.Key}`;
@@ -35,20 +36,21 @@ module.exports = async function (ir) {
     .filter(host => host.runtime !== undefined)
     .map(async host => {
       const hostRoleInfo = getLambdaInfo(host);
-
-      const myScope = ir.scopes[host.artifacts[0].scope];
+      const myScopeName = host.artifacts[0].scope;
+      const myScope = ir.scopes[myScopeName];
       const targetHosts = myScope
         .keys()
         .map(scopeName => ir.hosts.filter(targetHost => targetHost.name === scopeName)[0])
+        .purge()
         .filter(targetHost => targetHost.name !== host.name)
         .map(targetHost => {
           return targetHost.runtime === undefined
             ? getS3Info(targetHost)
             : getLambdaInfo(targetHost)
         });
-//{"Sid":"sns","Effect":"Allow","Principal":{"Service":"sns.amazonaws.com"},"Action":"lambda:InvokeFunction","Resource":"arn:aws:lambda:us-east-2:123456789012:function:my-function"}
+
       const roles = await Promise.all([
-        createRuntimeRole(hostRoleInfo, targetHosts),
+        createRuntimeRole(hostRoleInfo, targetHosts, additionalPerms[myScopeName]),
         createConnectRole(
           Object.assign(hostRoleInfo, { arn: "*" }), host.events)
       ]);
@@ -76,14 +78,15 @@ async function createConnectRole (host, events) {
   }]);
 }
 
-async function createRuntimeRole (host, targetHosts) {
+async function createRuntimeRole (host, targetHosts, additionalPerms) {
   return createRole(host.service, host.name, targetHosts
     .map(target => {
       return {
         action: target.serviceInvoke,
         arn: target.arn
       };
-    }));
+    })
+    .concat((additionalPerms || [])))
 }
 
 async function createRole (assumeService, roleName, targets) {
@@ -111,39 +114,41 @@ async function createRole (assumeService, roleName, targets) {
       resolve(r);
     })
   });
+  if (targets.length > 0) {
+    const policies = {
+      Version: "2012-10-17",
+      Statement: (targets || [])
+        .map(target => {
+          return {
+            Effect:"Allow",
+            Action: Array.isArray(target.action) ? target.action : [ target.action ],
+            Resource: target.arn
+          }
+        })
+    };
 
-  const policies = {
-    Version: "2012-10-17",
-    Statement: (targets || [])
-      .map(target => {
-        return {
-          Effect:"Allow",
-          Action: [ target.action ],
-          Resource: target.arn
-        }
-      })
-  };
+    const putPolicyParams = {
+      PolicyDocument: JSON.stringify(policies),
+      PolicyName: `${roleName}invocations`, 
+      RoleName: roleName
+    };
+    
+    console.log(`Allowing ${roleName} to invoke:
+    ${targets.map(target => target.arn).join('\n  ')}`);
 
-  const putPolicyParams = {
-    PolicyDocument: JSON.stringify(policies),
-    PolicyName: `${roleName}invocations`, 
-    RoleName: roleName
-  };
-  
-  console.log(`Allowing ${roleName} to invoke:
-  ${targets.map(target => target.arn).join('\n  ')}`);
-
-  await new Promise(function (resolve, reject) {
-    IAM.putRolePolicy(putPolicyParams, (e, r) => {
-      if (e) reject(e);
-      resolve(r);
+    await new Promise(function (resolve, reject) {
+      IAM.putRolePolicy(putPolicyParams, (e, r) => {
+        if (e) reject(e);
+        resolve(r);
+      });
     });
-  });
+  }
 
-  // console.log('Sleeping for 8 seconds because IAM is terrible');
+  // console.log('Sleeping for 10 seconds because IAM is terrible');
   //https://stackoverflow.com/questions/36419442/the-role-defined-for-the-function-cannot-be-assumed-by-lambda
+  //todo: sometimes this still isnt' enough; we need to put in a retry
   await new Promise(function (resolve, reject) {
-    setTimeout(resolve, 8000);
+    setTimeout(resolve, 10000);
   });
 
   return role.Role.Arn;
@@ -175,4 +180,54 @@ async function getAccountId () {
        resolve(data.Account);
     });
   });
+}
+
+/*
+
+Users may specify perms for scopes that have been collapsed!
+They may specify perms for several scopes that get collapsed into a single scope!
+*/
+function getAdditionalPerms (ir) {
+  const collapsedScopes = ir.hosts
+    .values()
+    .reduce((collapsedScopes, nextHost) => {
+      const thisHostsScope = nextHost.artifacts[0].scope;
+      nextHost.artifacts
+        .forEach(artifact => {
+          collapsedScopes[artifact.scope] = artifact.declaration.service;
+        });
+      return collapsedScopes;
+    }, {});
+
+  const additionalPerms = (config.aws.roles || {});
+
+  additionalPerms
+    .keys()
+    .forEach(key => {
+      validateConfigPerm(key, additionalPerms[key]);
+    });
+
+  const actualAdditionalPerms = additionalPerms
+    .keys()
+    .reduce((actualAdditionalPerms, additionalPermName) => {
+      actualAdditionalPerms[collapsedScopes[additionalPermName]]
+        = (actualAdditionalPerms[collapsedScopes[additionalPermName]] || [])
+          .concat(additionalPerms[additionalPermName]);
+
+      return actualAdditionalPerms;
+    }, {});
+
+  return actualAdditionalPerms;
+}
+
+function validateConfigPerm (scopeName, perms) {
+  (perms || [])
+    .forEach(perm => {
+      const keys = ['action', 'arn']
+        .forEach(key => {
+          if (perm[key] === undefined) {
+            throw `Permission for ${scopeName} incorrectly configured.  Missing key ${key}`;    
+          }
+        });
+    })
 }
