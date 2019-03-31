@@ -1,6 +1,6 @@
 # Hello world
 
-This guide will walk you through your first Strat system.  You'll create a Strat system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install [stratc](./Getting%20Started), Strat's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.
+This guide will walk you through a simple Strat system.  You'll create a system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install [stratc](./Getting%20Started), Strat's compiler, and if you wish to deploy to AWS you will need an account that you're comfortable deploying things to.
 
 # Local Hello World
 
@@ -33,11 +33,11 @@ Navigate to [localhost:3000](http://localhost:3000) in your browser
 
 # The Basics
 
-Strat is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.
+Strat is all about events and functions.  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.
 
-An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.
+An event is a single piece of serialized data that is passed into your system.  Events come from sources, and in this example we're including Http, which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.
 
-A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.
+A function is a single computational unit within your system, and it represents the actual code that gets deployed.  Functions accept events and execute code, and services are groupings of functions that control access to these infrastructure components.
 
 The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.
 
@@ -47,111 +47,40 @@ service HelloWorld {
 ```
 Here we declare a service HelloWorld.  All functions must reside within a service.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Strat systems behaves like scope in a language like Java.
 
-### 
 ```
 include "Http"
 ```
-Including Http lets us receive Http events and tells Strat this is a web server.  [Http](../Sources/Http) is a standard event source and part of the Strat standard library.
+Including Http lets us receive Http events and tells Strat this is a web server.
 
-###
 ```
 Http { method: "get", path: "*" } ->
 ```
-This is an "event description", and its semantics are determined by the Http event source.  The gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "All Http get requests should be sent to the following function".
+This is an event pattern, and the gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "Http get requests on any path should be sent to the following function".
 
-### 
 ```
 helloWorld ():any ->
 ```
 This is a function signature, complete with a function name, input type within the parens (in this case, no input type), and output type after the colon.  Types are not implemented yet in Strat, so this function returns the any type while in the future it will return "string".
 
-### 
 ```
 "./helloWorld.js"
 ```
-This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs...somewhere...more on code execution can be found in the [functions section of the specification](../Specification/Functions).
+This is the final part of a function definition--the [artifact](../User%20Guide/Artifacts).  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs...somewhere...more on code execution can be found in the [functions section of the specification](../Specification/Functions).  The power of Strat lies in users not specifying what type of infrastructure helloWorld.js executes on.  This allows stratc to port systems between wildly different substrates and optimize systems.
 
 # AWS Hello World
 
-Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files when stratc runs, it will provision Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.
+Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  You'll need an AWS account, so if you don't have one go [create one now](https://portal.aws.amazon.com/billing/signup?nc2=h_ct&src=default&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start)--its easy, requires no upfront financial commitment, and won't cost you anything to run this system thanks to generous free tiers.
 
-1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.
+Stratc will need to create resources on your AWS account and will need credentials to do that, so go ahead and set up your shared credentials file by following the instructions [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
+Note: you may already have one--make sure its for your test account!
 
-2) Create a file called stratconfig.json and paste the following in:
-
-```json
-{
-  "substrate": "aws",
-  "aws": {
-    "config": {
-      "region": "us-west-2"
-    }
-  }
-}
-
-```
-NOTE: everything within the "config" hash is passed into the [AWS.Config](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html) method of the AWS SDK, so you can add and change things as needed (for instance, you can change the region to "us-west-1").
-
-3) Strat will need to create resources on your AWS account and will need credentials to do that.  There are two ways it can access those credentials.  You need to do at least one of the following:
-
-  + A) Supply AWS credentials within the stratconfig.json
-    - add these two properties to the config hash in stratconfig.json:
-    - "accessKeyId": "{your access key id}",
-    - "secretAccessKey": "{your secret access key}"
-
-  + B) Have Strat use your shared ~/.aws/credentials file
-    - follow the instructions to create a shared credentials file [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).  Note: you may already have one--try $ stat ~/.aws/credentials
-    - If you do use an aws credentials file, make sure its for your test account!
-
-    NOTE: credentials provided through A override B.
-
-4) In the future, Strat will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for Strat to use when creating resources.  Create an [IAM role](https://aws.amazon.com/iam/) with the following policies:
-
-  + AWSLambdaFullAccess
-  + AmazonS3FullAccess
-  + InvokeAllLambda
-
-And make sure the role is assumable by Lambda and ApiGateway:
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": [
-          "lambda.amazonaws.com",
-          "apigateway.amazonaws.com"
-        ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-```
-
-Now, add this role's arn to stratconfig.json at the path aws/preCreatedRole.  Your stratconfig.json should look like this:
-
-```json
-{
-  "substrate": "aws",
-  "aws": {
-    "config": {
-      "region": "us-west-2"
-    },
-    "preCreatedRole": "{arn for the role you just created}"
-  }
-}
-```
-
-5) Run stratc (we don't need to build again--we can use the same .sa file)
+Now you're ready to deploy to AWS:
 
 ```bash
-  $ stratc ./HelloWorld.sa
+  $ stratc --aws ./HelloWorld.sa
 ```
 
-## Check it out
+You'll see stratc create resources in the console.  Look for the APIGateway URL and go there.  The first load takes up to 10 seconds as AWS loads your resources for the first time.
 
-Inside your AWS console you can see lit created a single lambda function and an APIGateway API called "HelloWorld".  You can invoke the system by navigating to the url APIGateway generates for you.  You can find this under the stages tab on the left of the APIGateway console for HelloWorld.
 
-If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat [here](https://github.com/CaptainCharlieGreen/lit_demo).
+If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat [here](./Bookstore).

@@ -2,7 +2,6 @@ const serializeAST = require('../util/jsExtensions');
 const stdPath = require('path');
 const frontend = passify(require('./frontend/passes'));
 const midend = passify(require('./midend/passes'));
-const errorFormat = require('./errors');
 
 function passify (passTuple) {
   return passTuple
@@ -63,7 +62,6 @@ module.exports = function (dependencies) {
             (dependencies)
             (result, filename))
       }, R(startingInput))
-      .catch(errorFormat);
   }
   return {
     runCommand: runCommand,

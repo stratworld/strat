@@ -36,7 +36,7 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="roadmap">Roadmap</h1>
 <p>The following features are presented in rough priority order.  The work required varies greatly between epic, with some requiring language development expertise and others DevOps skills and experience with proprietary clouds.</p>
@@ -68,24 +68,70 @@
 
 Http { method: "get"|"post" } -&gt; myFunction
 </code></pre>
-<h2 id="priorart">Prior art</h2>
+<h3 id="priorart">Prior art</h3>
 <p>Engineers have made good headway with some of the challenges of describing events across organizations with the <a href="https://www.openapis.org/">OpenAPI Specification</a>.  Strat's type system notation shouldn't be YAML, but it can integrate with all of the other artifacts from the OAS ecosystem, and potentially produce an OAS YAML file.</p>
 <p>Clojure's <a href="https://clojure.org/guides/spec">Spec</a> shares many of the design goals of a Strat type system.</p>
+<h1 id="awssubstrateperformanceimprovementsongoing">AWS Substrate Performance Improvements (Ongoing)</h1>
+<p>Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  The AWS SVS should implement routing inside APIGateway, and should proxy directly to s3 files to avoid lambda.  I suspect there's also some performance tweaks to be made around loading the AWS SDK lazier--Lambdas that don't load the AWS SDK typically take &lt; 10ms while loading the AWS SDK seems to put a floor on the Lambda's time at 50ms.  Honestly, I haven't done the requisite profiling to make serious suggestions but I can tell things are much slower than they should be.</p>
+<h1 id="runtimepatternmatchingvalues">Runtime Pattern Matching + Values</h1>
+<p>In the code:</p>
+<pre><code>Http { method: "get" } -&gt;
+</code></pre>
+<p>{ method: "get" } represents a pattern that should be matched by the strat runtime.  Right now, this matching is done within the Http event source's proxy function, but there's no reason the runtime shouldn't handle this branching.  This feature is important to decrease the barrier to entry for writing custom sources.</p>
+<p>Related to generic pattern definition is generic value definition, or expanding the string literal artifact with any JSON-y object.</p>
+<h1 id="dispatchgrammarreduction">Dispatch Grammar Reduction</h1>
+<p>There are several different hard-coded grammar productions for dispatches and functions that should be generic.  Immagine the following:</p>
+<pre><code>Cron { "/5****" } -&gt; "Every 5th minute",
+Cron { "0****" } -&gt; "Every hour" -&gt;
+  myFunc ():any -&gt; "./myFunc.js"
+</code></pre>
+<p>This is a way events can be translated into constants then sent to an artifact. Or this:</p>
+<pre><code>Http { } -&gt; "./myProxy.js" -&gt; Other.myFn
+</code></pre>
+<p>For this to work, there's probably going to be pretty extensive changes to the .sa file format because the runtime would have to compose these functions and it would need instructions to do so.  Myabe some clever code-gen in stratc would simplify this.</p>
+<h1 id="stratemitsourceextensions">Strat.emit &amp; Source Extensions</h1>
+<p>Immagine the usecase of a custom 404 page.  Here's some mock-y Strat that could do that:</p>
+<pre><code class="st language-st">source CustomErrorHttp {
+  include "Http"
+
+  notFound ():any -&gt; "&lt;h1&gt;custom 404 page&lt;/h1&gt;"
+
+  Http {} -&gt; customHttp ():any -&gt; "./customHttp.js"
+}
+</code></pre>
+<pre><code class="javascript language-javascript">const Strat = require('strat');
+module.exports = async event =&gt; {
+
+  // Strat.emit creates a "CustomErrorHttp" event and attempts to route it
+  // to a receiver
+  // strat runtime tries to find a receiver through pattern matching
+  // returns undefined if nobody matches
+  // or maybe throws
+  try {
+    return Strat.emit(event);
+  } catch (something) {
+    return Strat('CustomErrorHttp.notFound')();
+  }
+};
+</code></pre>
+<pre><code class="st language-st">source CustomHttpConsumer {
+  include "./CustomErrorHttp"
+
+  CustomErrorHttp { method: "get" path: "*"} -&gt; "&lt;h1&gt;thing&lt;/h1&gt;"
+}
+</code></pre>
 <h1 id="foreignsourceserviceinterface">Foreign Source/Service Interface</h1>
 <p>Strat needs a way for developers to add source and service libraries that expose more exotic infrastructure that a particular substrate provides.  This problem is analagous to foreign function interfaces in normal languages.</p>
 <h1 id="configsettings">Config Settings</h1>
-<p>Right now the stratconifg.json is very bare-bones.  This is great.  Config files suck.  A large feature set left out of Strat is fine-grained infrastructure configuration, which was intentional, but users will need it eventually, and stratconifg is the perfect place to put them.  In Java, for example, if you want to set how much RAM the JVM should consume you use config files, and if you want to control the resources Strat uses you should use stratconifg.  Some obvious use cases:</p>
+<p>Right now the svs.json is very bare-bones.  This is great.  Config files suck.  A large feature set left out of Strat is fine-grained infrastructure configuration, which was intentional, but users will need it eventually, and svs.json is the perfect place to put them.  In Java, for example, if you want to set how much RAM the JVM should consume you use config files, and if you want to control the resources Strat uses you should use stratconifg.  Some obvious use cases:</p>
 <ul>
 <li><p>I want a function to run by itself and not get collapsed from scope collapse, I should be able to specify in stratconfig "hey don't modify this"</p></li>
 <li><p>I want to set fine-grained AWS config values like timeout and concurrency for specific resources.</p></li>
 </ul>
-<h1 id="substratesupport">Substrate Support</h1>
-<p>Any infrastructure that can satisfy the <a href="../Specification/Function%20Infrastructure">function abstraction</a> is an eligible substrate.  For a substrate to be "complete", it must satisfy the <a href="../Specification/Infrastructure">core infrastructure requirements</a> as well as implement each standard source.  At the moment, Azure is the highest priority new substrate and is under active development.</p>
 <h1 id="languagesupport">Language Support</h1>
 <p>Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  For a language to be supported by Strat, it must have the following features:</p>
 <ul>
 <li>Basic SDK support for all major cloud providers</li>
-<li>Runtime support on serverless for all major cloud providers</li>
 </ul>
 <p>Languages that are aligned with Strat's performance tradeoffs and user experience biases are higher priority.</p>
 <h2 id="highprioritylanguages">High Priority Languages</h2>

@@ -36,10 +36,10 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="helloworld">Hello world</h1>
-<p>This guide will walk you through your first Strat system.  You'll create a Strat system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install <a href="./Getting%20Started">stratc</a>, Strat's compiler, and if you wish to deploy to AWS you will need an account and a few permissions set up which are outlined in the AWS section.</p>
+<p>This guide will walk you through a simple Strat system.  You'll create a system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install <a href="./Getting%20Started">stratc</a>, Strat's compiler, and if you wish to deploy to AWS you will need an account that you're comfortable deploying things to.</p>
 <h1 id="localhelloworld">Local Hello World</h1>
 <p>Create a file "HelloWorld.st" and paste the following into it:</p>
 <pre><code class="strat language-strat">service HelloWorld {
@@ -58,97 +58,35 @@
 </code></pre>
 <p>Navigate to <a href="http://localhost:3000">localhost:3000</a> in your browser</p>
 <h1 id="thebasics">The Basics</h1>
-<p>Strat is all about "events", "functions", and "services".  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.</p>
-<p>An "event" is a single piece of serialized data that is passed into your system.  Events come from "sources", and in this example we're including "Http", which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.</p>
-<p>A "function" is a single computational unit within your system, and it represents the actual infrastructure that gets deployed.  Functions accept events and execute code, and "services" are groupings of functions that control access to these infrastructure components.</p>
+<p>Strat is all about events and functions.  Its sole purpose is to describe what events and functions exist in your system and how those events are handled by those functions.</p>
+<p>An event is a single piece of serialized data that is passed into your system.  Events come from sources, and in this example we're including Http, which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.</p>
+<p>A function is a single computational unit within your system, and it represents the actual code that gets deployed.  Functions accept events and execute code, and services are groupings of functions that control access to these infrastructure components.</p>
 <p>The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.</p>
 <h2 id="linebylinebreakdown">Line by line breakdown</h2>
 <pre><code>service HelloWorld {
 </code></pre>
 <p>Here we declare a service HelloWorld.  All functions must reside within a service.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Strat systems behaves like scope in a language like Java.</p>
-<h3 id=""> </h3>
 <pre><code>include "Http"
 </code></pre>
-<p>Including Http lets us receive Http events and tells Strat this is a web server.  <a href="../Sources/Http">Http</a> is a standard event source and part of the Strat standard library.</p>
-<h2 id="-1">#</h2>
+<p>Including Http lets us receive Http events and tells Strat this is a web server.</p>
 <pre><code>Http { method: "get", path: "*" } -&gt;
 </code></pre>
-<p>This is an "event description", and its semantics are determined by the Http event source.  The gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "All Http get requests should be sent to the following function".</p>
-<h3 id="-2"> </h3>
+<p>This is an event pattern, and the gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "Http get requests on any path should be sent to the following function".</p>
 <pre><code>helloWorld ():any -&gt;
 </code></pre>
 <p>This is a function signature, complete with a function name, input type within the parens (in this case, no input type), and output type after the colon.  Types are not implemented yet in Strat, so this function returns the any type while in the future it will return "string".</p>
-<h3 id="-3"> </h3>
 <pre><code>"./helloWorld.js"
 </code></pre>
-<p>This is the final part of a function definition--the artifact.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution can be found in the <a href="../Specification/Functions">functions section of the specification</a>.</p>
+<p>This is the final part of a function definition--the <a href="../User%20Guide/Artifacts">artifact</a>.  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs…somewhere…more on code execution can be found in the <a href="../Specification/Functions">functions section of the specification</a>.  The power of Strat lies in users not specifying what type of infrastructure helloWorld.js executes on.  This allows stratc to port systems between wildly different substrates and optimize systems.</p>
 <h1 id="awshelloworld">AWS Hello World</h1>
-<p>Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  Instead of creating build directories and copying around files when stratc runs, it will provision Lambdas and APIGateway APIs.  The only thing that changes for you, dear user, is a 5 line config file.</p>
-<p>1) If you don't already have an AWS account that you can fool around with, create one.  Everything we're about to do falls well within AWS free tier limits.</p>
-<p>2) Create a file called stratconfig.json and paste the following in:</p>
-<pre><code class="json language-json">{
-  "substrate": "aws",
-  "aws": {
-    "config": {
-      "region": "us-west-2"
-    }
-  }
-}
+<p>Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  You'll need an AWS account, so if you don't have one go <a href="https://portal.aws.amazon.com/billing/signup?nc2=h_ct&src=default&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start">create one now</a>--its easy, requires no upfront financial commitment, and won't cost you anything to run this system thanks to generous free tiers.</p>
+<p>Stratc will need to create resources on your AWS account and will need credentials to do that, so go ahead and set up your shared credentials file by following the instructions <a href="https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html">here</a>.
+Note: you may already have one--make sure its for your test account!</p>
+<p>Now you're ready to deploy to AWS:</p>
+<pre><code class="bash language-bash">  $ stratc --aws ./HelloWorld.sa
 </code></pre>
-<p>NOTE: everything within the "config" hash is passed into the <a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html">AWS.Config</a> method of the AWS SDK, so you can add and change things as needed (for instance, you can change the region to "us-west-1").</p>
-<p>3) Strat will need to create resources on your AWS account and will need credentials to do that.  There are two ways it can access those credentials.  You need to do at least one of the following:</p>
-<ul>
-<li><p>A) Supply AWS credentials within the stratconfig.json</p>
-<ul>
-<li>add these two properties to the config hash in stratconfig.json:</li>
-<li>"accessKeyId": "{your access key id}",</li>
-<li>"secretAccessKey": "{your secret access key}"</li></ul></li>
-<li><p>B) Have Strat use your shared ~/.aws/credentials file</p>
-<ul>
-<li>follow the instructions to create a shared credentials file <a href="https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html">here</a>.  Note: you may already have one--try $ stat ~/.aws/credentials</li>
-<li>If you do use an aws credentials file, make sure its for your test account!</li></ul>
-<p>NOTE: credentials provided through A override B.</p></li>
-</ul>
-<p>4) In the future, Strat will create appropriate roles for each resource it creates.  Today, you need to create a role with some basic permissions for Strat to use when creating resources.  Create an <a href="https://aws.amazon.com/iam/">IAM role</a> with the following policies:</p>
-<ul>
-<li>AWSLambdaFullAccess</li>
-<li>AmazonS3FullAccess</li>
-<li>InvokeAllLambda</li>
-</ul>
-<p>And make sure the role is assumable by Lambda and ApiGateway:</p>
-<pre><code class="json language-json">{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": [
-          "lambda.amazonaws.com",
-          "apigateway.amazonaws.com"
-        ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-</code></pre>
-<p>Now, add this role's arn to stratconfig.json at the path aws/preCreatedRole.  Your stratconfig.json should look like this:</p>
-<pre><code class="json language-json">{
-  "substrate": "aws",
-  "aws": {
-    "config": {
-      "region": "us-west-2"
-    },
-    "preCreatedRole": "{arn for the role you just created}"
-  }
-}
-</code></pre>
-<p>5) Run stratc (we don't need to build again--we can use the same .sa file)</p>
-<pre><code class="bash language-bash">  $ stratc ./HelloWorld.sa
-</code></pre>
-<h2 id="checkitout">Check it out</h2>
-<p>Inside your AWS console you can see lit created a single lambda function and an APIGateway API called "HelloWorld".  You can invoke the system by navigating to the url APIGateway generates for you.  You can find this under the stages tab on the left of the APIGateway console for HelloWorld.</p>
-<p>If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat <a href="https://github.com/CaptainCharlieGreen/lit_demo">here</a>.</p></div>
+<p>You'll see stratc create resources in the console.  Look for the APIGateway URL and go there.  The first load takes up to 10 seconds as AWS loads your resources for the first time.</p>
+<p>If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat <a href="./Bookstore">here</a>.</p></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

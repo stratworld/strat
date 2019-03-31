@@ -17,8 +17,8 @@ module.exports = function (cases, stop) {
         fs.cat(testCase.entry),
         testCase.entry)
         .then(resultAst => {
-          if (testCase.errorCode !== undefined) {
-            done(new Error(`${testCase.name} didn't throw ${testCase.errorCode} when an error was expected.`));
+          if (testCase.stratCode !== undefined) {
+            done(new Error(`${testCase.name} didn't throw ${testCase.stratCode} when an error was expected.`));
           } else {
             if (typeof testCase.assertion === 'function') {
               testCase.assertion(resultAst, done);
@@ -28,12 +28,13 @@ module.exports = function (cases, stop) {
           }
         })
         .catch(e => {
-          if (testCase.errorCode !== undefined) {
-            if (testCase.errorCode === e.errorCode) {
+          if (Array.isArray(e)) e = e[0];
+          if (testCase.stratCode !== undefined) {
+            if (testCase.stratCode === e.stratCode) {
               done();
             } else {
               done(new Error(`${testCase.name} didn't throw the correct error code
-  expected ${testCase.errorCode} got ${e.errorCode}.  Error:
+  expected ${testCase.stratCode} got ${e.stratCode}.  Error:
 
 ${stringifyError(e)}`))
             }

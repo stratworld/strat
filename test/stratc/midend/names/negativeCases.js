@@ -9,7 +9,7 @@ service Backend {
   ddb ():any -> "./ddb.js"
 }
 `)},
-    errorCode: 'E_NAMES_DUPLICATE'
+    stratCode: 'E_NAMES_DUPLICATE'
   },
   {
     entry: 'Backend.st',
@@ -24,7 +24,7 @@ service Backend {
   ddb ():any -> "./ddb.js"
 }
 `)},
-    errorCode: 'E_NAMES_DUPLICATE'
+    stratCode: 'E_NAMES_DUPLICATE'
   },
 // this was removed from requirements
 //   {
@@ -36,7 +36,7 @@ service Backend {
 //   ddb ():any -> "./ddb.js"
 // }
 // `)},
-//     errorCode: 'E_NAMES_MISMATCH'
+//     stratCode: 'E_NAMES_MISMATCH'
 //   },
   {
     entry: 'Backend.st',
@@ -47,7 +47,7 @@ service Backend {
   Http {} -> "./ddb.js"
 }
 `)},
-    errorCode: 'E_NAMES_UNDECLARED'
+    stratCode: 'E_NAMES_UNDECLARED'
   },
   {
     entry: 'Backend.st',
@@ -58,7 +58,7 @@ service Backend {
   foo (foo):any -> "./ddb.js"
 }
 `)},
-    errorCode: 'E_NAMES_UNDECLARED'
+    stratCode: 'E_NAMES_UNDECLARED'
   },
   {
     entry: 'Backend.st',
@@ -71,7 +71,7 @@ service Backend {
   Http {} -> Other.other
 }
 `)},
-    errorCode: 'E_NAMES_UNDECLARED'
+    stratCode: 'E_NAMES_UNDECLARED'
   },
   {
     entry: 'Backend.st',
@@ -83,6 +83,6 @@ service Backend {
   Http ():any -> "./ddb.js"
 }
 `)},
-    errorCode: 'E_NAMES_DUPLICATE'
+    stratCode: 'E_NAMES_DUPLICATE'
   },
 ];

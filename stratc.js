@@ -5,6 +5,7 @@ const svs = require('./svs/substrateFactory')();
 const defaultFs = require('./util/fileSystem');
 const defaultLoader = require('./util/loader');
 const defaultInternet = require('./util/theInternet');
+const errorFormat = require('./stratc/errors');
 const compiler = compilerConstructor({
   fs: defaultFs,
   loader: defaultLoader,
@@ -94,6 +95,7 @@ if (command === 'help' || command === '-h' || command === '--help') {
       console.log(serializeAST(finalResults));
       process.exit(0);
     })
+    .catch(errorFormat)
     .catch(e => {
       if (Array.isArray(e)) {
         console.error(e.filter(error => !error.printed));

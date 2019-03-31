@@ -12,7 +12,7 @@
 ## Exhaustive stratc Command Reference
 
   - {.st file}
-    - compiles the file and builds a .saf file
+    - compiles the file and builds a .sa file
     - EX: $ stratc ./HelloWorld.st
 
   - [--{svs implementation}] {.sa file}
