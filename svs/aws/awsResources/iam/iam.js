@@ -1,14 +1,10 @@
-/*
-"apigateway.amazonaws.com",
-"lambda.amazonaws.com"
-*/
 const config = require('../../../config')();
 const AWS = require('aws-sdk');
 const IAM = new AWS.IAM();
 
 module.exports = async function (ir) {
   const account = await getAccountId();
-  const fnArn = getFunctionArner(account);
+  const fnArn = getFunctionArner(account, ir.id);
   const s3Object = getS3ObjectArner(account, ir.id);
 
   const additionalPerms = getAdditionalPerms(ir);
@@ -26,7 +22,7 @@ module.exports = async function (ir) {
   function getLambdaInfo (host) {
     return {
       name: host.compute.config.FunctionName,
-      arn: fnArn(host.name),
+      arn: fnArn(host.compute.config.FunctionName),
       service: "lambda.amazonaws.com",
       serviceInvoke: 'lambda:InvokeFunction'
     };
@@ -52,7 +48,7 @@ module.exports = async function (ir) {
       const roles = await Promise.all([
         createRuntimeRole(hostRoleInfo, targetHosts, additionalPerms[myScopeName]),
         createConnectRole(
-          Object.assign(hostRoleInfo, { arn: "*" }), host.events)
+          hostRoleInfo, host.events)//Object.assign(hostRoleInfo, { arn: "*" })
       ]);
       host.connectRole = roles[1];
       return [host.artifacts[0].scope, roles[0]];
@@ -66,6 +62,9 @@ module.exports = async function (ir) {
 }
 
 async function createConnectRole (host, events) {
+  if (events.length === 0) {
+    return undefined;
+  }
   const eventType = events[0].type;
   const roleName = `${host.name}${eventType}`;
   const assumeService = eventType === 'Http'
@@ -154,7 +153,7 @@ async function createRole (assumeService, roleName, targets) {
   return role.Role.Arn;
 }
 
-function getFunctionArner (account) {
+function getFunctionArner (account, id) {
   const region = config.aws.config.region;
 
   return function (functionName) {

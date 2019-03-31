@@ -1,39 +1,64 @@
 R = x => Promise.resolve(x);
 J = x => Promise.reject(x);
 
-Array.prototype.flat = function () {
-  return this.reduce((fm, n) => fm.concat(n), []);
-}
+Object.defineProperty(Array.prototype, 'flat',{
+  value: function() {
+    return this.reduce((fm, n) => fm.concat(n), []);
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Array.prototype.flatmap = function (fn) {
-  if (typeof fn === 'function') {
-    return this.map(fn).flat();
-  }
-  return this.flat();
-};
+Object.defineProperty(Array.prototype, 'flatmap',{
+  value: function(fn) {
+    if (typeof fn === 'function') {
+      return this.map(fn).flat();
+    }
+    return this.flat();
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Array.prototype.purge = function () {
-  return this.filter(x => x !== undefined);
-}
+Object.defineProperty(Array.prototype, 'purge',{
+  value: function() {
+    return this.filter(x => x !== undefined);
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Array.prototype.constantMapping = function (constant) {
-  return this.reduce((set, element) => {
-    set[element] = constant;
-    return set;
-  }, {});
-}
+Object.defineProperty(Array.prototype, 'constantMapping',{
+  value: function(constant) {
+    return this.reduce((set, element) => {
+      set[element] = constant;
+      return set;
+    }, {});
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
-Array.prototype.pipePromise = function (startingPromise) {
-  return this.reduce((totalPromise, nextPromise) => {
-    return totalPromise.then(result => nextPromise(result));
-  }, (startingPromise === undefined ? R() : startingPromise));
-}
+// Array.prototype.pipePromise = function (startingPromise) {
+//   return this.reduce((totalPromise, nextPromise) => {
+//     return totalPromise.then(result => nextPromise(result));
+//   }, (startingPromise === undefined ? R() : startingPromise));
+// }
 
-Array.prototype.first = function (predicate) {
-  return typeof predicate === 'function'
-    ? this.filter(predicate)[0]
-    : this[0];
-}
+Object.defineProperty(Array.prototype, 'first',{
+  value: function(predicate) {
+    return typeof predicate === 'function'
+      ? this.filter(predicate)[0]
+      : this[0];
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
 
 Object.defineProperty(Object.prototype, 'values',{
   value: function() {
@@ -79,7 +104,7 @@ Object.defineProperty(Object.prototype, 'purge',{
 });
 
 Object.defineProperty(Object.prototype, 'intersect',{
-  value: function() {
+  value: function(other) {
     return Object.keys(this)
       .filter(key => other[key] !== undefined)
       .constantMapping(true);
