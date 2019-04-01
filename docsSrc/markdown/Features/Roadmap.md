@@ -47,7 +47,7 @@ Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goal
 
 # AWS Substrate Performance Improvements (Ongoing)
 
-Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  The AWS SVS should implement routing inside APIGateway, and should proxy directly to s3 files to avoid lambda.  I suspect there's also some performance tweaks to be made around loading the AWS SDK lazier--Lambdas that don't load the AWS SDK typically take < 10ms while loading the AWS SDK seems to put a floor on the Lambda's time at 50ms.  Honestly, I haven't done the requisite profiling to make serious suggestions but I can tell things are much slower than they should be.
+Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  Its not clear what APIGateway brings to the table for Strat other than a massive latency tax.  The optimal solution is likely some combination of direct Lambda calls, CloudFront->Lambda, and CloudFront->s3.  This is all pretty in-the-weeds of AWS, but the current state of affairs of 500ms for a simple api call is not acceptable for a production system, and if we're to make good on "better infrastructure than you're making by hand" a realistic goal should be TP99 <50ms api calls (assuming they terminate in a single lambda, and assuming the client is in a place close-ish to an AWS datacenter).
 
 # Runtime Pattern Matching + Values
 
@@ -117,6 +117,11 @@ source CustomHttpConsumer {
 }
 ```
 
+# Browser Host
+
+This is so that users can call Strat("Books.getBooks") inside a browser a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utalizing direct Lambda calls.
+
+This also opens the way for people to write client-side "services" that can be included and run inside a user's browser.  The big question here is how does Strat know / how does the user specify that a particular service should be client-side.
 
 # Foreign Source/Service Interface
 

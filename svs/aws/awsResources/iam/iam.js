@@ -143,11 +143,10 @@ async function createRole (assumeService, roleName, targets) {
     });
   }
 
-  // console.log('Sleeping for 10 seconds because IAM is terrible');
+  // console.log('Sleeping for 5 seconds because IAM is terrible');
   //https://stackoverflow.com/questions/36419442/the-role-defined-for-the-function-cannot-be-assumed-by-lambda
-  //todo: sometimes this still isnt' enough; we need to put in a retry
   await new Promise(function (resolve, reject) {
-    setTimeout(resolve, 10000);
+    setTimeout(resolve, 5000);
   });
 
   return role.Role.Arn;

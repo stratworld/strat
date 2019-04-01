@@ -72,7 +72,7 @@ Http { method: "get"|"post" } -&gt; myFunction
 <p>Engineers have made good headway with some of the challenges of describing events across organizations with the <a href="https://www.openapis.org/">OpenAPI Specification</a>.  Strat's type system notation shouldn't be YAML, but it can integrate with all of the other artifacts from the OAS ecosystem, and potentially produce an OAS YAML file.</p>
 <p>Clojure's <a href="https://clojure.org/guides/spec">Spec</a> shares many of the design goals of a Strat type system.</p>
 <h1 id="awssubstrateperformanceimprovementsongoing">AWS Substrate Performance Improvements (Ongoing)</h1>
-<p>Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  The AWS SVS should implement routing inside APIGateway, and should proxy directly to s3 files to avoid lambda.  I suspect there's also some performance tweaks to be made around loading the AWS SDK lazier--Lambdas that don't load the AWS SDK typically take &lt; 10ms while loading the AWS SDK seems to put a floor on the Lambda's time at 50ms.  Honestly, I haven't done the requisite profiling to make serious suggestions but I can tell things are much slower than they should be.</p>
+<p>Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  Its not clear what APIGateway brings to the table for Strat other than a massive latency tax.  The optimal solution is likely some combination of direct Lambda calls, CloudFront-&gt;Lambda, and CloudFront-&gt;s3.  This is all pretty in-the-weeds of AWS, but the current state of affairs of 500ms for a simple api call is not acceptable for a production system, and if we're to make good on "better infrastructure than you're making by hand" a realistic goal should be TP99 &lt;50ms api calls (assuming they terminate in a single lambda, and assuming the client is in a place close-ish to an AWS datacenter).</p>
 <h1 id="runtimepatternmatchingvalues">Runtime Pattern Matching + Values</h1>
 <p>In the code:</p>
 <pre><code>Http { method: "get" } -&gt;
@@ -120,6 +120,9 @@ module.exports = async event =&gt; {
   CustomErrorHttp { method: "get" path: "*"} -&gt; "&lt;h1&gt;thing&lt;/h1&gt;"
 }
 </code></pre>
+<h1 id="browserhost">Browser Host</h1>
+<p>This is so that users can call Strat("Books.getBooks") inside a browser a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utalizing direct Lambda calls.</p>
+<p>This also opens the way for people to write client-side "services" that can be included and run inside a user's browser.  The big question here is how does Strat know / how does the user specify that a particular service should be client-side.</p>
 <h1 id="foreignsourceserviceinterface">Foreign Source/Service Interface</h1>
 <p>Strat needs a way for developers to add source and service libraries that expose more exotic infrastructure that a particular substrate provides.  This problem is analagous to foreign function interfaces in normal languages.</p>
 <h1 id="configsettings">Config Settings</h1>

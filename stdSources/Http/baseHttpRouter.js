@@ -56,11 +56,12 @@ module.exports = function (event) {
       ? undefined
       : JSON.parse(event.body);
   } catch (e) {
-    return Promise.reject({
+    return Promise.resolve({
       statusCode: 400,
       headers: {},
       isBase64Encoded: false,
-      body: `invalid json input: ${e}`
+      body: `invalid json input: ${e}
+Bad json: ${event.body}`
     });
   }
 
@@ -83,14 +84,14 @@ module.exports = function (event) {
     })
   })
   .catch(e => {
+    const errorText = e.stack === undefined
+      ? e
+      : e.stack;
     return Promise.resolve({
-      // if we didn't like it its a bad request!
-      // could 500 here, but that's a little dramatic
-      // its not me, its you!
       statusCode: 500,
       headers: {},
       isBase64Encoded: false,
-      body: e.toString()
+      body: errorText
     })
   });
 };
