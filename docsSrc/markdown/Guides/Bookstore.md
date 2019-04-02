@@ -1,10 +1,11 @@
 # Strat Bookstore Guide
 
 In this guide we'll make a simple bookstore that uses a:
-  A) Single page application frontend
-  B) frontend proxy
-  C) books service that depends on an external sales service
-  D) books database
+  
+  - single page application frontend
+  - frontend proxy
+  - books service that depends on an external sales service
+  - books database
 
 We'll take this application and run it locally and on the cloud via AWS.  Sounds like a lot of work, but we'll be done in less than 100 lines of code.
 
