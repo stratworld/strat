@@ -19,6 +19,10 @@ body {
   background-color: var(--white);
 }
 
+pre{
+  white-space: pre-wrap;
+}
+
 .navigation a:hover::after {
   content: '->';
   position: absolute;

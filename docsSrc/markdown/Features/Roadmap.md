@@ -49,6 +49,10 @@ Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goal
 
 Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  Its not clear what APIGateway brings to the table for Strat other than a massive latency tax.  The optimal solution is likely some combination of direct Lambda calls, CloudFront->Lambda, and CloudFront->s3.  This is all pretty in-the-weeds of AWS, but the current state of affairs of 500ms for a simple api call is not acceptable for a production system, and if we're to make good on "better infrastructure than you're making by hand" a realistic goal should be TP99 <50ms api calls (assuming they terminate in a single lambda, and assuming the client is in a place close-ish to an AWS datacenter).
 
+# "public by" / Custom connection semantics
+
+Right now when a user adds the public keyword to a function they get a bare-bones https based rest client.  Users will want to specify how clients will connect to their systems to add authentication/authorization.
+
 # Runtime Pattern Matching + Values
 
 In the code:

@@ -13,6 +13,9 @@ module.exports = injectedDeps => ast => {
       .concat(traverse(file, ['service', 'dispatch']));
     const filePath = val(file, 'path');
     return Promise.all(functions
+      //don't run for functions that already have an artifact made
+      //this make this function runnable multiple times
+      .filter(fn => fn.artifact === undefined || Buffer.isBuffer(fn.artifact))
       .map(fn => {
         //don't do anything with references
         return traverse(fn, ['reference']).length === 0

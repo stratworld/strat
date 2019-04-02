@@ -138,14 +138,14 @@ async function createFunctionDispatch (serviceName, functionNameAst) {
   const functionName = val(functionNameAst, 'name');
   const text = `service stub {
   Http { method: "get", path: "/strat/${serviceName}/${functionName}" } ->
-    public${createFunctionString(functionNameAst, './proxy.js')}
+    public${createFunctionString(functionNameAst, 'stub')}
 }`;
   return compileDispatch(text);
 }
 
 async function createResourceDispatch (serviceName, resourceName) {
   const text = `service stub {
-    Http { method: "get", path: "/strat/${serviceName}/${resourceName}"} -> "./foo.js"
+    Http { method: "get", path: "/strat/${serviceName}/${resourceName}"} -> "stub"
 }`;
   return compileDispatch(text);
 }
