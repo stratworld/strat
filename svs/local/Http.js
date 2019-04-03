@@ -1,7 +1,7 @@
 const http = require('http');
 
-module.exports = function (proxy) {
-  const port = 3000;
+module.exports = function (proxy, config) {
+  const port = config.port || 3000;
   function listener (request, response) {
     //todo: send body
     proxy({

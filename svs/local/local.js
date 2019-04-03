@@ -2,6 +2,7 @@ const nodeEval = require('node-eval');
 const Archive = require('../../util/archiveBuilder');
 const stdPath = require('path');
 const Http = require('./Http');
+const config = require("../config")();
 
 //todo: error handling
 module.exports = async function (saData) {
@@ -81,7 +82,7 @@ async function connect (ir, registry) {
     //assumption: the proxy will be first in the artifacts list
     // this is safe because of midend.scopecollapse
     const proxy = registry[host.artifacts[0].name];
-
-    return Http(proxy);
+    const HttpConfig = ((config.local || {}).Http || {});
+    return Http(proxy, HttpConfig);
   }));
 }
