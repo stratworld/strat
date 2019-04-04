@@ -25,6 +25,9 @@ function getHosts (ast) {
         .map(fn => {
           const fnName = name(service, fn);
           const events = getProxyEvents(proxyNameLookup, fnName);
+          const fnNameAst = traverse(fn, ['functionName'])[0];
+          const sigTypes = traverse(fnNameAst, ['signature', 'shape'])
+            .map(shapeAst => val(shapeAst, 'name'));
           return {
             name: fnName,
             eventType: events.map(event => event.type)[0],
@@ -35,7 +38,11 @@ function getHosts (ast) {
               {
                 declaration: {
                   path: path,
-                  name: val(traverse(fn, ['functionName'])[0], 'name'),
+                  name: val(fnNameAst, 'name'),
+                  signature: {
+                    input: sigTypes[1],
+                    output: sigTypes[0]
+                  },
                   service: serviceName
                 },
                 scope: serviceName,

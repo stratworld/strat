@@ -48,7 +48,7 @@ module.exports = async function (ir) {
       const roles = await Promise.all([
         createRuntimeRole(hostRoleInfo, targetHosts, additionalPerms[myScopeName]),
         createConnectRole(
-          hostRoleInfo, host.events)//Object.assign(hostRoleInfo, { arn: "*" })
+          hostRoleInfo, host.events)
       ]);
       host.connectRole = roles[1];
       return [host.artifacts[0].scope, roles[0]];
@@ -133,7 +133,7 @@ async function createRole (assumeService, roleName, targets) {
     };
     
     console.log(`Allowing ${roleName} to invoke:
-    ${targets.map(target => target.arn).join('\n  ')}`);
+  ${targets.map(target => target.arn).join('\n  ')}`);
 
     await new Promise(function (resolve, reject) {
       IAM.putRolePolicy(putPolicyParams, (e, r) => {
@@ -143,10 +143,10 @@ async function createRole (assumeService, roleName, targets) {
     });
   }
 
-  // console.log('Sleeping for 5 seconds because IAM is terrible');
+  // console.log('Sleeping for 3 seconds because IAM is terrible');
   //https://stackoverflow.com/questions/36419442/the-role-defined-for-the-function-cannot-be-assumed-by-lambda
   await new Promise(function (resolve, reject) {
-    setTimeout(resolve, 5000);
+    setTimeout(resolve, 3000);
   });
 
   return role.Role.Arn;

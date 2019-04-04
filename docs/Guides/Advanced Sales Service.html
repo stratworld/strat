@@ -51,10 +51,14 @@
 <p>Sales.st:</p>
 <pre><code class="st language-st">service Sales {
   public getSales ():any -&gt; "./getSales.js"
+  public setSales (any):any -&gt; "./setSales.js"
 }
 </code></pre>
 <p>getSales.js:</p>
 <pre><code class="javascript language-javascript">module.exports = () =&gt; [ 'John Steinbeck' ];
+</code></pre>
+<p>setSales.js:</p>
+<pre><code class="javascript language-javascript">module.exports = e =&gt; e;
 </code></pre>
 <p>Notice how we're not including Http--that public keyword sets up Http for us. Lets run this and poke around some endpoints:</p>
 <pre><code>stratc Sales.st &amp;&amp; stratc Sales.sa
@@ -89,10 +93,161 @@
 <p>If you get an error 'ECONNREFUSED' its because you don't have your Sales service running--the Sales service needs to be running to communicate with stratc while Bookstore is building.  Just to prove to yourself that you do indeed have two independent services running on your machine, change the sales response in getSales.js from 'John Steinbeck' to 'Leo Tolstoy', rebuild the Sales service then rebuild the Bookstore.  You should see a little on sale indicator next to <em>War and Peace</em>.</p>
 <h2 id="databaseaccess">Database Access</h2>
 <p>Stateless compute is all fun and games, but almost all real web software has a persistence layer.  For this tutorial we'll be using a DynamoDB database.  If you're not familiar, <a href="https://aws.amazon.com/dynamodb/">DynamoDB</a> is a managed NoSQL database available on AWS.  DDB backs most AWS services and therefore a substantial portion of the internet--its one of the rare technologies made for massive scale that's still user friendly and practical at smaller workloads.</p>
-<p>Make a new file getSalesFromDDB.js:
-todo</p>
+<p>We'll need to load in the AWS SDK.  Create a package.json file and past this content inside:</p>
+<pre><code class="json language-json">{
+  "name": "sales-demo",
+  "main": "getSales.js",
+  "devDependencies": {
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.434.0"
+  }
+}
+</code></pre>
+<p>Then run:</p>
+<pre><code class="sh language-sh">npm install
+</code></pre>
+<p>Now, lets create the Sales table we'll use in the API.  Create a javscript file 'createSalesTable.js' with this content:</p>
+<pre><code class="js language-js">var AWS = require("aws-sdk");
+
+AWS.config.update({
+    region: "us-west-2",
+});
+
+const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+const params = {
+  AttributeDefinitions: [
+    {
+      AttributeName: "iterationScope", 
+      AttributeType: "N"
+    },
+    {
+      AttributeName: "saleIteration", 
+      AttributeType: "N"
+    }
+  ],
+  KeySchema: [
+    {
+      AttributeName: "iterationScope", 
+      KeyType: "HASH"
+    },
+    {
+      AttributeName: "saleIteration", 
+      KeyType: "RANGE"
+    },
+  ], 
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5, 
+    WriteCapacityUnits: 5
+  },
+  TableName: "Sales"
+};
+
+ddb.createTable(params, (e, r) =&gt; {
+  if (e) {
+    console.log('error')
+    console.log(e)
+  } else {
+    console.log(r);
+  }
+});
+</code></pre>
+<p>Then execute that file to create the table:</p>
+<pre><code class="sh language-sh">node createSalesTable.js
+</code></pre>
+<p>You should see some output in your terminal that says the table is being created.  Now, make a new file we'll actually call in our api, salesDb.js:</p>
+<pre><code class="javascript language-javascript">var AWS = require("aws-sdk");
+
+AWS.config.update({
+    region: "us-west-2",
+});
+
+module.exports = {
+  getSales: getSales,
+  setSales: setSales
+};
+
+const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+async function getSales () {
+  return (await getRecentSales()).authors;
+}
+
+async function setSales (sales) {
+  const recentIteration = (await getRecentSales()).saleIteration;
+  await addSalesIteration(sales, recentIteration + 1);
+  return sales;
+}
+
+async function addSalesIteration (sales, iteration, dontRetry) {
+  var params = {
+    Item: {
+      authors: {
+       SS: sales
+      },
+      date: {
+       S: (new Date()).toISOString()
+      },
+      iterationScope: {
+        N: '1'
+      },
+      saleIteration: {
+        N: "" + iteration
+      }
+    },
+    ConditionExpression: "attribute_not_exists(saleIteration)"
+  };
+
+  try {
+    return await runDdb('putItem', params);
+  } catch (e) {
+    if (dontRetry) throw e;
+    return addSalesIteration(sales, iteration + 1, true);
+  }
+}
+
+async function getRecentSales () {
+  const queryResult = await runDdb('query', {
+    ExpressionAttributeValues: {
+      ':s': {N: '1'}
+    },
+    Limit: 1,
+    KeyConditionExpression: 'iterationScope=:s',
+    ScanIndexForward: false
+  });
+  const recentIteration = queryResult.Items
+    .map(item =&gt; {
+      return {
+        saleIteration: parseInt(item.saleIteration.N),
+        authors: item.authors.SS
+      };
+    })
+    [0] || { saleIteration: 0, authors: [] };
+  return recentIteration;
+}
+
+
+async function runDdb (operation, parameters) {
+  return new Promise(function (resolve, reject) {
+    const params = Object.assign(parameters, { TableName: "Sales" });
+    ddb[operation](params, (e, r) =&gt; {
+      if (e) reject(e);
+      resolve(r);
+    });
+  });
+}
+</code></pre>
+<p>This file handles all the query logic we need for two different API operations:</p>
+<ul>
+<li>accepting a list of authors and making them the authors on sale (setSales)</li>
+<li>returning the list of authors that are on sale (getSales)</li>
+</ul>
+<p>You may notice there's a lot of in-the-weeds dynamodb stuff around a range key saleIteration--you can ignore this (unless you want to code/design review this guide).</p>
 <h2 id="buildingajavascriptbundle">Building A Javascript Bundle</h2>
-<p>We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our getSales.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an artifact--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using <a href="https://webpack.js.org/">Webpack</a> here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.</p>
+<p>We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our API.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an artifact--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using <a href="https://webpack.js.org/">Webpack</a> here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.</p>
 <p>Create a package.json file:</p>
 <pre><code class="json language-json">{
   "name": "sales-demo",
@@ -112,28 +267,45 @@ const path = require('path');
 
 module.exports = {
   target: 'node',
-  entry: './getSales.js',
+  entry: {
+    getSales: './getSales.js',
+    setSales: './setSales.js'
+  },
   output: {
     path: path.resolve('./'),
-    filename: './getSales.bundle.js',
+    filename: './[name].bundle.js',
     library: 'strat-library',
     libraryTarget: 'umd'
-  },
-  optimization: {
-    minimize: false
   },
   plugins: [
     new webpack.IgnorePlugin(/strat/gi)
   ],
 };
 </code></pre>
-<p>Note: this configuration soup is why Webpack has such a bad reputation.  It's decent technology as long as somebody else hands you a working config file--you're welcome.</p>
+<p>This configuration soup is why Webpack has such a bad reputation.  It's decent technology as long as somebody else hands you a working config file--you're welcome.</p>
 <p>Install Webpack:</p>
 <pre><code class="sh language-sh">npm install
 </code></pre>
 <p>Run Webpack (note: requires npm 5+; use <a href="https://www.npmjs.com/package/n">n</a> or <a href="https://github.com/creationix/nvm/blob/master/README.md#installation-and-update">nvm</a> to upgrade your npm if npx doesn't work):</p>
 <pre><code class="sh language-sh">npx webpack
-</code></pre></div>
+</code></pre>
+<p>And change Sales.st to use the bundle:</p>
+<pre><code class="st language-st">service Sales {
+  public getSales ():any -&gt; "./getSales.bundle.js"
+  public setSales (any):any -&gt; "./setSales.bundle.js"
+}
+</code></pre>
+<p>From here on out, we need to rebuild our javascript bundle whenever we change things within our javascript files, so our new build command looks like:</p>
+<pre><code class="sh language-sh">npx webpack &amp;&amp; stratc Sales.st &amp;&amp; stratc Sales.sa
+</code></pre>
+<p>Try out your public endpoints (run these individually and look at the results):</p>
+<pre><code class="sh language-sh">curl localhost:3001/strat/Sales/getSales
+
+curl -X "POST" localhost:3001/strat/Sales/setSales -d "[ \"Brian Kernighan and Dennis Ritchie\"]"
+
+curl localhost:3001/strat/Sales/getSales
+</code></pre>
+<p>The second curl changes our database state to have a new sale, which we can see in the last curl.</p></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

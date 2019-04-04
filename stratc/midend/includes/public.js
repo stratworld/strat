@@ -136,8 +136,12 @@ function createFunctionString (functionNameAst, artifact) {
 
 async function createFunctionDispatch (serviceName, functionNameAst) {
   const functionName = val(functionNameAst, 'name');
+  const input = traverse(functionNameAst, ['signature', 'shape'])[1];
+  const method = input === undefined
+    ? 'get'
+    : 'post';
   const text = `service stub {
-  Http { method: "get", path: "/strat/${serviceName}/${functionName}" } ->
+  Http { method: "${method}", path: "/strat/${serviceName}/${functionName}" } ->
     public${createFunctionString(functionNameAst, 'stub')}
 }`;
   return compileDispatch(text);

@@ -14,12 +14,18 @@ Sales.st:
 ```st
 service Sales {
   public getSales ():any -> "./getSales.js"
+  public setSales (any):any -> "./setSales.js"
 }
 ```
 
 getSales.js:
 ```javascript
 module.exports = () => [ 'John Steinbeck' ];
+```
+
+setSales.js:
+```javascript
+module.exports = e => e;
 ```
 
 Notice how we're not including Http--that public keyword sets up Http for us. Lets run this and poke around some endpoints:
@@ -74,13 +80,180 @@ If you get an error 'ECONNREFUSED' its because you don't have your Sales service
 
 Stateless compute is all fun and games, but almost all real web software has a persistence layer.  For this tutorial we'll be using a DynamoDB database.  If you're not familiar, [DynamoDB](https://aws.amazon.com/dynamodb/) is a managed NoSQL database available on AWS.  DDB backs most AWS services and therefore a substantial portion of the internet--its one of the rare technologies made for massive scale that's still user friendly and practical at smaller workloads.
 
-Make a new file getSalesFromDDB.js:
-todo
+We'll need to load in the AWS SDK.  Create a package.json file and past this content inside:
+
+```json
+{
+  "name": "sales-demo",
+  "main": "getSales.js",
+  "devDependencies": {
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.434.0"
+  }
+}
+```
+
+Then run:
+
+```sh
+npm install
+```
+
+Now, lets create the Sales table we'll use in the API.  Create a javscript file 'createSalesTable.js' with this content:
+
+```js
+var AWS = require("aws-sdk");
+
+AWS.config.update({
+    region: "us-west-2",
+});
+
+const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+const params = {
+  AttributeDefinitions: [
+    {
+      AttributeName: "iterationScope", 
+      AttributeType: "N"
+    },
+    {
+      AttributeName: "saleIteration", 
+      AttributeType: "N"
+    }
+  ],
+  KeySchema: [
+    {
+      AttributeName: "iterationScope", 
+      KeyType: "HASH"
+    },
+    {
+      AttributeName: "saleIteration", 
+      KeyType: "RANGE"
+    },
+  ], 
+  ProvisionedThroughput: {
+    ReadCapacityUnits: 5, 
+    WriteCapacityUnits: 5
+  },
+  TableName: "Sales"
+};
+
+ddb.createTable(params, (e, r) => {
+  if (e) {
+    console.log('error')
+    console.log(e)
+  } else {
+    console.log(r);
+  }
+});
+```
+
+Then execute that file to create the table:
+
+```sh
+node createSalesTable.js
+```
+
+You should see some output in your terminal that says the table is being created.  Now, make a new file we'll actually call in our api, salesDb.js:
+
+```javascript
+var AWS = require("aws-sdk");
+
+AWS.config.update({
+    region: "us-west-2",
+});
+
+module.exports = {
+  getSales: getSales,
+  setSales: setSales
+};
+
+const ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+async function getSales () {
+  return (await getRecentSales()).authors;
+}
+
+async function setSales (sales) {
+  const recentIteration = (await getRecentSales()).saleIteration;
+  await addSalesIteration(sales, recentIteration + 1);
+  return sales;
+}
+
+async function addSalesIteration (sales, iteration, dontRetry) {
+  var params = {
+    Item: {
+      authors: {
+       SS: sales
+      },
+      date: {
+       S: (new Date()).toISOString()
+      },
+      iterationScope: {
+        N: '1'
+      },
+      saleIteration: {
+        N: "" + iteration
+      }
+    },
+    ConditionExpression: "attribute_not_exists(saleIteration)"
+  };
+
+  try {
+    return await runDdb('putItem', params);
+  } catch (e) {
+    if (dontRetry) throw e;
+    return addSalesIteration(sales, iteration + 1, true);
+  }
+}
+
+async function getRecentSales () {
+  const queryResult = await runDdb('query', {
+    ExpressionAttributeValues: {
+      ':s': {N: '1'}
+    },
+    Limit: 1,
+    KeyConditionExpression: 'iterationScope=:s',
+    ScanIndexForward: false
+  });
+  const recentIteration = queryResult.Items
+    .map(item => {
+      return {
+        saleIteration: parseInt(item.saleIteration.N),
+        authors: item.authors.SS
+      };
+    })
+    [0] || { saleIteration: 0, authors: [] };
+  return recentIteration;
+}
+
+
+async function runDdb (operation, parameters) {
+  return new Promise(function (resolve, reject) {
+    const params = Object.assign(parameters, { TableName: "Sales" });
+    ddb[operation](params, (e, r) => {
+      if (e) reject(e);
+      resolve(r);
+    });
+  });
+}
+
+```
+
+This file handles all the query logic we need for two different API operations:
+
+  - accepting a list of authors and making them the authors on sale (setSales)
+  - returning the list of authors that are on sale (getSales)
+
+You may notice there's a lot of in-the-weeds dynamodb stuff around a range key saleIteration--you can ignore this (unless you want to code/design review this guide).
 
 
 ## Building A Javascript Bundle
 
-We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our getSales.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an artifact--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using [Webpack](https://webpack.js.org/) here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.
+We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our API.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an artifact--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using [Webpack](https://webpack.js.org/) here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.
 
 Create a package.json file:
 
@@ -106,23 +279,24 @@ const path = require('path');
 
 module.exports = {
   target: 'node',
-  entry: './getSales.js',
+  entry: {
+    getSales: './getSales.js',
+    setSales: './setSales.js'
+  },
   output: {
     path: path.resolve('./'),
-    filename: './getSales.bundle.js',
+    filename: './[name].bundle.js',
     library: 'strat-library',
     libraryTarget: 'umd'
-  },
-  optimization: {
-    minimize: false
   },
   plugins: [
     new webpack.IgnorePlugin(/strat/gi)
   ],
 };
+
 ```
 
-Note: this configuration soup is why Webpack has such a bad reputation.  It's decent technology as long as somebody else hands you a working config file--you're welcome.
+This configuration soup is why Webpack has such a bad reputation.  It's decent technology as long as somebody else hands you a working config file--you're welcome.
 
 Install Webpack:
 ```sh
@@ -134,3 +308,31 @@ Run Webpack (note: requires npm 5+; use [n](https://www.npmjs.com/package/n) or 
 ```sh
 npx webpack
 ```
+
+And change Sales.st to use the bundle:
+
+```st
+service Sales {
+  public getSales ():any -> "./getSales.bundle.js"
+  public setSales (any):any -> "./setSales.bundle.js"
+}
+```
+
+From here on out, we need to rebuild our javascript bundle whenever we change things within our javascript files, so our new build command looks like:
+
+```sh
+npx webpack && stratc Sales.st && stratc Sales.sa
+```
+
+Try out your public endpoints (run these individually and look at the results):
+
+```sh
+curl localhost:3001/strat/Sales/getSales
+
+curl -X "POST" localhost:3001/strat/Sales/setSales -d "[ \"Brian Kernighan and Dennis Ritchie\"]"
+
+curl localhost:3001/strat/Sales/getSales
+```
+
+The second curl changes our database state to have a new sale, which we can see in the last curl.
+

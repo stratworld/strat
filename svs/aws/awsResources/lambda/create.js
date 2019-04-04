@@ -21,6 +21,14 @@ module.exports = async function (resource) {
   */
   params.Timeout = 20;
 
+  /*
+  128 is totally appropriate RAM for operations that don't load a large bundle.
+  We might want to switch this around based on how large the bundle is.
+  A 1MB bundle was paging with 128 RAM and "maxing out" at ~170 according
+  to the lambda console.
+  */
+  params.MemorySize = 256;
+
   async function attemptToCreateLambda (backoff) {
     var result;
     try {

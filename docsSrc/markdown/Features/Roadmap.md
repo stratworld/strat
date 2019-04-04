@@ -81,8 +81,25 @@ This is a way events can be translated into constants then sent to an artifact. 
 Http { } -> "./myProxy.js" -> Other.myFn
 ```
 
-For this to work, there's probably going to be pretty extensive changes to the .sa file format because the runtime would have to compose these functions and it would need instructions to do so.  Myabe some clever code-gen in stratc would simplify this.
+My best idea for how this would work is dynamically generating composed pipelines in stratc:
 
+```st
+service Composition {
+  Http { } -> "./myProxy.js" -> Other.myFn
+}
+```
+
+Would become:
+
+```
+service Composition {
+  Http {} -> compositionPipeline_AB ():any -> 
+    "./strat_generated_Composition_AB.js"
+  compositionPipeline_AB_A ():any -> "./myProxy.js"
+  compositionPipeline_AB_B ():any -> Other.myFn
+}
+```
+ Where "strat\_generated\_Composition\_AB.js" is some buffer generated at compile time that will compose the two functions A and B.
 
 # Strat.emit & Source Extensions
 

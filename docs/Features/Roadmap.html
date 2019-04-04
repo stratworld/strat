@@ -90,7 +90,20 @@ Cron { "0****" } -&gt; "Every hour" -&gt;
 <p>This is a way events can be translated into constants then sent to an artifact. Or this:</p>
 <pre><code>Http { } -&gt; "./myProxy.js" -&gt; Other.myFn
 </code></pre>
-<p>For this to work, there's probably going to be pretty extensive changes to the .sa file format because the runtime would have to compose these functions and it would need instructions to do so.  Myabe some clever code-gen in stratc would simplify this.</p>
+<p>My best idea for how this would work is dynamically generating composed pipelines in stratc:</p>
+<pre><code class="st language-st">service Composition {
+  Http { } -&gt; "./myProxy.js" -&gt; Other.myFn
+}
+</code></pre>
+<p>Would become:</p>
+<pre><code>service Composition {
+  Http {} -&gt; compositionPipeline_AB ():any -&gt; 
+    "./strat_generated_Composition_AB.js"
+  compositionPipeline_AB_A ():any -&gt; "./myProxy.js"
+  compositionPipeline_AB_B ():any -&gt; Other.myFn
+}
+</code></pre>
+<p>Where "strat_generated_Composition_AB.js" is some buffer generated at compile time that will compose the two functions A and B.</p>
 <h1 id="stratemitsourceextensions">Strat.emit &amp; Source Extensions</h1>
 <p>Immagine the usecase of a custom 404 page.  Here's some mock-y Strat that could do that:</p>
 <pre><code class="st language-st">source CustomErrorHttp {

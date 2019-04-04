@@ -3,13 +3,18 @@ const http = require('http');
 module.exports = function (proxy, config) {
   const port = config.port || 3000;
   function listener (request, response) {
-    //todo: send body
-    proxy({
-      path: request.url,
-      httpMethod: request.method
-    })
-    .then(result => format(result, response))
-    .catch(error => formatError(error, response));
+    const chunks = [];
+    request.on('data', chunk => chunks.push(chunk));
+    request.on('end', () => {
+      const body = Buffer.concat(chunks).toString();
+      proxy({
+        path: request.url,
+        httpMethod: request.method,
+        body: chunks.length > 0 ? body : undefined
+      })
+      .then(result => format(result, response))
+      .catch(error => formatError(error, response));
+    });
   }
 
   return new Promise(function(resolve, reject) {
