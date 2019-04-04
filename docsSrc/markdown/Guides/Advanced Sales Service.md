@@ -72,6 +72,8 @@ and re-run your Bookstore
 stratc Bookstore.st && stratc Bookstore.sa
 ```
 
+and checkout your new service oriented architecture at [localhost:3000](http://localhost:3000).
+
 If you get an error 'ECONNREFUSED' its because you don't have your Sales service running--the Sales service needs to be running to communicate with stratc while Bookstore is building.  Just to prove to yourself that you do indeed have two independent services running on your machine, change the sales response in getSales.js from 'John Steinbeck' to 'Leo Tolstoy', rebuild the Sales service then rebuild the Bookstore.  You should see a little on sale indicator next to *War and Peace*.
 
 
@@ -253,6 +255,22 @@ You may notice there's a lot of in-the-weeds dynamodb stuff around a range key s
 ## Building A Javascript Bundle
 
 We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our API.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an [artifact](../User%20Guide/Artifacts)--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using [Webpack](https://webpack.js.org/) here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.
+
+Change your getSales and setSales files to use the new database access file:
+
+getSales.js:
+```javascript
+const getSales = require('./salesDb').getSales;
+
+module.exports = getSales;
+```
+
+setSales.js:
+```javascript
+const setSales = require('./salesDb').setSales;
+
+module.exports = event => setSales(event.body);
+```
 
 Create a webpack.config.js file:
 ```js
