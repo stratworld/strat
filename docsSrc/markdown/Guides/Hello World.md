@@ -37,7 +37,7 @@ Strat is all about events and functions.  Its sole purpose is to describe what e
 
 An event is a single piece of serialized data that is passed into your system.  Events come from sources, and in this example we're including Http, which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.
 
-A function is a single computational unit within your system, and it represents the actual code that gets deployed.  Functions accept events and execute code, and services are groupings of functions that control access to these infrastructure components.
+A function is a single computational unit within your system, and it represents the actual code that gets deployed.  Functions accept events and execute code, and services are groupings of functions that control permissions.
 
 The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.
 
@@ -60,7 +60,7 @@ This is an event pattern, and the gist here is we're describing what type of Htt
 ```
 helloWorld ():any ->
 ```
-This is a function signature, complete with a function name, input type within the parens (in this case, no input type), and output type after the colon.  Types are not implemented yet in Strat, so this function returns the any type while in the future it will return "string".
+This is a function signature, complete with a function name, input type within the parens (in this case, no input type), and output type after the colon.  Types are not implemented yet in Strat, so this function returns the any type while in the future it will return "text".
 
 ```
 "./helloWorld.js"
@@ -76,7 +76,7 @@ Note: you may already have one--make sure its for your test account!
 
 Now you're ready to deploy to AWS:
 
-```bash
+```sh
   $ stratc --aws ./HelloWorld.sa
 ```
 

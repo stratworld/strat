@@ -1,10 +1,9 @@
 # Advanced Guide: Sales Service
 
-In this guide we'll create our own sales service and use that instead of the public one we included in the [Bookstore Guide](./Bookstore).  If you haven't completed the Bookstore Guide, do that first.  The topics covered here should be the last bits needed to create a application with Strat.  We'll learn how to:
+In this guide we'll create our own sales service and use that instead of the public one we included in the [Bookstore Guide](./Bookstore).  If you haven't completed the Bookstore Guide, do that first.  The topics covered here should be the last bits needed to create an application with Strat.  We'll learn how to
 
   - manage access to resources outside of Strat (like a database)
   - externalize APIs using the public keyword
-  - use a new standard library source Cron to schedule tasks
   - configure SVS behavior with an svs.json
   - build a javascript bundle artifact
 
@@ -80,7 +79,7 @@ If you get an error 'ECONNREFUSED' its because you don't have your Sales service
 
 Stateless compute is all fun and games, but almost all real web software has a persistence layer.  For this tutorial we'll be using a DynamoDB database.  If you're not familiar, [DynamoDB](https://aws.amazon.com/dynamodb/) is a managed NoSQL database available on AWS.  DDB backs most AWS services and therefore a substantial portion of the internet--its one of the rare technologies made for massive scale that's still user friendly and practical at smaller workloads.
 
-We'll need to load in the AWS SDK.  Create a package.json file and past this content inside:
+We'll need to load in the AWS SDK.  Create a package.json file and paste this content inside:
 
 ```json
 {
@@ -253,24 +252,7 @@ You may notice there's a lot of in-the-weeds dynamodb stuff around a range key s
 
 ## Building A Javascript Bundle
 
-We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our API.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an artifact--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using [Webpack](https://webpack.js.org/) here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.
-
-Create a package.json file:
-
-```json
-{
-  "name": "sales-demo",
-  "main": "getSales.js",
-  "devDependencies": {
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0"
-  },
-  "dependencies": {
-    "aws-sdk": "^2.434.0"
-  }
-}
-
-```
+We are at an unfortunate time in this guide.  We have a nice little database access file, but its not totally clear how we'll access this in our API.  We could make it its own function in Sales.st and call it from getSales by using Strat like we do in the Books service, but instead we'll bundle it into the getSales function.  Strat is rigid about what constitutes an [artifact](../User%20Guide/Artifacts)--single files that expose a single function.  For most languages this is pretty easy--the compiler for rust creates a single binary file, for example.  However, javascript is lacking in this regard, and we have to bring in some extra tools to create this nice single file bundle.  If you've already lived through the 7th circle of hell that is building javascript, go ahead and use whatever you're comfortable with.  We'll be using [Webpack](https://webpack.js.org/) here because it's the preeminent cause of mental breakdowns in the Javascript community--we want only the best.
 
 Create a webpack.config.js file:
 ```js
@@ -336,3 +318,37 @@ curl localhost:3001/strat/Sales/getSales
 
 The second curl changes our database state to have a new sale, which we can see in the last curl.
 
+Our Sales API is good to go, now there's just one last thing we need to do to deploy it to AWS.  Our functions will be deployed out on infrastructure (probably Lambdas), and those infrastructure components will need to have custom permissions in order to access DynamoDB.  We will specify these permissions by adding a role property in our svs.json:
+
+```json
+{
+  "substrate": "aws",
+  "aws": {
+    "config": {
+      "region": "us-west-2"
+    },
+    "roles": {
+      "Sales": [
+        {
+          "action": [ "dynamodb:Query", "dynamodb:PutItem" ],
+          "arn": "arn:aws:dynamodb:*:*:table/Sales"
+        }
+      ]
+    }
+  },
+  "local": {
+    "Http": {
+      "port": 3001
+    }
+  }
+}
+```
+
+There are a couple things in this svs.json to mention:
+
+  - The top property "substrate" is sort of like a pointer to the other top level properties "aws" and "local".  That property tells stratc which config map to use.  To switch between aws and local you can change that setting or use the --aws and --local command line arguments
+  - Under aws, the config map is passed into the [aws sdk's config method](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property).  If you want to run against a different region you can set that here.
+  - Roles is a hash where keys are service names and values are a list of IAM permissions to inject into those services.
+  - Roles are specified at a service level.
+
+The next time you run the build command you'll deploy to AWS.  This conlcudes your Sales service, and now you should be equiped to build real stuff with Strat.
