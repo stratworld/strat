@@ -27,8 +27,9 @@ const assets = stdPath.resolve(__dirname, './assets');
   const archive = new ArchiveBuilder();
 
   indexFiles.forEach(file => {
+    const fileName = getName(file.filePath);
     archive.addDataAsFile(
-      Buffer.from(wrapInTemplate(file.html, contents)),
+      Buffer.from(wrapInTemplate(file.html, contents, getFolder(fileName, file.filePath), fileName)),
       getTargetLocation(file.filePath));
   });
 
@@ -46,6 +47,19 @@ async function transformMarkdown (markdownFilePath) {
     filePath: markdownFilePath,
     html: converter.makeHtml(buffer.toString())
   };
+}
+
+function getName (filePath) {
+  const basename = stdPath.basename(filePath, '.md');
+  if (basename === 'index') {
+    return "Introduction";
+  }
+  return basename;
+}
+
+function getFolder (name, filePath) {
+  if (name === 'Introduction') return "";
+  return stdPath.basename(filePath.replace(`/${name}.md`, '')) + ':';
 }
 
 // build out a left side navigation panel
@@ -87,9 +101,12 @@ function getTargetLocation (filePath) {
   return stdPath.relative(markdown, filePath.replace('.md', '.html'));
 }
 
-function wrapInTemplate (html, contents) {
+function wrapInTemplate (html, contents, folder, name) {
   return `
 <head>
+  <title>${folder} ${name} | Strat Documentation</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Work+Sans:800" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
