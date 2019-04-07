@@ -32,7 +32,7 @@ Just how language compilers like gcc optimize your code, __Strat's compiler opti
 
 Lets run that hello world system on AWS.
 
-If you don't have a burner AWS account already, make one and set up your [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+If you don't have a burner AWS account already, make one and set up your [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).  Strat needs permissions to create resources on this AWS account.  More information about this [here](./User%20Guide/AWS).
 
 Run in your terminal
 ```

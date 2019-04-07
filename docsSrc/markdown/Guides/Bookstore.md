@@ -204,7 +204,23 @@ I have led you astray!  You should see the error "Could not resolve Sales.getSal
 include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st"
 ```
 
-to the top of the Books service, just how we have include "Http" at the top of FrontendProxy.  Build and run again, and you should see the api working [localhost:3000/api/books](http://localhost:3000/api/books), and if you check the SPA out you'll see a little on sale indicator next to one of the books.
+to the top of the Books service, just how we have include "Http" at the top of FrontendProxy.  Your Bookstore.st file should look like this:
+
+```st
+service FrontendProxy {
+  include "Http"
+  Http { method: "get", path: "/"} -> "./index.html"
+  Http { method: "get", path: "/client.js"} -> "./client.js"
+  Http { method: "get", path: "/api/books" } -> Books.getBooks
+}
+
+service Books {
+  include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st"
+  getBooks ():any -> "./getBooks.js"
+}
+```
+
+Build and run again, and you should see the api working [localhost:3000/api/books](http://localhost:3000/api/books), and if you check the SPA out you'll see a little on sale indicator next to one of the books.
 
 Strat's lexical scope means now that you've included Sales inside Books, anything in Books can call anything in Sales, but Sales can't call (and doesn't know about) anything else inside your infrastructure.
 

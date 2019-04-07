@@ -39,7 +39,7 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="thestratcloudlanguage">The Strat Cloud Language</h1>
 <p>Strat is a language to represent and deploy portable cloud systems.  Strat is the first "infrastructure as high level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's what the future looks like:</p>
@@ -66,7 +66,7 @@ stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
 </ul>
 <h3 id="portabiltyisback">Portabilty is back</h3>
 <p>Lets run that hello world system on AWS.</p>
-<p>If you don't have a burner AWS account already, make one and set up your <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">credentials file</a>.</p>
+<p>If you don't have a burner AWS account already, make one and set up your <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">credentials file</a>.  Strat needs permissions to create resources on this AWS account.  More information about this <a href="./User%20Guide/AWS">here</a>.</p>
 <p>Run in your terminal</p>
 <pre><code>stratc --aws ./HelloWorld.sa
 </code></pre>

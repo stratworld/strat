@@ -39,7 +39,7 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="stratbookstoreguide">Strat Bookstore Guide</h1>
 <p>In this guide we'll make a simple bookstore that uses a:</p>
@@ -196,7 +196,20 @@ const getSales = Strat('Sales.getSales');
 <p>I have led you astray!  You should see the error "Could not resolve Sales.getSales within scope for Books.getBooks".  Strat brings the concept of scope to infrastructure.  Strat's implementation of scope is based on the lexical scope you're used to in regular languages.  When you deploy your systems onto cloud substrates like AWS Strat builds roles and access control to enforce the same scope you see when you write your Strat files.  Looking at Bookstore.st now, you can see inside FrontendProxy a reference to Books.getBooks.  This works because FrontendProxy and Books are defined at the top level of the same file.  The two services exist within the same scope, and any function inside Books can call any function inside FrontendProxy.  Sales exists elsewhere, and its not included so Strat doesn't know how to resolve it within the service Books's scope.  Lets fix that by adding</p>
 <pre><code class="st language-st">include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st"
 </code></pre>
-<p>to the top of the Books service, just how we have include "Http" at the top of FrontendProxy.  Build and run again, and you should see the api working <a href="http://localhost:3000/api/books">localhost:3000/api/books</a>, and if you check the SPA out you'll see a little on sale indicator next to one of the books.</p>
+<p>to the top of the Books service, just how we have include "Http" at the top of FrontendProxy.  Your Bookstore.st file should look like this:</p>
+<pre><code class="st language-st">service FrontendProxy {
+  include "Http"
+  Http { method: "get", path: "/"} -&gt; "./index.html"
+  Http { method: "get", path: "/client.js"} -&gt; "./client.js"
+  Http { method: "get", path: "/api/books" } -&gt; Books.getBooks
+}
+
+service Books {
+  include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st"
+  getBooks ():any -&gt; "./getBooks.js"
+}
+</code></pre>
+<p>Build and run again, and you should see the api working <a href="http://localhost:3000/api/books">localhost:3000/api/books</a>, and if you check the SPA out you'll see a little on sale indicator next to one of the books.</p>
 <p>Strat's lexical scope means now that you've included Sales inside Books, anything in Books can call anything in Sales, but Sales can't call (and doesn't know about) anything else inside your infrastructure.</p>
 <p>This concludes the N-tier architecture sans database, which we'll cover in the advanced tutorial.</p>
 <p>Now you're not the kind of person to just blindly copy and paste code without reading and understanding it first right?  You surely noticed that you're including a Sales URL and not some file.  This is a great idea put forth by <a href="https://deno.land/">Deno</a> and it works great for service inclusions.  Strat includes can be either relative files, URLs, or std library names like "Http".  Have a look at that <a href="https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st">included url</a>--its a Strat file and it specifies a service!  URL includes in Strat allow users to download entire services and run them inside their own infrastructure.  I know what you're thinking--this seems <em>wildly unsafe</em>!  Well each service included this way gets its own isolated piece of infrastructure to run on that is:</p>

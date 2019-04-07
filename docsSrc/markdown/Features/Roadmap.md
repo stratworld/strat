@@ -140,7 +140,7 @@ source CustomHttpConsumer {
 
 # Browser Host
 
-This is so that users can call Strat("Books.getBooks") inside a browser a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utalizing direct Lambda calls.
+This is so that users can call Strat("Books.getBooks") inside a browser and a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utilizing direct Lambda calls.
 
 This also opens the way for people to write client-side "services" that can be included and run inside a user's browser.  The big question here is how does Strat know / how does the user specify that a particular service should be client-side.
 

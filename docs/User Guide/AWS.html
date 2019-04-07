@@ -1,6 +1,6 @@
 
 <head>
-  <title>Sources: Http | Strat Documentation</title>
+  <title>User Guide: AWS | Strat Documentation</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
@@ -41,24 +41,45 @@
     <div  class="heading">User Guide</div>
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="http">HTTP</h1>
-<p>mostly todo</p>
-<p>The Http source sources http events into your system.</p>
-<p>Http's event config must have a method and a path.  The method must be:</p>
-<ul>
-<li>get</li>
-<li>post</li>
-<li>put</li>
-<li>delete</li>
-</ul>
-<p>Path examples:</p>
-<ul>
-<li>"/"</li>
-<li>"/*/foo"</li>
-<li>"foo.html"</li>
-<li>"/foo/:argument1/bar"</li>
-<li>"/:arg1/:arg2/bar"</li>
-</ul></div>
+    <div id="document"><h1 id="awssvsguide">AWS SVS Guide</h1>
+<p>The AWS SVS uses Lambda, APIGateway, S3, and IAM to fulfill users' infrastructure requirements.</p>
+<h2 id="credentials">Credentials</h2>
+<p>Stratc needs credentials to create the resources above on your AWS account.  The easiest way to supply these is by letting stratc use your shared <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">credentials file</a>.  If you wish to create a custom user to have stratc run under, you can do so by supplying an access key directly inside the config block of your svs.json:</p>
+<pre><code class="json language-json">{
+  "substrate": "aws",
+  "aws": {
+    "config": {
+      "region": "us-west-2",
+      "accessKeyId": "&lt;access key&gt;",
+      "secretAccessKey": "&lt;secret&gt;"
+    }
+  }
+}
+</code></pre>
+<p>Keys provided this way override keys from your shared credentials file.  A minimum IAM policy configuration for stratc to run is:</p>
+<pre><code class="json language-json">{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:CreateFunction",
+                "s3:PutObject",
+                "apigateway:DELETE",
+                "apigateway:UpdateRestApiPolicy",
+                "apigateway:PUT",
+                "apigateway:PATCH",
+                "iam:CreateRole",
+                "s3:CreateBucket",
+                "iam:UpdateRole",
+                "apigateway:POST"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+</code></pre></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

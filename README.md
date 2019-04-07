@@ -21,7 +21,7 @@ With Strat you don't specify infrastructure details, just how you don't write go
 
 ### Better infrastructure than what you're building by hand
 
-Just how language compilers like gcc and Javac optimize your code, __Strat's compiler optimizes your infrastructure to be:__
+Just how language compilers like gcc optimize your code, __Strat's compiler optimizes your infrastructure to be:__
 
   - __more secure__ by building the narrowest access control for every component in your system
   - __faster__ by hosting components on optimal infrastructure, whether that's a container or APIGateway backed by lambda.
@@ -32,7 +32,7 @@ Just how language compilers like gcc and Javac optimize your code, __Strat's com
 
 Lets run that hello world system on AWS.
 
-If you don't have a burner AWS account already, make one and set up your [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+If you don't have a burner AWS account already, make one and set up your [credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).  Strat needs permissions to create resources on this AWS account.  More information about this [here](./User%20Guide/AWS).
 
 Run in your terminal
 ```
@@ -63,13 +63,13 @@ const sales = await getSales();
 
 # "Just"ice
 
-We say "just" a lot: "just do this" or "it just works!" or "I just want a server!".  The modern DevOps landscape overindexes on power and configurability over simplicity and "just-works-iness".  What's the customer value of setting up and operating [Consul](https://www.hashicorp.com/products/consul) for your CRUD application?  Don't get us wrong, the modern cloud is an engineering marvel and you'd be crazy not to run your systems on it, but now that its been around for a while its not unreasonable to demand higher user experience standards--yaml config files don't cut it anymore.
+We say "just" a lot: "just do this" or "it just works!" or "I just want a server!".  The modern DevOps landscape overindexes on power and configurability over simplicity and "just-works-iness".  What's the customer value of setting up and operating [Consul](https://www.hashicorp.com/products/consul) for your CRUD application?  Don't get us wrong, the modern cloud is an engineering marvel and you'd be crazy not to run your systems on it, but now that its been around for a while its not unreasonable to demand higher user experience standards--__yaml config files don't cut it anymore__.
 
 Ruby on Rails showed the world most people can get by fine with "just" the basics and convention.  Strat has traditional language influences (ML, Javascript, Java, etc.), but perhaps its most important influence is the philosophical legacy left by Rails.
 
 
 
-#### Like what you see?  Continue to the [Hello World deep dive](https://strat.world/Guides/Hello%20World) or build an [N-tier bookstore](https://strat.world/Guides/Bookstore).
+#### Like what you see?  Continue to the [Hello World deep dive](./Guides/Hello%20World) or build an [N-tier bookstore](./Guides/Bookstore).
 
 ### Contributing
 

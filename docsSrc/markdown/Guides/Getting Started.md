@@ -4,10 +4,9 @@
 
 2. Install stratc using NPM:
 
-  ```bash
-  npm install -g stratc
-  ```
-
+```bash
+npm install -g stratc
+```
 
 ## Exhaustive stratc Command Reference
 
