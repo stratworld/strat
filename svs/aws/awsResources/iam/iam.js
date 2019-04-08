@@ -109,8 +109,11 @@ async function createRole (assumeService, roleName, targets) {
 
   const role = await new Promise(function (resolve, reject) {
     IAM.createRole(createRoleParams, (e, r) => {
-      if (e) reject(e);
-      resolve(r);
+      if (e) {
+        reject(e);
+      } else {
+        resolve(r);
+      }
     })
   });
   if (targets.length > 0) {
@@ -137,8 +140,11 @@ async function createRole (assumeService, roleName, targets) {
 
     await new Promise(function (resolve, reject) {
       IAM.putRolePolicy(putPolicyParams, (e, r) => {
-        if (e) reject(e);
-        resolve(r);
+        if (e) {
+          reject(e);
+        } else {
+          resolve(r);
+        }
       });
     });
   }
@@ -171,11 +177,12 @@ function getS3ObjectArner (account, buildId) {
 async function getAccountId () {
   var sts = new AWS.STS();
   return await new Promise(function (resolve, reject) {
-    sts.getCallerIdentity({}, function(err, data) {
-       if (err) {
-          reject(err);
-       }
-       resolve(data.Account);
+    sts.getCallerIdentity({}, function(e, r) {
+      if (e) {
+        reject(e);
+      } else {
+        resolve(r.Account);
+      }
     });
   });
 }
