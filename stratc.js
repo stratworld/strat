@@ -1,4 +1,4 @@
-#! /usr/bin/node
+#!/usr/bin/env node
 
 const compilerConstructor = require('./stratc/compiler');
 const svs = require('./svs/substrateFactory')();
