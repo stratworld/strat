@@ -200,7 +200,6 @@ They may specify perms for several scopes that get collapsed into a single scope
 */
 function getAdditionalPerms (ir) {
   const collapsedScopes = ir.hosts
-    .values()
     .reduce((collapsedScopes, nextHost) => {
       const thisHostsScope = nextHost.artifacts[0].scope;
       nextHost.artifacts
