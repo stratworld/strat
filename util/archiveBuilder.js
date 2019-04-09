@@ -22,8 +22,9 @@ const ArchiveBuilder = function (artifactObject) {
 }
 
 ArchiveBuilder.prototype.read = function (filename) {
+  const unWindowsdPath = filename.replace('\\', '/');
   return this.zip.getEntries()
-    .filter(entry => entry.entryName === filename)
+    .filter(entry => entry.entryName === unWindowsdPath)
     .map(foundEntries => foundEntries.getData())
     [0];
 }
