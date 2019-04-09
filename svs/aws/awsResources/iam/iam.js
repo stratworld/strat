@@ -110,7 +110,9 @@ async function createRole (assumeService, roleName, targets) {
   const role = await new Promise(function (resolve, reject) {
     IAM.createRole(createRoleParams, (e, r) => {
       if (e) {
-        reject(e);
+        reject({
+          substrateError: e
+        });
       } else {
         resolve(r);
       }
@@ -141,7 +143,9 @@ async function createRole (assumeService, roleName, targets) {
     await new Promise(function (resolve, reject) {
       IAM.putRolePolicy(putPolicyParams, (e, r) => {
         if (e) {
-          reject(e);
+          reject({
+            substrateError: e
+          });
         } else {
           resolve(r);
         }
@@ -179,7 +183,9 @@ async function getAccountId () {
   return await new Promise(function (resolve, reject) {
     sts.getCallerIdentity({}, function(e, r) {
       if (e) {
-        reject(e);
+        reject({
+          substrateError: e
+        });
       } else {
         resolve(r.Account);
       }
