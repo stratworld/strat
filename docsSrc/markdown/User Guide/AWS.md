@@ -23,6 +23,7 @@ Keys provided this way override keys from your shared credentials file.  A minim
 
 ```json
 {
+
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -30,14 +31,17 @@ Keys provided this way override keys from your shared credentials file.  A minim
             "Effect": "Allow",
             "Action": [
                 "lambda:CreateFunction",
-                "s3:PutObject",
                 "apigateway:DELETE",
                 "apigateway:UpdateRestApiPolicy",
                 "apigateway:PUT",
                 "apigateway:PATCH",
+                "apigateway:GET",
                 "iam:CreateRole",
-                "s3:CreateBucket",
                 "iam:UpdateRole",
+                "iam:PutRolePolicy",
+                "iam:PassRole",
+                "s3:CreateBucket",
+                "s3:PutObject",
                 "apigateway:POST"
             ],
             "Resource": "*"
