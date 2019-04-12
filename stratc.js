@@ -1,4 +1,4 @@
-#! /usr/bin/node
+#!/usr/bin/env node
 
 const compilerConstructor = require('./stratc/compiler');
 const svs = require('./svs/substrateFactory')();
@@ -15,9 +15,14 @@ const compile = compiler.runCommand;
 const serializeAST = compiler.serializeAST;
 
 const stdPath = require('path');
+//this is true for win 64 too...
+const isWindows = process.platform === 'win32';
 
 var stdinData;
-if (!process.stdin.isTTY) {
+//don't activate this feature for windows users;
+//assumption is compiler development will happen on
+//linux and OSX, and isTTY breaks for cygwin users
+if (!isWindows && !process.stdin.isTTY) {
   stdinData = new Promise(function (resolve, reject) {
     const stdin = process.openStdin();
     var data = "";

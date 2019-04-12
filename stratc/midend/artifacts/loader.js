@@ -61,7 +61,7 @@ async function resolveArtifact (fn, declaredPath) {
     .then(data => R({
       data: data,
       type: type,
-      path: filePath
+      path: stdPath.basename(filePath)
     }))
     .catch(e => {
       return J({

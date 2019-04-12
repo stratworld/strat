@@ -15,6 +15,8 @@ const TokenTypes = {
   //whitespace
   SPACE: sequence(' '),
   TAB: sequence(' '),
+  OTHER_TAB: sequence('\t'),
+  RETURN: sequence('\r'),
   NEWLINE: sequence('\n'),
   END: sequence('\0'),
 
@@ -69,6 +71,8 @@ module.exports = {
     'TAB': true,
     'NEWLINE': true,
     'COMMENT': true,
-    'COMMA': true
+    'COMMA': true,
+    'RETURN': true,
+    'OTHER_TAB': true
   }
 };

@@ -16,6 +16,10 @@ function formatError (e) {
   if (e.stratCode) {
     return formatStratError(e);
   }
+  if (e.substrateError) {
+    return `Substrate Error:
+${JSON.stringify(e.substrateError, null, 2)}`;
+  }
   return `Internal stratc failure:
 ${e.stack}`;
 }

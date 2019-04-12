@@ -58,6 +58,7 @@
 </code></pre>
 <p>Keys provided this way override keys from your shared credentials file.  A minimum IAM policy configuration for stratc to run is:</p>
 <pre><code class="json language-json">{
+
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -65,14 +66,17 @@
             "Effect": "Allow",
             "Action": [
                 "lambda:CreateFunction",
-                "s3:PutObject",
                 "apigateway:DELETE",
                 "apigateway:UpdateRestApiPolicy",
                 "apigateway:PUT",
                 "apigateway:PATCH",
+                "apigateway:GET",
                 "iam:CreateRole",
-                "s3:CreateBucket",
                 "iam:UpdateRole",
+                "iam:PutRolePolicy",
+                "iam:PassRole",
+                "s3:CreateBucket",
+                "s3:PutObject",
                 "apigateway:POST"
             ],
             "Resource": "*"
