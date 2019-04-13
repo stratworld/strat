@@ -45,20 +45,20 @@
 <ul>
 <li><p>{.st file}</p>
 <ul>
-<li>compiles the file and builds a .saf file</li>
+<li>compiles the file and builds a .sa file</li>
 <li>EX: $ stratc ./HelloWorld.st</li></ul></li>
-<li><p>{.sa file}</p>
+<li><p>[--{svs implementation}] {.sa file}</p>
 <ul>
-<li>reads the .sa file and creates running infrastructure</li>
+<li>reads the .sa file and runs it on the specified SVS implementation</li>
+<li>if no svs is supplied, stratc checks for an svs.json and uses
+the value for "substrate" provided there.</li>
+<li>if no svs.json is supplied, the local svs is used</li>
+<li>valid svs implementations: [aws, local]</li>
+<li>EX: $ stratc --aws ./HelloWorld.sa</li>
 <li>EX: $ stratc ./HelloWorld.sa</li></ul></li>
 <li><p>-v or --version</p>
 <ul>
 <li>prints the version of stratc</li></ul></li>
-<li><p>--{svs implementation} {.sa file}</p>
-<ul>
-<li>reads the .sa file and runs it on the specified SVS implementation</li>
-<li>valid svs implementations: [aws, local]</li>
-<li>EX: $ stratc --aws ./HelloWorld.sa</li></ul></li>
 </ul></div>
   </div>
   <div id="footer" class="row navigation">

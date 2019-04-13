@@ -8,7 +8,7 @@
 npm install -g stratc
 ```
 
-## Exhaustive stratc Command Reference
+## stratc Command Reference
 
   - {.st file}
     - compiles the file and builds a .sa file
