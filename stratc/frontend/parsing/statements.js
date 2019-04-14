@@ -8,26 +8,33 @@ module.exports = function (T, error, descend) {
         service: []
       };
       while(!T.atEnd()) {
-        const next = T.match('SOURCE')
-          ? 'source'
-          : 'service';
+        const next = T.match('SERVICE')
+          ? 'service'
+          : 'source';
         children[next].push(descend(next));
       }
       return AST('file', {}, children.source, children.service);
     },
     source: () => {
+      const sync = !T.match('ASYNC');
+      T.consume('SOURCE');
       const name = T.consume('IDENTIFIER');
-      const block = descend('block');
+      const body = descend('body');
       return AST('source', {
-        name: name
-      }, block);
+        name: name,
+        sync: sync
+      }, body);
     },
     service: () => {
-      T.consume('SERVICE');
       const name = T.consume('IDENTIFIER');
+      const body = descend('body');
+      return AST('service', {
+        name: name
+      }, body);
+    },
+    body: () => {
       T.consume('LEFT_BRACE');
       const components = [];
-      const kvps = [];
       const includes = [];
       while (T.peek().type !== 'RIGHT_BRACE'
         && T.peek().type !== 'END') {
@@ -37,10 +44,8 @@ module.exports = function (T, error, descend) {
           components.push(descend('component'))
         }
       }
-      T.advance();
-      return AST('service', {
-        name: name
-      }, kvps, includes, components);
+      T.consume('RIGHT_BRACE');
+      return AST('body', {}, includes, components);
     },
     include: () => {
       return AST('include', {
@@ -48,28 +53,10 @@ module.exports = function (T, error, descend) {
       });
     },
     component: () => {
-      var eventAst;
-      if (T.peek().type === 'IDENTIFIER' && T.peek2().type === 'LEFT_BRACE') {
-        return descend('dispatch');
+      if (T.peek().type === 'IDENTIFIER' && T.peek2().type === 'LEFT_PAREN') {
+        return descend('function');
       }
-      return descend('function');
-    },
-    block: () => {
-      T.consume('LEFT_BRACE');
-      const kvps = [];
-      while(!T.match('RIGHT_BRACE')) {
-        kvps.push(descend('kvp'));
-      }
-      return kvps;
-    },
-    kvp: () => {
-      const key = T.consume('IDENTIFIER');
-      T.consume('COLON');
-      const value = T.consume('STRING');
-      return AST('kvp', {
-        key: key,
-        value: value
-      });
+      return descend('dispatch');
     },
     dispatch: () => {
       const events = [];
@@ -100,10 +87,16 @@ module.exports = function (T, error, descend) {
     },
     event: () => {
       const name = T.consume('IDENTIFIER');
-      const block = descend('block');
+      if (T.peek().type === 'IDENTIFIER'
+          || T.peek().type === 'ARROW') {
+        return AST('event', {
+          name: name
+        });
+      }
+      const pattern = descend('pattern');
       return AST('event', {
         name: name
-      }, block);
+      }, pattern);
     },
     function: () => {
       const functionName = descend('functionName');
@@ -135,6 +128,59 @@ module.exports = function (T, error, descend) {
       T.consume('COLON');
       const outputShape = descend('shape');
       return AST('signature', {}, outputShape, inputShape);
+    },
+    pattern: () => {
+      const nextType = T.peek().type;
+      console.log(nextType)
+      switch (nextType) {
+        case 'NUMBER':
+
+          return AST('pattern', {
+            number: T.consume('NUMBER')
+          });
+        case 'STRING':
+          return AST('pattern', {
+            string: T.consume('STRING')
+          });
+        case 'LEFT_BRACE':
+          return descend('map');
+        case 'LEFT_BRACKET':
+          return descend('array');
+        case 'TRUE':
+          return AST('true', {});
+        case 'FALSE':
+          return AST('false', {});
+        case 'NULL':
+          return AST('null', {});
+      }
+      throw {
+        stratCode: "E_UNEXPECTED_TOKEN",
+        message: `Unexpected token ${T.peek().value}
+  Expected 'true', 'false', 'null', number, string, map, or array.`,
+        line: T.peek().line
+      };
+    },
+    map: () => {
+      T.consume('LEFT_BRACE');
+      const kvps = [];
+      while(!T.match('RIGHT_BRACE')) {
+        kvps.push(descend('kvp'));
+      }
+      return AST('map', {}, kvps);
+    },
+    kvp: () => {
+      const key = T.consume('IDENTIFIER');
+      T.consume('COLON');
+      const value = descend('pattern');
+      return AST('kvp', {
+        key: key
+      }, value);
+    },
+    array: () => {
+      T.consume('LEFT_BRACKET');
+      const shape = descend('shape');
+      T.consume('RIGHT_BRACKET');
+      return AST('array', {}, shape);
     },
     shape: () => {
       const name = T.consume('IDENTIFIER');

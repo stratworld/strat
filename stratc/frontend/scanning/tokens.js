@@ -24,7 +24,11 @@ const TokenTypes = {
   SERVICE: sequence('service'),
   SOURCE: sequence('source'),
   INCLUDE: sequence('include'),
-  PUBLIC: sequence('public')
+  PUBLIC: sequence('public'),
+  ASYNC: sequence('async'),
+  TRUE: sequence('true'),
+  FALSE: sequence('false'),
+  NULL: sequence('null')
 }
 
 function sequence (string) {

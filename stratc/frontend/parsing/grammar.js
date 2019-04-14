@@ -3,10 +3,13 @@ file
   (service|source)*
 
 service
-  "service" IDENTIFIER '{' (component|include)* '}'
+  "service" IDENTIFIER body
 
 source
-  "source" IDENTIFIER block
+  (async)? "source" IDENTIFIER body
+
+body
+  '{' (component|include)* '}'
 
 include
   "include" (STRING|IDENTIFIER)
@@ -25,7 +28,7 @@ events
   event+ "->"
 
 event
-  IDENTIFIER block
+  IDENTIFIER pattern?
 
 functionName
   "public"? IDENTIFIER signature? "->"
@@ -33,11 +36,17 @@ functionName
 signature
   "(" shape? ")" ":" shape
 
-block
+pattern
   "{" kvp* "}"
+  "[" shape "]"
+  STRING
+  NUMBER
+  TRUE
+  FALSE
+  NULL
 
 kvp
-  IDENTIFIER ":" (STRING|NUMBER)
+  IDENTIFIER ":" pattern
 
 shape
   IDENTIFIER
