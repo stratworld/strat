@@ -20,6 +20,7 @@ const everything = []
 const prebuiltSegments = {
   frontend: frontend,
   midend: midend,
+  ast: frontend.concat(midend.slice(0, 2)),
   build: frontend.concat(midend)
 };
 
@@ -40,7 +41,7 @@ module.exports = function (dependencies) {
     return executePasses(getSegment(start, stop), startingInput, filename);
   }
 
-  function runCommand (command, startingInput, filename) {
+  async function runCommand (command, startingInput, filename) {
     const prebuilt = prebuiltSegments[command];
     if (prebuilt) {
       return executePasses(prebuilt, startingInput, filename);
@@ -51,7 +52,7 @@ module.exports = function (dependencies) {
         return executePasses([singleCommand], startingInput, filename);
       }
     }
-    return J(`Could not find command ${command}`);
+    throw new Error(`invalid command '${command}'`);
   }
 
   function executePasses (passes, startingInput, filename) {

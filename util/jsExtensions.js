@@ -43,17 +43,26 @@ Object.defineProperty(Array.prototype, 'constantMapping',{
   enumerable: false
 });
 
-// Array.prototype.pipePromise = function (startingPromise) {
-//   return this.reduce((totalPromise, nextPromise) => {
-//     return totalPromise.then(result => nextPromise(result));
-//   }, (startingPromise === undefined ? R() : startingPromise));
-// }
-
 Object.defineProperty(Array.prototype, 'first',{
   value: function(predicate) {
     return typeof predicate === 'function'
       ? this.filter(predicate)[0]
       : this[0];
+  },
+  writable: true,
+  configurable: true,
+  enumerable: false
+});
+
+Object.defineProperty(Array.prototype, 'toMap',{
+  value: function(getValues, getKeys = key => key) {
+    if (typeof getValues !== 'function') {
+      getValues = () => true;
+    }
+    return this.reduce((map, item) => {
+      map[getKeys(item)] = getValues(item);
+      return map;
+    }, {});
   },
   writable: true,
   configurable: true,

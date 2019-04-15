@@ -1,29 +1,11 @@
-const ast = require('../../ast');
-const AST = ast.build;
-const traverse = ast.traverse;
-const val = ast.val;
+const { build, traverse, val } = require('../../ast');
 const compilerConstructor = require('../../compiler');
-const stdPath = require('path');
-const stdSourcesPath = stdPath.resolve(__dirname, '../../../stdSources');
 
-var stratStdPaths;
 var deps;
 module.exports = function (injectedDeps) {
   deps = injectedDeps;
-  const stdPathsPromise = deps.fs.ls(stdSourcesPath)
-    .then(stdModules => stdModules
-      .reduce((paths, stdModuleName) => {
-        paths[stdModuleName] = stdPath.join(stdSourcesPath, stdModuleName, `${stdModuleName}.st`);
-        return paths;
-      }, {}));
 
-  return function (ast, filename) {
-    return stdPathsPromise
-      .then(result => {
-        stratStdPaths = result;
-        return traversal(ast, filename);
-      });
-  }
+  return traversal;
 }
 
 async function traversal (ast) {
@@ -38,87 +20,59 @@ async function traversal (ast) {
     const focus = traversalStack.pop();
     const newEdgesOut = traverse(
         asts[focus],
-        ['service', 'include'])
-      .map(includeAst => {
-        return {
-          includeValue: val(includeAst, 'path'),
-          includeAst: includeAst
-        };
-      })
-      .filter(includeAstObj =>
-        asts[includeAstObj.includeValue] === undefined);
+        ['service|source', 'body', 'include'])
+      .map(includeAst => includeAst.artifact)
+      .filter(artifactInfo =>
+        asts[artifactInfo.absolutePath] === undefined);
 
     const resolvedEdges = await Promise.all(
       newEdgesOut
-        .map(includeAstObj => {
-          const edgeFileName = getFileName(
-            includeAstObj.includeValue,
-            focus);
-
-          includeAstObj.includeAst.tokens.path.value = edgeFileName;
-
-          return getData(edgeFileName, focus, includeAstObj.includeAst.tokens.path.line)
-            .then(fileData => parseFile(fileData, edgeFileName))
+        .map(artifactInfo => {
+          if (artifactInfo.type === 'text') {
+            throw {
+              stratCode: 'E_INVALID_INCLUDE',
+              message: `The include text ${artifactInfo.token.value} is neither a file nor a URL.`,
+              file: artifactInfo.declaredFile,
+              line: artifactInfo.token.line
+            }
+          }
+          const context = artifactInfo.type === 'url'
+            ? deps.internet
+            : deps.fs;
+          return getData(artifactInfo, context)
+            .then(fileData => parseFile(fileData, artifactInfo.absolutePath))
             .then(newAst => R({
-              name: edgeFileName,
+              absolutePath: artifactInfo.absolutePath,
               ast: newAst
             }));
         })
     );
 
     resolvedEdges.forEach(newEdge => {
-      asts[newEdge.name] = newEdge.ast;
-      traversalStack.push(newEdge.name);
+      asts[newEdge.absolutePath] = newEdge.ast;
+      traversalStack.push(newEdge.absolutePath);
     });
   }
 
-  return AST('program', {
+  return build('program', {
     root: root
   }, asts.values());
 }
 
-function getFileName (importString, declaredFile) {
-  if (deps.internet.isUrl(importString)) return importString;
-
-  const pathResolution = deps.internet.isUrl(declaredFile)
-    ? deps.internet.path
-    : stdPath;
-
-  const parentDirectory = pathResolution.dirname(declaredFile);
-  var absolutePath;
-  if (stratStdPaths[importString]) {
-    absolutePath = stratStdPaths[importString];
-  } else {
-    if (!pathResolution.isAbsolute(importString)) {
-      absolutePath = pathResolution.resolve(parentDirectory, importString);
-    } else {
-      absolutePath = importString;
-    }
-
-    if (pathResolution.extname(absolutePath) === '') {
-      absolutePath = absolutePath + '.st';
-    }
-  }
-
-  return absolutePath;
-}
-
-async function getData (importString, declaredFile, declaredLine) {
-  try {
-    return deps.internet.isUrl(importString)
-      ? await deps.internet.fetch(importString)
-      : await deps.fs.cat(importString);
-    } catch (e) {
+async function getData (artifact, context) {
+  return context.cat(artifact.absolutePath)
+    .catch(e => {
       throw {
         stratCode: 'E_NO_ENTITY',
-        message: `Unable to load ${importString}`,
-        file: declaredFile,
-        line: declaredLine
+        message: `Unable to load ${artifact.token.value} as ${artifact.absolutePath}`,
+        file: artifact.declaredFile,
+        line: artifact.token.line
       };
-    }
+    });
 }
 
 async function parseFile (buffer, fileName) {
   const compile = compilerConstructor(deps).runCommand;
-  return compile('frontend', buffer.toString(), fileName);
+  const frontendAst = compile('frontend', buffer.toString(), fileName);
+  return compile('absolutify', frontendAst, fileName);
 }

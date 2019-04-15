@@ -31,7 +31,7 @@ event
   IDENTIFIER pattern?
 
 functionName
-  "public"? IDENTIFIER signature? "->"
+  IDENTIFIER signature? "->"
 
 signature
   "(" shape? ")" ":" shape

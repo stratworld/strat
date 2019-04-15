@@ -48,7 +48,7 @@ const path = {
 }
 
 module.exports = {
-  fetch: fetch,
+  cat: fetch,
   isUrl: isUrl,
-  path: path
+  ...path
 };

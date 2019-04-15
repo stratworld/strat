@@ -1,11 +1,27 @@
 module.exports = [
-  // works with the AST
+  // builds the AST
+  [ 'absolutify', 'midend/includes/absolutify' ],
   [ 'includes', 'midend/includes/index' ],
-  [ 'public', 'midend/includes/public' ],
+
+  //injects things into the AST
+  // public is a little low value for MVP and its not really complete
+  // [ 'public', 'midend/includes/public' ],
+  [ 'namegen', 'midend/names/nameGen' ],
+
+  //match
+  //emit
+  [ 'inheritance', 'midend/injection/inheritance' ],
+  
+
+  //config
+  //extern
+  //birth
+
+
+  //works with the AST
   [ 'names', 'midend/names/index'],
-  [ 'namegen', 'midend/names/nameGen'],
-  [ 'loader', 'midend/artifacts/loader'],
-  [ 'libinclude', 'midend/libs/include'],
+  // [ 'loader', 'midend/artifacts/loader'],
+  // [ 'libinclude', 'midend/libs/include'],
   // run the loader a second time to load whatever libinclude injected
   // and to load references, which are resolved in libinclude for some reason
   [ 'loader', 'midend/artifacts/loader'],

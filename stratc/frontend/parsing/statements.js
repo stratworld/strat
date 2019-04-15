@@ -49,7 +49,7 @@ module.exports = function (T, error, descend) {
     },
     include: () => {
       return AST('include', {
-        path: T.consume('STRING')
+        artifact: T.consume('STRING')
       });
     },
     component: () => {
@@ -67,8 +67,7 @@ module.exports = function (T, error, descend) {
       if (T.peek().type === 'IDENTIFIER'
           && T.peek2().type === 'PERIOD') {
         return AST('dispatch', {}, events, descend('reference'));
-      } else if (T.peek().type === 'IDENTIFIER'
-        || T.peek().type === 'PUBLIC') {
+      } else if (T.peek().type === 'IDENTIFIER') {
         functionName = descend('functionName');
       }
       const artifact = T.consume('STRING');
@@ -106,7 +105,6 @@ module.exports = function (T, error, descend) {
       }, functionName);
     },
     functionName: () => {
-      const public = T.match('PUBLIC');
       const name = T.consume('IDENTIFIER');
       var signature;
       if (T.peek().type !== 'ARROW') {
@@ -114,8 +112,7 @@ module.exports = function (T, error, descend) {
       }
       T.consume('ARROW');
       return AST('functionName', {
-        name: name,
-        public: public || undefined
+        name: name
       }, signature);
     },
     signature: () => {
@@ -131,10 +128,8 @@ module.exports = function (T, error, descend) {
     },
     pattern: () => {
       const nextType = T.peek().type;
-      console.log(nextType)
       switch (nextType) {
         case 'NUMBER':
-
           return AST('pattern', {
             number: T.consume('NUMBER')
           });
@@ -147,10 +142,13 @@ module.exports = function (T, error, descend) {
         case 'LEFT_BRACKET':
           return descend('array');
         case 'TRUE':
+          T.advance();
           return AST('true', {});
         case 'FALSE':
-          return AST('false', {});
+          T.advance();
+          return AST('FALSE', {});
         case 'NULL':
+          T.advance();
           return AST('null', {});
       }
       throw {
