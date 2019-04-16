@@ -5,7 +5,7 @@
   "main": "stratc.js",
   "preferGlobal": true,
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/stratc/**/*.js test/stdSources/**/*.js --reporter spec"
+    "test": "./node_modules/mocha/bin/mocha test/stratc/**/*.js test/std/**/*.js --reporter spec"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,6 @@
-module.exports = function match ({ event, pattern }) {
+module.exports = match;
+
+function match ({ event, pattern }) {
   const no = { matched: false, event: event };
   const yes = { matched: true, event: event };
 
@@ -14,18 +16,22 @@ module.exports = function match ({ event, pattern }) {
   if (event == pattern) return yes;
 
   if (typeof event === 'object' && typeof pattern === 'object') {
-    return recurseMatch(Object.keys(pattern).map(key => [event[key], pattern[key]]));
+    const keys = Object.keys(pattern);
+    return keys.length === 0
+      ? yes
+      : recurseMatch(keys.map(key => [event[key], pattern[key]]));
   }
 
   return no;
 };
 
 function recurseMatch (arrayOfProps) {
-  var propMatch, i = 0, length = arrayOfProps.length;
+  var propMatch, i = 0, length = arrayOfProps.length, prop;
   for (; i<length; i++) {
+    prop = arrayOfProps[i];
     propMatch = match({
-      event: arrayOfProps[0],
-      pattern: arrayOfProps[1]
+      event: prop[0],
+      pattern: prop[1]
     });
     if (propMatch.matched === false) return propMatch
   }
