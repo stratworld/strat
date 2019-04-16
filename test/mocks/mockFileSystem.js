@@ -5,18 +5,26 @@ const fsFileSystem = require('../../util/fileSystem');
 const stdPath = require('path');
 
 module.exports = function (fileMap, dontFallThrough) {
-  return fsFileSystem
-    .keys()
-    .reduce((mockFs, nextFsFunction) => {
-      mockFs[nextFsFunction] = function (filePath) {
-        const baseName = stdPath.basename(filePath);
-        if (fileMap[baseName] !== undefined) {
-          return R(fileMap[baseName]);
-        } else if (!dontFallThrough) {
-          return fsFileSystem[nextFsFunction](filePath);
-        }
-        return J(`${filePath} not found`);
+
+  function overrideFs (fallthrough) {
+    return async function overrideFs (filePath) {
+      const baseName = stdPath.basename(filePath);
+      const mock = (fileMap || {})[baseName];
+      if (mock !== undefined) {
+        return Buffer.isBuffer(mock)
+          ? mock
+          : Buffer.from(mock);
+      } else if (!dontFallThrough) {
+        return fsFileSystem[fallthrough](filePath);
       }
-      return mockFs;
-    }, {});
+      throw `${filePath} not found`;
+    }
+  }
+
+  return {
+    cat: overrideFs('cat'),
+    ls: overrideFs('ls'),
+    stat: overrideFs('stat'),
+    path: fsFileSystem.path
+  }
 };

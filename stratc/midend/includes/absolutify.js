@@ -70,7 +70,7 @@ function getAbsolutifier (declaredFile, ast, deps, stdNames) {
       declaredFile: declaredFile,
       absolutePath: path,
       type: isText ? 'text' : isArtifactUrl ? 'url' : 'file',
-      media: isText ? '.txt' : context.extname(path)
+      media: isText ? '.txt' : context.path.extname(path)
     };
   }
 }
@@ -90,7 +90,7 @@ function absolutify(declaredFile, artifactText, context, stdNames) {
   //you can't have "./foo" be text; you have to put it in a file
 
   //absolute URL
-  if ((artifactText|| '').indexOf('http') === 0) {
+  if ((artifactText || '').indexOf('http') === 0) {
     return artifactText;
   }
 
@@ -100,13 +100,13 @@ function absolutify(declaredFile, artifactText, context, stdNames) {
     return false;
   }
 
-  return context.resolve(context.dirname(declaredFile), artifactText);
+  return context.path.resolve(context.path.dirname(declaredFile), artifactText);
 }
 
 async function getStdNames(fs) {
-  const stdDirectory = fs.resolve(__dirname, relativePathToStd);
+  const stdDirectory = fs.path.resolve(__dirname, relativePathToStd);
   const stdNames = await fs.ls(stdDirectory);
 
   return stdNames
-    .toMap(name => fs.resolve(stdDirectory, name, `${name}.st`));
+    .toMap(name => fs.path.resolve(stdDirectory, name, `${name}.st`));
 }

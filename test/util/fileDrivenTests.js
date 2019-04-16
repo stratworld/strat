@@ -1,16 +1,13 @@
+const compileFactory = require('../stratc/compile');
 const fsFactory = require('../mocks/mockFileSystem');
 const internetFactory = require('../mocks/mockInternet');
-const compileFactory = require('../stratc/compile');
 
 module.exports = function (cases, stop) {
   cases.forEach(testCase => {
     it(testCase.name, done => {
       const fs = fsFactory(testCase.files);
       const internet = internetFactory(testCase.files);
-      const compile = compileFactory({
-        fs: fs,
-        internet: internet
-      });
+      const compile = compileFactory({fs: fs, internet: internet});
       compile(
         null,
         stop,

@@ -6,7 +6,9 @@ module.exports = {
   stat: promisify(fs.stat),
   ls: promisify(fs.readdir),
   cat: promisify(fs.readFile),
-  extname: path.extname,
-  resolve: path.resolve,
-  dirname: path.dirname
+  path: {
+    extname: path.extname,
+    resolve: path.resolve,
+    dirname: path.dirname
+  }
 };

@@ -50,5 +50,5 @@ const path = {
 module.exports = {
   cat: fetch,
   isUrl: isUrl,
-  ...path
+  path: path
 };

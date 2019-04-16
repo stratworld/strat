@@ -1,17 +1,17 @@
 module.exports = [
   // builds the AST
   [ 'absolutify', 'midend/includes/absolutify' ],
-  [ 'includes', 'midend/includes/index' ],
+  [ 'includes', 'midend/includes/traverse' ],
 
   //injects things into the AST
   // public is a little low value for MVP and its not really complete
   // [ 'public', 'midend/includes/public' ],
+  [ 'id', 'midend/id.js'],
   [ 'namegen', 'midend/names/nameGen' ],
 
   //match
   //emit
   [ 'inheritance', 'midend/injection/inheritance' ],
-  
 
   //config
   //extern
@@ -25,7 +25,6 @@ module.exports = [
   // run the loader a second time to load whatever libinclude injected
   // and to load references, which are resolved in libinclude for some reason
   [ 'loader', 'midend/artifacts/loader'],
-  [ 'id', 'midend/id.js'],
   [ 'sysir', 'midend/sys/toSysIr.js'],
 
   // works with the sysIR

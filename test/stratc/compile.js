@@ -1,9 +1,12 @@
-const fsFileSystem = require('../../util/fileSystem');
-const requireLoader = require('../../util/loader');
+const fs = require('../mocks/mockFileSystem')();
+const internet = require('../mocks/mockInternet')();
+const loader = require('../mocks/mockLoader');
+
 const compilerConstructor = require('../../stratc/compiler');
-module.exports = function (mockDeps) {
+module.exports = function (overrideDeps) {
   return compilerConstructor(Object.assign({
-    fs: fsFileSystem,
-    loader: requireLoader
-  }, mockDeps)).runSegment;
+    fs: fs,
+    internet: internet,
+    loader: loader
+  }, overrideDeps)).runSegment;
 };
