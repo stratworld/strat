@@ -35,6 +35,11 @@ describe('subscribers', () => {
   });
   it('should add the event pattern', async () => {
     const result = await subscribe(dispatchWithPattern);
-    assert(typeof result.subscribers.Http[0].pattern === 'object');
+    const resultPattern = result.subscribers.Http[0].pattern;
+    assert(typeof resultPattern === 'object');
+    assert.deepStrictEqual({
+      method: "get",
+      path: "*"
+    }, resultPattern);
   });
 });

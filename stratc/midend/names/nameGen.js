@@ -3,7 +3,7 @@ const { traverse, val, kvpsToMap, build } = require('../../ast');
 module.exports = (deps) => gen;
 
 // generate a name for unnamed resource dispatches
-// this is needed by libinclude proxy functions
+// this is needed by subscribers
 function gen (ast) {
   const dispatches = traverse(ast, ['file', 'service|source', 'body', 'dispatch']);
 

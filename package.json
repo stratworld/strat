@@ -5,7 +5,8 @@
   "main": "stratc.js",
   "preferGlobal": true,
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha test/stratc/**/*.js test/std/**/*.js --reporter spec"
+    "test": "./node_modules/mocha/bin/mocha test/stratc/**/*.js test/std/**/*.js --reporter spec",
+    "debug": "./node_modules/mocha/bin/mocha --inspect-brk test/stratc/**/*.js test/std/**/*.js --reporter spec"
   },
   "repository": {
     "type": "git",

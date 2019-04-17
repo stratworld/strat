@@ -22,11 +22,9 @@ module.exports = deps => ast => {
       const event = nextEventTuple[0];
       const reference = nextEventTuple[1];
       const eventName = val(event, 'name');
-      const pattern = event.pattern;
-
+      const pattern = (event.pattern|| [])[0];
       const subConfig = {
-        //todo: make patterns cleaner / work
-        pattern: pattern || getAnyPattern(),
+        pattern: reducePattern(pattern),
         reference: reference
       };
 
@@ -41,10 +39,6 @@ module.exports = deps => ast => {
   mergeDispatchesIntoFunctions(ast);
   return ast;
 };
-
-function getAnyPattern () {
-  return 'any';
-}
 
 function mergeDispatchesIntoFunctions (ast) {
   const containers = traverse(ast, ['file', 'source|service']);
@@ -64,4 +58,28 @@ function mergeDispatchesIntoFunctions (ast) {
     container.body[0].dispatch = [];
     container.body[0].function = functions;
   });
+}
+
+function reducePattern (patternAst) {
+  if (patternAst === undefined) {
+    return 'any';
+  }
+  const type = val(patternAst, 'type');
+  switch(type) {
+    case 'string':
+    case 'number':
+    case 'true':
+    case 'false':
+    case 'null':
+      return val(patternAst, 'value');
+    case 'array':
+      return [ (patternAst.shape || []).map(shape => val(shape, 'name'))[0] ]
+        .purge();
+    case 'map':
+      return (patternAst.pattern || [])
+        .map(reducePattern)
+        .toMap(kvp => kvp[1], kvp => kvp[0]);
+    case 'kvp':
+      return [val(patternAst, 'key'), reducePattern(patternAst.pattern[0])];
+  }
 }

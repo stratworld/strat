@@ -130,36 +130,36 @@ module.exports = function (T, error, descend) {
       const nextType = T.peek().type;
       switch (nextType) {
         case 'NUMBER':
+          const numberToken = T.consume('NUMBER');
+          numberToken.value = parseFloat(numberToken.value);
           return AST('pattern', {
-            type: 'number',
-            value: parseFloat(T.consume('NUMBER'))
+            type: typeify(numberToken, 'number'),
+            value: numberToken
           });
         case 'STRING':
+          const stringToken = T.consume('STRING');
           return AST('pattern', {
-            type: 'string',
-            value: T.consume('STRING')
+            type: typeify(stringToken, 'string'),
+            value: stringToken
           });
         case 'LEFT_BRACE':
           return descend('map');
         case 'LEFT_BRACKET':
           return descend('array');
         case 'TRUE':
-          T.advance();
-          return AST('pattern', {
-            type: 'boolean',
-            value: true
-          });
         case 'FALSE':
-          T.advance();
+          const boolToken = T.advance();
+          boolToken.value = nextType === 'TRUE';
           return AST('pattern', {
-            type: 'boolean',
-            value: false
+            type: typeify(boolToken, 'boolean'),
+            value: boolToken
           });
         case 'NULL':
-          T.advance();
+          const nullToken = T.advance();
+          nullToken.value = null;
           return AST('pattern', {
-            type: 'null',
-            value: null
+            type: typeify(nullToken, 'null'),
+            value: nullToken
           });
       }
       throw {
@@ -170,29 +170,30 @@ module.exports = function (T, error, descend) {
       };
     },
     map: () => {
-      T.consume('LEFT_BRACE');
+      const leftBraceToken = T.consume('LEFT_BRACE');
       const kvps = [];
       while(!T.match('RIGHT_BRACE')) {
         kvps.push(descend('kvp'));
       }
       return AST('pattern', {
-        type: 'map'
+        type: typeify(leftBraceToken, 'map')
       }, kvps);
     },
     kvp: () => {
-      const key = T.consume('IDENTIFIER');
+      const keyToken = T.consume('IDENTIFIER');
       T.consume('COLON');
       const value = descend('pattern');
       return AST('pattern', {
-        key: key
+        key: keyToken,
+        type: typeify(keyToken, 'kvp')
       }, value);
     },
     array: () => {
-      T.consume('LEFT_BRACKET');
+      const leftBracket = T.consume('LEFT_BRACKET');
       const shape = descend('shape');
       T.consume('RIGHT_BRACKET');
       return AST('array', {
-        type: 'array'
+        type: typeify(leftBracket, 'array')
       }, shape);
     },
     shape: () => {
@@ -202,4 +203,12 @@ module.exports = function (T, error, descend) {
       });
     }
   }
+}
+
+function typeify (token, typename) {
+  return {
+    type: 'STRING',
+    value: typename,
+    line: token.line
+  };
 }
