@@ -43,12 +43,11 @@ module.exports = deps => {
           isAsync: val(container, 'async'),
           name: val(container, 'name'),
           declaredFile: val(file, 'path'),
-          subscribers: getSubs(container, ast),
+          subscribers: getSubs(container, ast.subscribers),
           functions: getFunctions(container)
         };
 
         const stubCopy = Object.assign({}, reflectionStub);
-
         const reflectionFunction = addInfoIntoStub(stubCopy, reflectionInfo);
         addFunctionIntoContainer(container, reflectionFunction);
       });
@@ -57,9 +56,10 @@ module.exports = deps => {
   }
 };
 
-//todo
-function getSubs () { return []; }
-
+function getSubs (container, subscribers) {
+  const name = val(container, 'name');
+  return subscribers[name] || [];
+}
 
 //todo: figure out what information should be shown here
 //shapes will put stuff here

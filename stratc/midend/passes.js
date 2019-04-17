@@ -3,6 +3,8 @@ module.exports = [
   [ 'absolutify', 'midend/includes/absolutify' ],
   [ 'includes', 'midend/includes/traverse' ],
 
+
+
   //injects things into the AST
   // public is a little low value for MVP and its not really complete
   // [ 'public', 'midend/includes/public' ],
@@ -13,12 +15,13 @@ module.exports = [
   //emit
   [ 'inheritance', 'midend/injection/inheritance' ],
 
+  [ 'subscribers', 'midend/events/subscribers'],
+
   //reflection
   [ 'reflection', 'midend/injection/reflection' ],
 
   //extern
   //birth
-
 
   //works with the AST
   [ 'names', 'midend/names/index' ],

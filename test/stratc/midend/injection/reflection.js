@@ -10,6 +10,15 @@ const reflect = fileData => compiler(
 
 const emptyService = 'service empty {}';
 const serviceWithOneFn = 'service one { foo ():any -> "sef"}';
+const serviceWithSubs = `
+async source X {}
+
+service Y {
+  X -> "foo"
+
+  X 1 -> "bar"
+}
+`;
 
 function getReflectionInfo (container) {
   const reflectFn = traverse(container, ['body', 'function'])
@@ -31,15 +40,22 @@ describe('reflection', () => {
       .constantMapping(true);
     assert(fnNamesSet['reflect']);
   });
-  it('should service name inside info', async () => {
+  it('should add service name inside info', async () => {
     const result = await reflect(emptyService);
     const info = getReflectionInfo(traverse(result, ['file', 'service'])[0]);
     assert(info.name === 'empty');
   });
-  it('should functions inside info', async () => {
+  it('should add functions inside info', async () => {
     const result = await reflect(serviceWithOneFn);
     const info = getReflectionInfo(traverse(result, ['file', 'service'])[0]);
     const foo = info.functions[0];
     assert(foo.name === 'foo');
+  });
+  it('should add subscribers inside info', async () => {
+    const result = await reflect(serviceWithSubs);
+    const info = getReflectionInfo(traverse(result, ['file', 'service'])[0]);
+    const subs = info.subscribers;
+    //todo: little weak...
+    assert(subs.length === 2);
   });
 });

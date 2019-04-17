@@ -5,7 +5,7 @@ module.exports = (deps) => gen;
 // generate a name for unnamed resource dispatches
 // this is needed by libinclude proxy functions
 function gen (ast) {
-  const dispatches = traverse(ast, ['file', 'service', 'body', 'dispatch']);
+  const dispatches = traverse(ast, ['file', 'service|source', 'body', 'dispatch']);
 
   dispatches
     .filter(dispatch => dispatch.functionName === undefined)
