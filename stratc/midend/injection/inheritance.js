@@ -20,7 +20,7 @@ function inherit (source, baseFunctions) {
     .map(nameAst => val(nameAst, 'name')));
   baseFunctions.keys().forEach(functionName => {
     if (!sourceFunctionNames.has(functionName)) {
-      source.function = (source.function || []).concat(baseFunctions[functionName]);
+      source.body[0].function = (source.body[0].function || []).concat(baseFunctions[functionName]);
     }
   });
 }
