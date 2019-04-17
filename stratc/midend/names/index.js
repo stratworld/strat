@@ -2,9 +2,6 @@ const { val, traverse, line } = require('../../ast');
 const path = require('path');
 const policies = [
 
-  // why?
-  // fileNameShouldMatchEntity,
-  canOnlyIncludeANameOnce,
   namesCanOnlyBeDeclaredOnce,
   shapeNamesHaveBeenDeclared,
   eventsMustHaveBeenIncluded,
@@ -12,6 +9,8 @@ const policies = [
   
   //todo: requires refactor of this file
   //referencesPointToRealFunctions
+
+  //todo: rewrite this file; its pretty ghetto
 ];
 
 module.exports = () => assertNames;
@@ -35,76 +34,13 @@ function assertNames (ast) {
   return ast;
 };
 
-// Since declarations are 1:1, file names should be the same as the thing declared
-// This assumes only one entity declared per file
-// This may be obnoxious for shapes, but the thought is that shapes will be
-// attached to a service
-// Why make this restriction?
-//   -Makes it easier to search for implementations.
-//   -Makes includes simpler
-//
-// This is disabled because it doesn't jive with URL includes, which
-// are case insensitive.  Also, we shouldn't break compilation for
-// something that may not be under user control.
-// We could relax this for URL imports but then whats the point of
-// having it at all?
-function fileNameShouldMatchEntity (file) {
-  const filePath = val(file, 'path');
-  const fileName = path.basename(filePath, '.st');
-  const entity = traverse(file, ['source|service'])[0];
-  if (entity !== undefined) {
-    if (val(entity, 'name') !== fileName) {
-      throw {
-        stratCode: 'E_NAMES_MISMATCH',
-        error: 'Naming violation',
-        message: `${val(entity, 'name')} should be declared in a file named ${val(entity, 'name')}.st`,
-        file: filePath,
-        line: line(entity, 'name')
-      }
-    }
-  };
-}
-
-// This stinks-- it blocks people from naming their things the same.
-// EX: mystuff/Http.st and otherStuff/Http.st will break
-// Have to do this because we don't have any namespacing for events/services
-// I'm expecting this to not be a huge deal for MVP
-// The upside here is it makes includes and using them dramatically simpler
-// This is also a restriction that can be lifted later
-function canOnlyIncludeANameOnce (file) {
-  const topLevelEntities = traverse(file, ['service|source']);
-
-  topLevelEntities.forEach(entity => {
-    checkDupNames(traverse(entity, ['include'])
-      .concat(topLevelEntities) , val(file, 'path'));  
-  })
-}
-
-function checkDupNames (entities, filePath) {
-  const existingNameTokens = {};
-  entities.forEach(entity => {
-    const entityPathToken = (entity.tokens.path || entity.tokens.name);
-    const entityName = path.basename(entityPathToken.value, '.st');
-    if (existingNameTokens[entityName] !== undefined) {
-      throw {
-        stratCode: 'E_NAMES_DUPLICATE',
-        message: `${entityName} is already declared on line ${existingNameTokens[entityName].line}`,
-        file: filePath,
-        line: entityPathToken.line
-      }
-    } else {
-      existingNameTokens[entityName] = entityPathToken;
-    }
-  });
-}
-
 function namesCanOnlyBeDeclaredOnce (file) {
   const topLevelEntities = traverse(file, ['service|source']);
   checkDupNames(topLevelEntities, val(file, 'path'));
   topLevelEntities.forEach(entity => {
     checkDupNames(
-      traverse(entity, ['include'])
-        .concat(traverse(entity, ['function|dispatch', 'functionName']))
+      traverse(entity, ['body', 'include'])
+        .concat(traverse(entity, ['body', 'function|dispatch', 'functionName']))
       , val(file, 'path'));
   });
 }
@@ -136,16 +72,16 @@ function shapeNamesHaveBeenDeclared (file) {
 }
 
 function getFunctions (file) {
-  return traverse(file, ['service', 'function', 'functionName'])
-    .concat(traverse(file, ['service', 'dispatch', 'functionName']));
+  return traverse(file, ['service', 'body', 'function', 'functionName'])
+    .concat(traverse(file, ['service', 'body', 'dispatch', 'functionName']));
 }
 
 function eventsMustHaveBeenIncluded (file) {
-  const includes = traverse(file, ['service', 'include']);
-  const events = traverse(file, ['service', 'dispatch', 'event']);
+  const includes = traverse(file, ['service', 'body', 'include']);
+  const events = traverse(file, ['service', 'body', 'dispatch', 'event']);
   const includeNames = {};
   includes.forEach(include => {
-    const includeName = path.basename(val(include, 'path'), '.st');
+    const includeName = path.basename(include.artifact.absolutePath, '.st');
     includeNames[includeName] = true;
   });
 
@@ -177,15 +113,15 @@ function canOnlyReferenceServicesInScope (file, ast) {
     }, {});
 
   servicesInFile.forEach(service => {
-    const allIncludedServices = traverse(service, ['include'])
-      .map(include => path.basename(val(include, 'path'), '.st'))
+    const allIncludedServices = traverse(service, ['body', 'include'])
+      .map(include => path.basename(include.artifact.absolutePath, '.st'))
       .flatmap(includeBaseName => baseNamesToServiceNames[includeBaseName]);
 
     const servicesInScope = serviceNamesInFile
       .concat(allIncludedServices)
       .constantMapping(true);
 
-    const references = traverse(service, ['dispatch', 'reference']);
+    const references = traverse(service, ['body', 'dispatch', 'reference']);
 
     references.forEach(reference => {
       const referenceService = val(reference, 'service');
@@ -198,5 +134,29 @@ function canOnlyReferenceServicesInScope (file, ast) {
         }
       }
     });
+  });
+}
+
+
+function checkDupNames (entities, filePath) {
+  const existingNameTokens = {};
+  entities.forEach(entity => {
+    var entityPathToken;
+    if (entity.artifact !== undefined) {
+      entityPathToken = entity.artifact.token;
+    } else {
+      entityPathToken = entity.tokens.name;
+    }
+    const entityName = path.basename(entityPathToken.value, '.st');
+    if (existingNameTokens[entityName] !== undefined) {
+      throw {
+        stratCode: 'E_NAMES_DUPLICATE',
+        message: `${entityName} is already declared on line ${existingNameTokens[entityName].line}`,
+        file: filePath,
+        line: entityPathToken.line
+      }
+    } else {
+      existingNameTokens[entityName] = entityPathToken;
+    }
   });
 }

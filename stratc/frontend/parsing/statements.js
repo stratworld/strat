@@ -131,11 +131,13 @@ module.exports = function (T, error, descend) {
       switch (nextType) {
         case 'NUMBER':
           return AST('pattern', {
-            number: T.consume('NUMBER')
+            type: 'number',
+            value: parseFloat(T.consume('NUMBER'))
           });
         case 'STRING':
           return AST('pattern', {
-            string: T.consume('STRING')
+            type: 'string',
+            value: T.consume('STRING')
           });
         case 'LEFT_BRACE':
           return descend('map');
@@ -143,13 +145,22 @@ module.exports = function (T, error, descend) {
           return descend('array');
         case 'TRUE':
           T.advance();
-          return AST('true', {});
+          return AST('pattern', {
+            type: 'boolean',
+            value: true
+          });
         case 'FALSE':
           T.advance();
-          return AST('FALSE', {});
+          return AST('pattern', {
+            type: 'boolean',
+            value: false
+          });
         case 'NULL':
           T.advance();
-          return AST('null', {});
+          return AST('pattern', {
+            type: 'null',
+            value: null
+          });
       }
       throw {
         stratCode: "E_UNEXPECTED_TOKEN",
@@ -164,13 +175,15 @@ module.exports = function (T, error, descend) {
       while(!T.match('RIGHT_BRACE')) {
         kvps.push(descend('kvp'));
       }
-      return AST('map', {}, kvps);
+      return AST('pattern', {
+        type: 'map'
+      }, kvps);
     },
     kvp: () => {
       const key = T.consume('IDENTIFIER');
       T.consume('COLON');
       const value = descend('pattern');
-      return AST('kvp', {
+      return AST('pattern', {
         key: key
       }, value);
     },
@@ -178,7 +191,9 @@ module.exports = function (T, error, descend) {
       T.consume('LEFT_BRACKET');
       const shape = descend('shape');
       T.consume('RIGHT_BRACKET');
-      return AST('array', {}, shape);
+      return AST('array', {
+        type: 'array'
+      }, shape);
     },
     shape: () => {
       const name = T.consume('IDENTIFIER');

@@ -17,11 +17,12 @@ function gen (ast) {
 function generateName (dispatch) {
   const firstEvent = traverse(dispatch, ['event'])[0];
   const eventName = val(firstEvent, 'name');
-  const eventConfig = kvpsToMap(traverse(dispatch, ['event', 'kvp']));
+  const eventConfig = traverse(dispatch, ['event', 'pattern']);
 
   const nameHash = {
     name: eventName,
-    config: eventConfig
+    config: eventConfig,
+    artifact: dispatch.artifact
   }.hash();
   const name = `anonymousResource#${nameHash.substr(0,8)}`;
 

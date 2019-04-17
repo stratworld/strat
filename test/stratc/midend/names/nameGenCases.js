@@ -57,7 +57,7 @@ service Backend {
     assertion: function createdUniqueNames (ast, done) {
       const nameSet = traverse(
         ast,
-        ['file', 'service', 'dispatch', 'functionName'])
+        ['file', 'service', 'body', 'dispatch', 'functionName'])
         .map(nameAst => val(nameAst, 'name'))
         .constantMapping(true)
         .keys();
@@ -73,7 +73,7 @@ service Backend {
 function didCreateName (ast, done) {
   const didBuildName = traverse(
     ast,
-    ['file', 'service', 'dispatch', 'functionName'])
+    ['file', 'service', 'body', 'dispatch', 'functionName'])
       .length > 0;
   if (didBuildName) {
     done();
