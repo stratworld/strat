@@ -10,6 +10,7 @@ module.exports = [
   // [ 'public', 'midend/includes/public' ],
   [ 'id', 'midend/id.js'],
   [ 'namegen', 'midend/names/nameGen' ],
+  [ 'names', 'midend/names/index' ],
 
   //match
   //emit
@@ -24,10 +25,6 @@ module.exports = [
   //birth
 
   //works with the AST
-  [ 'names', 'midend/names/index' ],
-  // [ 'libinclude', 'midend/libs/include'],
-  // run the loader a second time to load whatever libinclude injected
-  // and to load references, which are resolved in libinclude for some reason
   [ 'loader', 'midend/artifacts/loader' ],
   [ 'sysir', 'midend/sys/toSysIr.js' ],
 

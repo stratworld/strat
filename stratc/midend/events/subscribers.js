@@ -37,9 +37,31 @@ module.exports = deps => ast => {
       return subscribers;
     }, {});
   ast.subscribers = subscribers;
+
+  mergeDispatchesIntoFunctions(ast);
   return ast;
 };
 
 function getAnyPattern () {
   return 'any';
+}
+
+function mergeDispatchesIntoFunctions (ast) {
+  const containers = traverse(ast, ['file', 'source|service']);
+
+  containers.forEach(container => {
+    const dispatches = traverse(container, ['body', 'dispatch']);
+
+    dispatches.forEach(dispatch => {
+      dispatch.type = 'function';
+      delete dispatch.event;
+    });
+
+    var functions = traverse(container, ['body', 'function']) || [];
+
+    functions = functions.concat(dispatches);
+
+    container.body[0].dispatch = [];
+    container.body[0].function = functions;
+  });
 }

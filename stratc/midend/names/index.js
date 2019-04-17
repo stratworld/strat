@@ -78,12 +78,13 @@ function getFunctions (file) {
 
 function eventsMustHaveBeenIncluded (file) {
   const includes = traverse(file, ['service', 'body', 'include']);
+  const sourcesInFile = traverse(file, ['source']).map(source => val(source, 'name'));
   const events = traverse(file, ['service', 'body', 'dispatch', 'event']);
-  const includeNames = {};
-  includes.forEach(include => {
-    const includeName = path.basename(include.artifact.absolutePath, '.st');
-    includeNames[includeName] = true;
-  });
+  const includeNames = includes.map(include => {
+      return path.basename(include.artifact.absolutePath, '.st');
+    })
+    .concat(sourcesInFile)
+    .constantMapping(true);
 
   events.forEach(event => {
     const filePath = val(file, 'path');
