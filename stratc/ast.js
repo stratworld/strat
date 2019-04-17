@@ -19,6 +19,7 @@ module.exports = {
   },
   traverse: traverse,
   val: val,
+  getName: t => val(t, 'name'),
   line: (node, key) => tokenDive(node, key, 'line'),
   getConfig: (node, key) => traverse(node, ['kvp'])
     .filter(kvp => tokenDive(kvp, 'key', 'value') === key)

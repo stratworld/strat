@@ -30,5 +30,20 @@ service OtherBackend {
 }
 `)
     }
+  },
+  {
+    entry: 'Backend.st',
+    name: 'names passes a legit file including another service',
+    files: {
+      'Backend.st': B(`
+service Backend {
+  include "./Other.st"
+  OtherSource {} -> http ():void -> "./foobar.js"
+}
+`),
+      'Other.st': B(`
+source OtherSource {}
+`)
+    }
   }
 ];

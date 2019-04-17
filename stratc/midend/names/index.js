@@ -76,12 +76,16 @@ function getFunctions (file) {
     .concat(traverse(file, ['service', 'body', 'dispatch', 'functionName']));
 }
 
-function eventsMustHaveBeenIncluded (file) {
+function eventsMustHaveBeenIncluded (file, ast) {
   const includes = traverse(file, ['service', 'body', 'include']);
   const sourcesInFile = traverse(file, ['source']).map(source => val(source, 'name'));
   const events = traverse(file, ['service', 'body', 'dispatch', 'event']);
-  const includeNames = includes.map(include => {
-      return path.basename(include.artifact.absolutePath, '.st');
+  const includeNames = includes.flatmap(include => {
+      const includePath = include.artifact.absolutePath;
+      const file = traverse(ast, ['file'])
+        .filter(file => val(file, 'path') === includePath)[0];
+      return traverse(file, ['service|source'])
+        .map(container => val(container, 'name'));
     })
     .concat(sourcesInFile)
     .constantMapping(true);

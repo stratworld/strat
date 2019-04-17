@@ -1,5 +1,6 @@
 R = x => Promise.resolve(x);
 J = x => Promise.reject(x);
+ID = x => x;
 
 Object.defineProperty(Array.prototype, 'flat',{
   value: function() {

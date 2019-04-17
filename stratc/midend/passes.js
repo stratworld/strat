@@ -15,11 +15,11 @@ module.exports = [
   [ 'subscribers', 'midend/events/subscribers'],
   [ 'reflection', 'midend/injection/reflection' ],
 
-  //works with the AST
-  // [ 'loader', 'midend/artifacts/loader' ],
-  [ 'sysir', 'midend/sys/toSysIr.js' ],
+  //simplifies the AST into the sa IR
+  [ 'scope', 'midend/sa/scopes' ],
+  [ 'saIr', 'midend/sa/saIr' ],
 
-  // works with the sysIR
+  // works with the sa IR
   //extern
   //birth
   [ 'scopereduce', 'midend/hostCollapse/reduceScopes.js' ],
