@@ -17,12 +17,26 @@ module.exports = [
 
   //simplifies the AST into the sa IR
   [ 'scope', 'midend/sa/scopes' ],
-  [ 'saIr', 'midend/sa/saIr' ],
+  [ 'reducescopes', 'midend/hostCollapse/reduceScopes.js' ],
+  [ 'hosts', 'midend/sa/hosts' ],
+
+
 
   // works with the sa IR
+  
+  //not needed, since we don't build bad hosts
+  // [ 'collapse', 'midend/hostCollapse/collapse.js' ],
+
+
   //extern
-  //birth
-  [ 'scopereduce', 'midend/hostCollapse/reduceScopes.js' ],
-  [ 'collapse', 'midend/hostCollapse/collapse.js' ],
-  [ 'sysfile', 'midend/sys/sys.js' ]
+  //create the majordomo function for each host
+  //extern
+
+  //birth ?????
+
+  //clean shit up
+  // [ 'saIr', 'midend/sa/saIr' ],
+
+  //print the file
+  //[ 'sysfile', 'midend/sys/sys.js' ]
 ];

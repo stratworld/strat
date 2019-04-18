@@ -1,19 +1,12 @@
 module.exports = deps => ir => {
   const redundantScopes = findRedundantScopes(ir.scopes);
 
-  ir.hosts.flatmap(host => host.artifacts)
-    .forEach(artifact => {
-      const replaceScope = redundantScopes[artifact.scope];
-      if (replaceScope !== undefined) {
-        artifact.scope = replaceScope;
-      }
-    });
-
   ir.scopes.keys().forEach(scopeName => {
     if (redundantScopes[scopeName]) {
       delete ir.scopes[scopeName];
     }
   });
+  ir.movedScopes = redundantScopes;
   return ir;
 };
 

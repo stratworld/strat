@@ -20,6 +20,13 @@ service Bar {}
 service Baz {}
 `;
 
+const httpInclude= `
+service X {
+  include "Http"
+  Http -> "foo"
+}
+`;
+
 const includeCase = {
   name: "should include containers in included files",
   files: {
@@ -37,7 +44,7 @@ service Other {}
     assert.deepStrictEqual(ast.scopes.Entry, {Other:true, Entry:true})
     done();
   }
-}
+};
 
 describe('scopes', () => {
   it('should create a scope for even an empty service', async () => {
@@ -47,6 +54,18 @@ describe('scopes', () => {
   it('should include containers in the same file', async () => {
     const result = await scope(simpleFile);
     assert.deepStrictEqual(result.scopes.Foo, {Foo: true, Bar: true, Baz: true});
+  });
+  it('should allow http to call X', async () => {
+    const result = await scope(httpInclude);
+    assert(result.scopes.Http.X);
+  });
+  it('should not allow X to call Http', async () => {
+    const result = await scope(httpInclude);
+    assert(result.scopes.X.Http === undefined);
+  });
+  it('should not add SUBSTRATE to Http', async () => {
+    const result = await scope(httpInclude);
+    assert(result.scopes.Http.SUBSTRATE === undefined);
   });
   fileDrivenTests([includeCase], 'scope');
 });
