@@ -22,6 +22,13 @@ service Y {
 }
 `;
 
+const httpService = `
+service X {
+  include "Http"
+  Http -> foo ():any -> "foo"
+}
+`;
+
 describe('reduceScopes', () => {
   it('should remove redundant scope Y', async () => {
     const result = await reduceScopes(redundant);
@@ -34,5 +41,9 @@ describe('reduceScopes', () => {
   it('should mark Y as moved to X', async () => {
     const result = await reduceScopes(stillRedundant);
     assert(result.movedScopes['Y'] === 'X');
+  });
+  it('should preserve Http\'s scope', async () => {
+    const result = await reduceScopes(httpService);
+    assert(result.scopes.Http !== undefined);
   });
 });

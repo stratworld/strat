@@ -51,10 +51,32 @@ service Backend {
   },
   {
     entry: 'Backend.st',
+    name: 'event source not included in source',
+    files: {
+    'Backend.st': B(`
+source Backend {
+  Http {} -> "./ddb.js"
+}
+`)},
+    stratCode: 'E_NAMES_UNDECLARED'
+  },
+  {
+    entry: 'Backend.st',
     name: 'shape not declared',
     files: {
     'Backend.st': B(`
 service Backend {
+  foo (foo):any -> "./ddb.js"
+}
+`)},
+    stratCode: 'E_NAMES_UNDECLARED'
+  },
+  {
+    entry: 'Backend.st',
+    name: 'shape not declared in source',
+    files: {
+    'Backend.st': B(`
+source Backend {
   foo (foo):any -> "./ddb.js"
 }
 `)},

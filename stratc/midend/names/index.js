@@ -72,14 +72,14 @@ function shapeNamesHaveBeenDeclared (file) {
 }
 
 function getFunctions (file) {
-  return traverse(file, ['service', 'body', 'function', 'functionName'])
-    .concat(traverse(file, ['service', 'body', 'dispatch', 'functionName']));
+  return traverse(file, ['service|source', 'body', 'function', 'functionName'])
+    .concat(traverse(file, ['service|source', 'body', 'dispatch', 'functionName']));
 }
 
 function eventsMustHaveBeenIncluded (file, ast) {
-  const includes = traverse(file, ['service', 'body', 'include']);
+  const includes = traverse(file, ['service|source', 'body', 'include']);
   const sourcesInFile = traverse(file, ['source']).map(source => val(source, 'name'));
-  const events = traverse(file, ['service', 'body', 'dispatch', 'event']);
+  const events = traverse(file, ['service|source', 'body', 'dispatch', 'event']);
   const includeNames = includes.flatmap(include => {
       const includePath = include.artifact.absolutePath;
       const file = traverse(ast, ['file'])

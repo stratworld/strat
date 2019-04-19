@@ -6,7 +6,7 @@ const scope = fileData => compiler(
   'scope',
   fileData,
   path.resolve(__dirname, './fileInput.st'));
-const { traverse } = require('../../../../stratc/ast');
+const { traverse, val } = require('../../../../stratc/ast');
 const fileDrivenTests = require('../../../util/fileDrivenTests');
 
 
@@ -23,7 +23,13 @@ service Baz {}
 const httpInclude= `
 service X {
   include "Http"
-  Http -> "foo"
+  Http -> foo ():any -> "foo"
+}
+`;
+
+const externInclude = `
+serivce X {
+  Birth -> "foo"
 }
 `;
 
@@ -67,5 +73,16 @@ describe('scopes', () => {
     const result = await scope(httpInclude);
     assert(result.scopes.Http.SUBSTRATE === undefined);
   });
+  it('should remove Extern and Birth sources from the ast', async () => {
+    const result = await scope(httpInclude);
+    const birth = traverse(result, ['file', 'source'])
+      .filter(source => val(source, 'name') === 'Birth')
+      [0];
+    assert(birth === undefined);
+  });
+  it('should add the reflexive scope to soures', async () => {
+    const result = await scope(httpInclude);
+    assert(result.scopes.Http.Http);
+  })
   fileDrivenTests([includeCase], 'scope');
 });

@@ -12,6 +12,7 @@ module.exports = [
 
   //add std functions
   [ 'inheritance', 'midend/injection/inheritance' ],
+  [ 'substrate', 'midend/injection/substrate' ],
   [ 'subscribers', 'midend/events/subscribers'],
   [ 'reflection', 'midend/injection/reflection' ],
 
@@ -19,14 +20,6 @@ module.exports = [
   [ 'scope', 'midend/sa/scopes' ],
   [ 'reducescopes', 'midend/hostCollapse/reduceScopes.js' ],
   [ 'hosts', 'midend/sa/hosts' ],
-
-
-
-  // works with the sa IR
-  
-  //not needed, since we don't build bad hosts
-  // [ 'collapse', 'midend/hostCollapse/collapse.js' ],
-
 
   //extern
   //create the majordomo function for each host

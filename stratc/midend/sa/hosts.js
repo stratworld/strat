@@ -7,6 +7,8 @@ module.exports = deps => ast => {
       inScope: {},
       artifacts: []
     });
+    //couple of wrong things
+    //its copying out in scope stuff that it shouldnt
 
   traverse(ast, ['file', 'service|source'])
     .flatmap(container => traverse(container, ['body', 'function'])

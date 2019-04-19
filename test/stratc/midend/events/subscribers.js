@@ -9,17 +9,21 @@ const subscribe = fileData => compiler(
   path.resolve(__dirname, './fileInput.st'));
 
 const multipleDispatch = `source MultipleDispatch {
-  First,
+  include "Extern"
+  include "Birth"
+  Extern,
   Birth -> "foo"
-  First -> "bar"
+  Birth -> "bar"
 }`;
 
 const oneDispatch = `source OneDispatch {
+  include "Birth"
   Birth -> "foo"
 }`;
 
 const dispatchWithPattern = `
 source pattern {
+  include "Http"
   Http { method: "get", path: "*" } -> x ():any -> "./x.js"
 }
 `;
@@ -31,7 +35,7 @@ describe('subscribers', () => {
   });
   it('should create a subscriber for multiple events', async () => {
     const result = await subscribe(multipleDispatch);
-    assert(result.subscribers.First.length === 2);
+    assert(result.subscribers.Birth.length === 2);
   });
   it('should add the event pattern', async () => {
     const result = await subscribe(dispatchWithPattern);

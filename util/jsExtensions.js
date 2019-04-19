@@ -1,6 +1,7 @@
 R = x => Promise.resolve(x);
 J = x => Promise.reject(x);
 ID = x => x;
+C = x => console.log(JSON.stringify(x, null, 2));
 
 Object.defineProperty(Array.prototype, 'flat',{
   value: function() {

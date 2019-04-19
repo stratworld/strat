@@ -22,7 +22,7 @@ function
 
 dispatch
   events functionName? STRING
-  events IDENTIFIER "." IDENTIFIER  
+  events IDENTIFIER "." IDENTIFIER
 
 events
   event+ "->"
