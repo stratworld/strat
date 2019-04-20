@@ -3,7 +3,6 @@
 // look like functions on the container
 // then remove SUBSTRATE from the AST
 
-const includeSubstrateRefs = new Set(['invoke']);
 const { traverse, val } = require('../../ast');
 const compilerFactory = require('../../compiler');
 const stdPath = require('path');
@@ -13,7 +12,6 @@ module.exports = deps => async ast => {
   const substrateFns = await getSubstrateReferenceAsts(deps);
   const containers = traverse(ast, ['file', 'service|source']);
 
-  addIncludeFunctions (containers, substrateFns);
   replaceReferences(containers, substrateFns)
   removeSubstrate(ast);
 
@@ -54,18 +52,6 @@ function replaceReferences (containers, substrateFns) {
         delete dispatch.reference;
       }
     });
-  });
-}
-
-function addIncludeFunctions (containers, substrateFns) {
-  const functionsToInclude = substrateFns
-    .keys()
-    .filter(key => includeSubstrateRefs.has(key))
-    .map(key => substrateFns[key]);
-  containers.forEach(container => {
-    container.function = (container.function || [])
-      //todo: might need to deep copy this
-      .concat(functionsToInclude);
   });
 }
 

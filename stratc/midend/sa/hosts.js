@@ -25,18 +25,12 @@ module.exports = deps => ast => {
         = targetHost.artifacts.concat(getArtifact(fnAst, containerName));
     });
 
-  //figure out what's in scope after moves
   hosts
     .pairs()
     .forEach(kvp => {
       const name = kvp[0];
       const host = kvp[1];
-
-      const scope = ast.scopes[name];
-      host.inScope = scope
-        .keys()
-        .map(key => ast.movedScopes[key] || key)
-        .constantMapping(true);
+      host.inScope = ast.scopes[name];
     });
 
   ast.hosts = hosts;

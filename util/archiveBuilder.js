@@ -30,7 +30,11 @@ ArchiveBuilder.prototype.read = function (filename) {
 }
 
 ArchiveBuilder.prototype.addDataAsFile = function (buffer, pathFromRoot) {
-  this.zip.addFile(pathFromRoot, buffer);
+  if (this.zip.getEntries()
+    .filter(entry => entry.entryName === pathFromRoot)
+    [0] === undefined) {
+    this.zip.addFile(pathFromRoot, buffer);
+  }
 }
 
 ArchiveBuilder.prototype.copyDirectory = function (absoluteDirectoryPath, pathFromRoot) {

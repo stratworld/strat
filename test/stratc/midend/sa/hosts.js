@@ -31,6 +31,23 @@ service X {
 }
 `;
 
+const complexTwoServices = `
+service foo {
+  include "Http"
+  include "Extern"
+  Extern -> bleh ():any -> "foo.js"
+
+  Http -> "foo"
+
+  blah ():any -> "foo.js"
+}
+
+service Other {
+  include "Birth"
+  Birth -> foo.blah
+  baz ():any -> "x"
+}`;
+
 describe('hosts', () => {
   it('creates a single X host', async () => {
     const result = await hosts(emptySource);
@@ -53,5 +70,10 @@ describe('hosts', () => {
       .toMap(v => true, k => k.name.split('.')[0]);
     assert(result.hosts.Http.containers.X === undefined);
     assert(servicesWithFunctionsOnThisHost['X'] === undefined);
+  });
+  it('should keep other in scope for foo', async () => {
+    const result = await hosts(complexTwoServices);
+    assert.deepStrictEqual(result.hosts.foo.inScope,
+      {foo: true, Other: true});
   });
 });

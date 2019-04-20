@@ -13,6 +13,7 @@ module.exports = [
   //add std functions
   [ 'inheritance', 'midend/injection/inheritance' ],
   [ 'substrate', 'midend/injection/substrate' ],
+  [ 'dereference', 'midend/injection/dereference' ],
   [ 'subscribers', 'midend/events/subscribers'],
   [ 'reflection', 'midend/injection/reflection' ],
 
@@ -24,13 +25,7 @@ module.exports = [
   //create the majordomo function for each host
   [ 'majordomoconfig', 'midend/injection/majordomoConfig' ],
   [ 'majordomo', 'midend/injection/majordomo' ],
-  //extern
-
-  //birth ?????
-
-  //clean shit up
-  // [ 'saIr', 'midend/sa/saIr' ],
 
   //print the file
-  //[ 'sysfile', 'midend/sys/sys.js' ]
+  [ 'safile', 'midend/sa/sa.js' ]
 ];

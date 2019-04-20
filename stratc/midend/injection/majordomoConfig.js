@@ -1,14 +1,16 @@
 module.exports = deps => async ir => {
-  ir.hosts.values().forEach(async host => {
-    host.artifacts.push(getConfigArtifact(host, ir.subscribers));
+  ir.hosts.pairs().forEach(async kvp => {
+    const hostName = kvp[0];
+    const host = kvp[1];
+    host.artifacts.push(getConfigArtifact(hostName, host, ir.subscribers));
   });
 
   return ir;
 };
 
-function getConfigArtifact (host, subscribers) {
+function getConfigArtifact (hostName, host, subscribers) {
   return {
-    name: "MAJORDOMO.CONFIG",
+    name: `${hostName}.majordomoConfig`,
     token: {
       value: wrapInfo({
         extern: getExtern(host.artifacts, subscribers),
@@ -40,5 +42,5 @@ function getBirth(artifacts, subscribers) {
 }
 
 function wrapInfo (info) {
-  return `module.exports = () => JSON.parse('${JSON.stringify(info)}');`;
+  return `cosnt d = JSON.parse('${JSON.stringify(info)}');module.exports = () => d;`;
 }

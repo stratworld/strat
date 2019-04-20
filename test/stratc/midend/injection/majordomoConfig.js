@@ -10,10 +10,10 @@ const mConfig = fileData => compiler(
 
 function getConfigInfo (host) {
   const configArtifact = host.artifacts
-    .filter(a => a.name === 'MAJORDOMO.CONFIG')[0];
+    .filter(a => a.name.indexOf('majordomoConfig') > 0)[0];
   const mConfigString = configArtifact.token.value
     .replace(/.*JSON\.parse\('/, '')
-    .replace(/'\);$/, '');
+    .replace(/'\);.*/, '');
 
   return JSON.parse(mConfigString);
 }
@@ -29,7 +29,7 @@ describe('majordomoConfig', () => {
   it('should add a majordomo config function', async () => {
     const result = await mConfig(httpInclude);
     assert(result.hosts.X.artifacts
-      .filter(a => a.name === 'MAJORDOMO.CONFIG')[0] !== undefined);
+      .filter(a => a.name === 'X.majordomoConfig')[0] !== undefined);
   });
   it('should have in scope information', async () => {
     const result = await mConfig(httpInclude);

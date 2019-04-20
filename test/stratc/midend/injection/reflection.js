@@ -24,10 +24,9 @@ function getReflectionInfo (container) {
   const reflectFn = traverse(container, ['body', 'function'])
     .filter(fn => val(traverse(fn, ['functionName'])[0], 'name') === 'reflect')
     [0];
-
   const reflectionInfoString = reflectFn.tokens.artifact.value
     .replace(/.*JSON\.parse\('/, '')
-    .replace(/'\);$/, '');
+    .replace(/'\);.*/, '');
 
   return JSON.parse(reflectionInfoString);
 }

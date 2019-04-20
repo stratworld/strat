@@ -2,7 +2,7 @@ const Tokens = require('./tokens');
 const tokenRadix = Tokens.radix;
 const ignoreTokens = Tokens.ignoreTokens;
 const numberRegex = /^[0-9]+(\.[0-9]*)?$/g;
-const identifierRegex = /^[a-zA-Z_]+$/g;
+const identifierRegex = /^[a-zA-Z_]+[a-zA-Z_#0-9]*$/g;
 
 module.exports = () => scan;
 
