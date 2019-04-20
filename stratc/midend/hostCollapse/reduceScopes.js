@@ -1,5 +1,15 @@
 module.exports = deps => ir => {
   const redundantScopes = findRedundantScopes(ir.scopes);
+  const externContainers = findContainersWithExtern(ir.subscribers);
+
+  //if both movee and moved are extern containers don't move!
+  const redundantNames = redundantScopes.keys();
+  for (var i = 0; i<redundantNames.length; i++) {
+    if (externContainers.has(redundantScopes[redundantNames[i]])
+      && externContainers.has(redundantNames[i])) {
+      delete redundantScopes[redundantNames[i]];
+    }
+  }
 
   ir.scopes.keys().forEach(scopeName => {
     if (redundantScopes[scopeName]) {
@@ -32,4 +42,9 @@ function findRedundantScopes (scopes) {
   }
 
   return redundantToOriginal;
+}
+
+function findContainersWithExtern (subscribers) {
+  return new Set((subscribers['Extern'] || [])
+    .map(externSub => externSub.reference.split('.')[0]));
 }

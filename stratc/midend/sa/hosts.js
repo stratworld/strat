@@ -7,8 +7,6 @@ module.exports = deps => ast => {
       inScope: {},
       artifacts: []
     });
-    //couple of wrong things
-    //its copying out in scope stuff that it shouldnt
 
   traverse(ast, ['file', 'service|source'])
     .flatmap(container => traverse(container, ['body', 'function'])
@@ -17,11 +15,16 @@ module.exports = deps => ast => {
       const containerName = containerFnTuple[0];
       const fnAst = containerFnTuple[1];
       const targetHost = hosts[ast.movedScopes[containerName] || containerName];
-      targetHost.containers[containerName] = true;
+      
+      // dangerous javascript mutation bugs lurk here:
+      // need to be careful to create new objects for the hosts
+      targetHost.containers = Object.assign({
+        [containerName]: true
+      }, targetHost.containers);
       targetHost.artifacts
         = targetHost.artifacts.concat(getArtifact(fnAst, containerName));
     });
-  
+
   //figure out what's in scope after moves
   hosts
     .pairs()
@@ -33,8 +36,6 @@ module.exports = deps => ast => {
       host.inScope = scope
         .keys()
         .map(key => ast.movedScopes[key] || key)
-        //don't include identity because its annoying
-        .filter(key => key !== name)
         .constantMapping(true);
     });
 

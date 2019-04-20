@@ -18,42 +18,27 @@ Also provides subscriber information for sources.
 }
 */
 
+const injectFactory = require('./injectConstantFunction');
 const { traverse, val, line } = require('../../ast');
-const compilerConstructor = require('../../compiler');
 
-module.exports = deps => {
+module.exports = deps => async ast => {
+  await Promise.all(traverse(ast, ['file']).map(async file => {
+    const containers = traverse(file, ['service|source']);
 
-  async function getReflectionStub () {
-    const compile = compilerConstructor(deps).runCommand;
-    const ast = await compile(
-      'ast',
-      'service x { reflect ():any -> "./stub.js"}',
-      './stub.st');
-    return ast;
-  }
+    await Promise.all(containers.map(async container => {
+      const inject = await injectFactory(deps, 'reflect');
+      const reflectionInfo = {
+        isAsync: val(container, 'async'),
+        name: val(container, 'name'),
+        declaredFile: val(file, 'path'),
+        subscribers: getSubs(container, ast.subscribers),
+        functions: getFunctions(container)
+      };
 
-  return async ast => {
-    const reflectionStub = await getReflectionStub();
-
-    traverse(ast, ['file']).forEach(file => {
-      const containers = traverse(file, ['service|source']);
-
-      containers.forEach(container => {
-        const reflectionInfo = {
-          isAsync: val(container, 'async'),
-          name: val(container, 'name'),
-          declaredFile: val(file, 'path'),
-          subscribers: getSubs(container, ast.subscribers),
-          functions: getFunctions(container)
-        };
-
-        const stubCopy = Object.assign({}, reflectionStub);
-        const reflectionFunction = addInfoIntoStub(stubCopy, reflectionInfo);
-        addFunctionIntoContainer(container, reflectionFunction);
-      });
-    });
-    return ast;
-  }
+      inject(container, reflectionInfo);
+    }));
+  }));
+  return ast;
 };
 
 function getSubs (container, subscribers) {
@@ -72,25 +57,4 @@ function getFunctions (container) {
         line: line(fnName, 'name')
       };
     });
-}
-
-function addInfoIntoStub (stub, reflectionInfo) {
-  const newArtifact = wrapInfo(reflectionInfo);
-  const reflectFn = traverse(stub, ['file', 'service', 'body', 'function'])[0];
-
-  reflectFn.tokens.artifact.value = newArtifact;
-  reflectFn.artifact.type = 'text';
-  reflectFn.artifact.media = '.js';
-
-  return reflectFn;
-}
-
-function addFunctionIntoContainer (container, fn) {
-  container.body[0].function = (container.body[0].function || [])
-    .concat(fn);
-}
-
-function wrapInfo (info) {
-  //what a line!
-  return `module.exports = () => JSON.parse('${JSON.stringify(info)}');`;
 }

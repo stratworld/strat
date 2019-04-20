@@ -29,6 +29,18 @@ service X {
 }
 `;
 
+const twoExterns = `
+source X {
+  include "Extern"
+  Extern -> "foo"
+}
+
+source Y {
+  include "Extern"
+  Extern -> "foo"
+}
+`;
+
 describe('reduceScopes', () => {
   it('should remove redundant scope Y', async () => {
     const result = await reduceScopes(redundant);
@@ -45,5 +57,10 @@ describe('reduceScopes', () => {
   it('should preserve Http\'s scope', async () => {
     const result = await reduceScopes(httpService);
     assert(result.scopes.Http !== undefined);
+  });
+  it('should not move when two externs would be put in the same scope', async () => {
+    const result = await reduceScopes(twoExterns);
+    assert(result.scopes.X !== undefined);
+    assert(result.scopes.Y !== undefined);
   });
 });

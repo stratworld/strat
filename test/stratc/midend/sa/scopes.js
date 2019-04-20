@@ -83,6 +83,6 @@ describe('scopes', () => {
   it('should add the reflexive scope to soures', async () => {
     const result = await scope(httpInclude);
     assert(result.scopes.Http.Http);
-  })
+  });
   fileDrivenTests([includeCase], 'scope');
 });

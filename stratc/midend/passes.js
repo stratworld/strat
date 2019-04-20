@@ -21,8 +21,9 @@ module.exports = [
   [ 'reducescopes', 'midend/hostCollapse/reduceScopes.js' ],
   [ 'hosts', 'midend/sa/hosts' ],
 
-  //extern
   //create the majordomo function for each host
+  [ 'majordomoconfig', 'midend/injection/majordomoConfig' ],
+  [ 'majordomo', 'midend/injection/majordomo' ],
   //extern
 
   //birth ?????

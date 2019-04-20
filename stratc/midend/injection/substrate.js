@@ -32,7 +32,7 @@ async function getSubstrateReferenceAsts (deps) {
     .map(fnTuple => {
       const fnAst = fnTuple[0];
       const name = fnTuple[1];
-      fnAst.functionName[0].tokens.name.value = `$SUBSTRATE.${name}`;
+      fnAst.functionName[0].tokens.name.value = `$SUBSTRATE-${name}`;
       return fnTuple;
     })
     .toMap(t => t[0], t => t[1]);

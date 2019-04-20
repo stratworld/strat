@@ -35,8 +35,16 @@ Object.defineProperty(Array.prototype, 'purge',{
 
 Object.defineProperty(Array.prototype, 'constantMapping',{
   value: function(constant) {
+    var valueGenerator;
+    if (Array.isArray(constant)) {
+      valueGenerator = () => Array.from(constant);
+    } else if (typeof constant === 'object') {
+      valueGenerator = () => Object.assign({}, constant);
+    } else {
+      valueGenerator = () => constant;
+    }
     return this.reduce((set, element) => {
-      set[element] = constant;
+      set[element] = valueGenerator();
       return set;
     }, {});
   },

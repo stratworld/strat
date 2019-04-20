@@ -53,7 +53,7 @@ describe('reflection', () => {
   });
   it('should add subscribers inside info', async () => {
     const result = await reflect(serviceWithSubs);
-    const info = getReflectionInfo(traverse(result, ['file', 'service'])[0]);
+    const info = getReflectionInfo(traverse(result, ['file', 'source'])[0]);
     const subs = info.subscribers;
     //todo: little weak...
     assert(subs.length === 2);

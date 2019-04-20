@@ -47,4 +47,11 @@ describe('hosts', () => {
     assert(result.hosts.keys().length === 2);
     assert(result.hosts.Http !== undefined);
   });
+  it('should not include Xs functions inside Https host', async () => {
+    const result = await hosts(httpService);
+    const servicesWithFunctionsOnThisHost = result.hosts.Http.artifacts
+      .toMap(v => true, k => k.name.split('.')[0]);
+    assert(result.hosts.Http.containers.X === undefined);
+    assert(servicesWithFunctionsOnThisHost['X'] === undefined);
+  });
 });
