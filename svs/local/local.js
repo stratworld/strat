@@ -8,34 +8,57 @@ const config = require("../config")();
 module.exports = async function (saData) {
   const archive = new Archive(saData);
 
-  const ir = JSON.parse(archive.read('ir.json').toString());
+  const hosts = JSON.parse(archive.read('hosts.json').toString());
 
+  const hijack = require('strat');
+  
+  const domoLookup = getDomoLookup(hosts, archive);
 
-  const registry = getRegistry(archive, ir);
+  await hijack.setDomos(domoLookup);
 
-  require('strat')(ir, registry);
+  const registry = getRegistry(archive, hosts);
 
-  await connect(ir, registry);
+  hijack.setRegistry(registry);
+
+  await birth(hosts, hijack);
 };
 
-function getRegistry (archive, ir) {
-  return ir.hosts
-    .flatmap(host => host.artifacts
-      .map(artifact => [host.runtime, artifact]))
+//load in majordomo functions first
+function getDomoLookup (hosts, archive) {
+  return hosts
+    .pairs()
+    .map(kvps => {
+      const hostName = kvps[0];
+      const domoArtifact = kvps[1].artifacts
+        .filter(artifact => artifact.name === 'Strat.majordomo')
+        [0];
+      return [hostName, domoArtifact]
+    })
+    .toMap(tuple => loadFunction(tuple[1], archive), t => t[0]);
+}
+
+function getRegistry (archive, hosts) {
+  return hosts
+    .pairs()
+    .flatmap(kvp => kvp[1].artifacts
+      .map(artifact => [kvp[0], artifact]))
     .reduce((lookup, artifactTuple) => {
       const artifact = artifactTuple[1];
-      const runtime = artifactTuple[0];
-      lookup[artifact.name] = (runtime === undefined
-        ? loadResource: loadFunction)(artifact, archive);
+      const hostName = artifactTuple[0];
+      lookup[artifact.name] = (artifact.media === '.txt'
+        ? loadResource: loadFunction)(artifact, archive, hostName);
       return lookup;
     }, {});
 }
 
 //todo: error handling in this function
-function loadFunction (artifactConfig, archive) {
-  const filePath = stdPath.join(
-    artifactConfig.name,
-    stdPath.basename(artifactConfig.path));
+//maybe not; maybe the domo does everything
+//maybe the domo turns shit to gold
+function loadFunction (artifact, archive, hostName) {
+  const fileName = artifact.absolutePath === false
+    ? `data${artifact.media}`
+    : stdPath.basename(artifact.absolutePath);
+  const filePath = stdPath.join(artifact.name, fileName);
 
   const artifactData = archive.read(filePath).toString();
 
@@ -43,46 +66,30 @@ function loadFunction (artifactConfig, archive) {
   //change its behavior based on the script that calls it (to handle scope)
   const modifiedScript = artifactData.replace(
     /require\('strat'\)/g,
-    `require('strat')('${artifactConfig.name}')`);
+    `require('strat')('${hostName}')`);
   const invokableFunction = nodeEval(modifiedScript, `./${filePath}`);
 
-  return event => {
-    const result = invokableFunction(event, artifactConfig.declaration);
-    return typeof result === 'object'
-      && typeof result.then === 'function'
-      ? result
-      : Promise.resolve(result);
+  if (typeof invokableFunction !== 'function') {
+    throw new Error(`Module exported by ${artifact.name} is not a function.`);
+  }
+
+  return async (a, b) => {
+    return invokableFunction(a, b);
   };
 }
 
-function loadResource (artifactConfig, archive) {
+function loadResource (artifact, archive) {
   const filePath = stdPath.join(
-    artifactConfig.name,
-    stdPath.basename(artifactConfig.path));
+    artifact.name,
+    "data.txt");
 
   return async function () {
-    //should we tosring?
     return archive.read(filePath).toString();
   }
 }
 
-async function connect (ir, registry) {
-  const hostsWithEvents = ir.hosts
-    .filter(host => host.events.length >0);
-
-  //todo: since the http server blocks, we'll want to do this
-  // in parallel
-  // right now this will just start an http server for the first host
-  await Promise.all(hostsWithEvents.map(host => {
-    const type = host.events[0].type;
-    if (type !== 'Http') {
-      throw `Event type ${type} not supported`;
-    }
-
-    //assumption: the proxy will be first in the artifacts list
-    // this is safe because of midend.scopecollapse
-    const proxy = registry[host.artifacts[0].name];
-    const HttpConfig = ((config.local || {}).Http || {});
-    return Http(proxy, HttpConfig);
+async function birth (hosts, hijack) {
+  return Promise.all(hosts.keys().map(async hostName => {
+    return hijack.dispatch(hostName, 'Birth');
   }));
 }

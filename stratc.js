@@ -97,7 +97,9 @@ if (command === 'help' || command === '-h' || command === '--help') {
 
   work
     .then(finalResults => {
-      console.log(serializeAST(finalResults));
+      if (finalResults !== undefined) {
+        console.log(serializeAST(finalResults));
+      }
       process.exit(0);
     })
     .catch(errorFormat)

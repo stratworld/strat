@@ -42,5 +42,5 @@ function getBirth(artifacts, subscribers) {
 }
 
 function wrapInfo (info) {
-  return `cosnt d = JSON.parse('${JSON.stringify(info)}');module.exports = () => d;`;
+  return `const d = JSON.parse('${JSON.stringify(info)}');module.exports = () => d;`;
 }
