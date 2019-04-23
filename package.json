@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "mocha": "^5.2.0",
-    "showdown": "^1.9.0"
+    "showdown": "^1.9.0",
+    "stack-trace": "0.0.10"
   }
 }

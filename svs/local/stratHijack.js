@@ -17,7 +17,6 @@ Hijack.prototype.setDomos = async function (domos) {
 Hijack.prototype.getInvoker = function (hostName) {
   return async (dep, event) => {
     try {
-      //todo: filter registry by hostName
       return this.registry[dep](event);
     }catch (e) {
       console.log('could not invoke dep ' + dep);

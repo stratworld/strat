@@ -4,7 +4,6 @@ const stdPath = require('path');
 const Http = require('./Http');
 const config = require("../config")();
 
-//todo: error handling
 module.exports = async function (saData) {
   const archive = new Archive(saData);
 
@@ -20,7 +19,7 @@ module.exports = async function (saData) {
 
   hijack.setRegistry(registry);
 
-  await birth(hosts, hijack);
+  printBirthResults(await birth(hosts, hijack));
 };
 
 //load in majordomo functions first
@@ -90,6 +89,16 @@ function loadResource (artifact, archive) {
 
 async function birth (hosts, hijack) {
   return Promise.all(hosts.keys().map(async hostName => {
-    return hijack.dispatch(hostName, 'Birth');
+    return await hijack.dispatch(hostName, 'Birth');
   }));
+}
+
+function printBirthResults (birthResultsArray) {
+  (birthResultsArray || [])
+    .forEach(birthResultObj => {
+      birthResultObj.pairs().forEach(kvp => {
+        console.log(`Birth response from ${kvp[0]}:`);
+        console.log(`  ${JSON.stringify(kvp[1], null, 2)}`);
+      });
+    });
 }

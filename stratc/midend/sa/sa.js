@@ -6,7 +6,7 @@ module.exports = deps => async (ir, filename) => {
   }
   const targetName = `${deps.fs.path.basename(filename, '.st')}.sa`;
   await deps.fs.writeFile(targetName, await buildSysArchive(deps, ir.hosts));
-  return `Successfully created ${targetName}`;
+  return undefined;
 };
 
 async function buildSysArchive (deps, hosts) {
@@ -52,8 +52,6 @@ async function loadArtifact (deps, artifact) {
   try {
     artifact.data = await cat(artifact.absolutePath);  
   } catch (e) {
-    C(artifact)
-    //todo: this can be more than not found!
     throw {
       stratCode: 'E_INVALID_ARTIFACT',
       message: `Failed to load file ${artifact.absolutePath}: ${e.message}`,

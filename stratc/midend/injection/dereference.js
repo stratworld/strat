@@ -30,7 +30,7 @@ async function injectProxy (dispatch, deps, service, fn, filename) {
     fn: fn,
     filename: filename
   }.hash();
-  const name = `anonymousProxy#${nameHash.substr(0,8)}`;
+  const name = `anonymous#${nameHash.substr(0,8)}`;
 
   const stubFile = `service stub {
     ${name} (any):any -> "${getFn(service, fn)}"

@@ -24,7 +24,7 @@ function generateName (dispatch) {
     config: eventConfig,
     artifact: dispatch.artifact
   }.hash();
-  const name = `anonymousResource#${nameHash.substr(0,8)}`;
+  const name = `anonymous#${nameHash.substr(0,8)}`;
 
   dispatch.functionName = [nameAst(name)];
 }

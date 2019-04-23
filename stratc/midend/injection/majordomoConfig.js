@@ -15,6 +15,7 @@ function getConfigArtifact (hostName, host, subscribers) {
       value: wrapInfo({
         extern: getExtern(host.artifacts, subscribers),
         birth: getBirth(host.artifacts, subscribers),
+        onHost: host.containers,
         inScope: host.inScope
       }),
       line: 0,
