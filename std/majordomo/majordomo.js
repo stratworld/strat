@@ -10,6 +10,9 @@ module.exports = async function (rawInvoker, myHostName, ignoreFrames = 2) {
       || functionName.split('.').length !== 2) {
       throw new StratError(caller, new Error(`Input to strat must be a string of the form ServiceName.functionName EX: HelloWorld.foo`));
     }
+    if (functionName.indexOf('this.') === 0) {
+      functionName = functionName.replace('this.', `${caller.service}.`);
+    }
     return async event => {
       const caller = captureCaller(stackTrace.get(), ignoreFrames - 1);
       const config = await invoker(caller, `${myHostName}.majordomoConfig`);
@@ -52,7 +55,7 @@ module.exports = async function (rawInvoker, myHostName, ignoreFrames = 2) {
     if (config.extern !== undefined) {
       return await Majordomo(config.extern)(rawEvent);
     }
-    throw new StratError(caller, new Error('Could not dispatch event to a Strat function'));
+    throw new StratError(caller, new Error('External event received and no Extern function specified.'));
   };
 
   return Majordomo;
@@ -75,8 +78,16 @@ function captureCaller (stack, ignoreFrames) {
   }
 
   return relevantStack.map(frame => {
+    const file = frame.getFileName();
+    //sometimes this happens?
+    if (file === null) {
+      return;
+    }
+    const fileTokens = file.split('/');
+    const service = fileTokens[fileTokens.length - 2].split('.')[0];
     return {
-      file: frame.getFileName(),
+      file: file,
+      service: service,
       functionName: frame.getFunctionName(),
       line: frame.getLineNumber(),
       col: frame.getColumnNumber(),

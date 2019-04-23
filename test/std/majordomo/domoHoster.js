@@ -13,5 +13,14 @@ module.exports = async function (mockEnvironment, hostName) {
 
   //Haskell eat your heart out
   require('strat').setExport(ret);
+
+  // we need to load in the modules that require strat AFTER
+  // we've added our mock strat env.
+  mockEnvironment.pairs().forEach(kvp => {
+    if (typeof kvp[1] === 'string') {
+      delete require.cache[require.resolve(kvp[1])];
+      mockEnvironment[kvp[0]] = require(kvp[1]);
+    }
+  })
   return ret;
 };

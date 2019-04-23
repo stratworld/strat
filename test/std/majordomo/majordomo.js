@@ -104,6 +104,31 @@ describe('majordomo', () => {
           }
         });
     });
+    it('should dereference \'this\'', async () => {
+      const host = await hoster({
+        'test.majordomoConfig': () => {
+          return {
+            birth: ['test.foo'],
+            inScope: {test: true, majordomo: true},
+            onHost: {test: true}
+          };
+        },
+        'test.foo': () => {
+          const Strat = require('strat');
+          const x = Strat('this.x');
+          return x('foo');
+        },
+        // 'this' works off of file names from stack traces
+        // which are hard to spoof.  If it works as expected it'll
+        // inject 'majordomo' as 'this'
+        'majordomo.x': e => {
+          return true;
+        }
+      }, 'test');
+
+      const r = await host.dispatch('Birth');
+      assert.deepStrictEqual(r, {'test.foo': true});
+    })
   });
   describe('wrapping', () => {
     it('should wrap domo-domo communication', async () => {
@@ -188,7 +213,7 @@ describe('majordomo', () => {
         await host.dispatch('foobar');
         assert(false);
       } catch (e) {
-        assert(e.message.indexOf('Could not dispatch event to a Strat function') > -1);
+        assert(e.message.indexOf('External event received and no Extern function specified.') > -1);
       }
     });
   });
