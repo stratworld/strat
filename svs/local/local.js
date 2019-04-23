@@ -19,7 +19,14 @@ module.exports = async function (saData) {
 
   hijack.setRegistry(registry);
 
-  printBirthResults(await birth(hosts, hijack));
+  try {
+    printBirthResults(await birth(hosts, hijack));
+    process.exit(0);
+  } catch (e) {
+    console.log(e.stack);
+    process.exit(1);
+  }
+  
 };
 
 //load in majordomo functions first
@@ -72,7 +79,7 @@ function loadFunction (artifact, archive, hostName) {
     throw new Error(`Module exported by ${artifact.name} is not a function.`);
   }
 
-  return async (a, b) => {
+  return async function invoke (a, b) {
     return invokableFunction(a, b);
   };
 }

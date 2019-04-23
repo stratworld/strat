@@ -8,7 +8,7 @@ Hijack.prototype.setDomos = async function (domos) {
     .map(async kvp => {
       const hostName = kvp[0];
       const domo = kvp[1];
-      const domoClosure = await domo(this.getInvoker(hostName), hostName);
+      const domoClosure = await domo(this.getInvoker(hostName), hostName, 3);
       return [hostName, domoClosure];
     })))
     .toMap(kvp => kvp[1], kvp => kvp[0]);

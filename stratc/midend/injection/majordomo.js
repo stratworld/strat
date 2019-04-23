@@ -8,7 +8,7 @@ module.exports = deps => (ast, filename) => {
         type: 'STRING'
       },
       declaredFile: filename,
-      absolutePath: deps.fs.path.resolve(__dirname, '../../../std/majordomo/majordomo.js'),
+      absolutePath: deps.fs.path.resolve(__dirname, '../../../std/majordomo.bundle.js'),
       type: 'file',
       media: '.js'
     });

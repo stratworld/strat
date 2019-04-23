@@ -67,7 +67,7 @@ describe('majordomo', () => {
         await host.dispatch('Birth');
         assert(false);
       } catch (e) {
-        assert(e.message.indexOf('NotInScope.x is undefined') > 0)
+        assert(e.message.indexOf('NotInScope.x is undefined') > -1)
       }
     });
     [
@@ -100,7 +100,7 @@ describe('majordomo', () => {
             await host.dispatch('Birth');
             assert(false);
           } catch (e) {
-            assert(e.message.indexOf('Input to strat must be a string') > 0);
+            assert(e.message.indexOf('Input to strat must be a string') > -1);
           }
         });
     });
@@ -173,7 +173,7 @@ describe('majordomo', () => {
       await host.dispatch({_stratCallee: 'test.x', event: 'foo'});
       assert(event === 'foo');
     });
-    it ('should throw if no extern and no stratCallee', async () => {
+    it('should throw if no extern and no stratCallee', async () => {
       const host = await hoster({
         'test.majordomoConfig': () => {
           return {
@@ -192,7 +192,7 @@ describe('majordomo', () => {
       }
     });
   });
-  describe.only('traces', () => {
+  describe('traces', () => {
     it('should provide a system stack trace if a component fails', async () => {
       const host = await hoster({
         'test.majordomoConfig': () => {
@@ -205,7 +205,8 @@ describe('majordomo', () => {
         },
         'test.x': e => {
           const Strat = require('strat');
-          return Strat('test.y')(e);
+          return Strat('test.y')
+          (e);
         },
         'test.y': e => {
           const Strat = require('strat');
@@ -217,10 +218,15 @@ describe('majordomo', () => {
       }, 'test');
 
       try {
-        const result = await host.dispatch('foo');  
+        const result = await host.dispatch('foo');
+        assert(false);
       } catch (e) {
-        console.log(e.serialize());
+        const s = e.stack;
+        assert(s.indexOf('test.y') > -1);
+        assert(s.indexOf('test.x') > -1);
+        assert(s.indexOf('New error from z') > -1);
       }
     });
+    it('should serialize and deserialize StratErrors across hosts');
   });
 });

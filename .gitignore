@@ -6,3 +6,4 @@ litconfig.json
 build
 *.sys
 *.saf
+*.bundle.js

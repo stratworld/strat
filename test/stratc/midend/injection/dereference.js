@@ -27,6 +27,6 @@ describe('dereference', () => {
       [0]
 
     assert(dispatch.reference === undefined);
-    assert(val(dispatch.functionName[0], 'name').indexOf('anonymousProxy') === 0);
+    assert(val(dispatch.functionName[0], 'name').indexOf('anonymous') === 0);
   });
 });
