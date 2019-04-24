@@ -35,7 +35,7 @@ describe('majordomo', () => {
         };
       },
       'test.foo': () => {
-        const Strat = require('strat');
+        const Strat = require('strat').getResolver();
         const x = Strat('test.x');
         return x();
       },
@@ -56,7 +56,7 @@ describe('majordomo', () => {
           };
         },
         'test.foo': () => {
-          const Strat = require('strat');
+          const Strat = require('strat').getResolver();
           const x = Strat('NotInScope.x');
           return x();
         },
@@ -90,7 +90,7 @@ describe('majordomo', () => {
               };
             },
             'test.foo': () => {
-              const Strat = require('strat');
+              const Strat = require('strat').getResolver();
               const x = Strat(testCase);
               return x();
             }
@@ -114,7 +114,7 @@ describe('majordomo', () => {
           };
         },
         'test.foo': () => {
-          const Strat = require('strat');
+          const Strat = require('strat').getResolver();
           const x = Strat('this.x');
           return x('foo');
         },
@@ -142,7 +142,7 @@ describe('majordomo', () => {
           };
         },
         'test.foo': () => {
-          const Strat = require('strat');
+          const Strat = require('strat').getResolver();
           const x = Strat('AnotherHost.x');
           return x('foo');
         },
@@ -229,12 +229,12 @@ describe('majordomo', () => {
           };
         },
         'test.x': e => {
-          const Strat = require('strat');
+          const Strat = require('strat').getResolver();
           return Strat('test.y')
           (e);
         },
         'test.y': e => {
-          const Strat = require('strat');
+          const Strat = require('strat').getResolver();
           return Strat('test.z')(e);
         },
         'test.z': e => {

@@ -45,7 +45,7 @@ async function injectProxy (dispatch, deps, service, fn, filename) {
 }
 
 function getFn (service, fn) {
-  return `const Strat = require('strat');
+  return `const Strat = require('strat').getResolver();
 const target = Strat('${service}.${fn}')
 module.exports = function stratProxy_${service}_${fn} (event) { return target(event); }`;
 }

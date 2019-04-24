@@ -1,10 +1,16 @@
 const Hijack = function () {};
-Hijack.prototype.getDomo = function (hostName) {
-  return this.domos[hostName];
+Hijack.prototype.getDomo = function (serviceName) {
+  return this.domos[this.domoLookup[serviceName]];
 };
 
-Hijack.prototype.setDomos = async function (domos) {
-  this.domos = (await Promise.all(domos.pairs()
+Hijack.prototype.setDomos = async function (domosByServiceName) {
+  const uniqueDomos = domosByServiceName
+    .values()
+    .toMap(domoInfo => domoInfo.domo, domoInfo => domoInfo.hostName);
+  this.domoLookup = domosByServiceName
+    .pairs()
+    .toMap(kvp => kvp[1].hostName, kvp => kvp[0]);
+  this.domos = (await Promise.all(uniqueDomos.pairs()
     .map(async kvp => {
       const hostName = kvp[0];
       const domo = kvp[1];

@@ -1,4 +1,4 @@
-const Strat = require('strat');
+const Strat = require('strat').getResolver();
 const reflect = Strat('this.reflect');
 const match = Strat('this.match');
 

@@ -12,6 +12,9 @@ module.exports = {
     library: 'strat-runtime',
     libraryTarget: 'umd'
   },
+  optimization: {
+    minimize: false
+  },
   plugins: [
     new webpack.IgnorePlugin(/^strat$/g)
   ],

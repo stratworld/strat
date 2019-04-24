@@ -31,7 +31,7 @@ describe('stdEmit', () => {
   it('should emit to an any pattern', async () => {
     const d = await getRuntime({
       'test.entry': () => {
-        const Strat = require('strat');
+        const Strat = require('strat').getResolver();
         const emit = Strat('this.emit');
         return emit('foo');
       },
@@ -44,7 +44,7 @@ describe('stdEmit', () => {
   it('should throw if no match is found', async () => {
     const d = await getRuntime({
       'test.entry': async () => {
-        const Strat = require('strat');
+        const Strat = require('strat').getResolver();
         const emit = Strat('this.emit');
         return await emit('y');
       },
@@ -62,7 +62,7 @@ describe('stdEmit', () => {
   it('should throw if multiple sync matches found', async () => {
     const d = await getRuntime({
       'test.entry': async () => {
-        const Strat = require('strat');
+        const Strat = require('strat').getResolver();
         const emit = Strat('this.emit');
         return await emit('x');
       },
@@ -81,7 +81,7 @@ describe('stdEmit', () => {
     var counter = 0;
     const d = await getRuntime({
       'test.entry': async () => {
-        const Strat = require('strat');
+        const Strat = require('strat').getResolver();
         const emit = Strat('this.emit');
         return await emit('x');
       },
@@ -99,7 +99,7 @@ describe('stdEmit', () => {
   it('should pass a mutated event', async () => {
     const d = await getRuntime({
       'test.entry': async () => {
-        const Strat = require('strat');
+        const Strat = require('strat').getResolver();
         const emit = Strat('this.emit');
         return await emit('x');
       },

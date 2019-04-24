@@ -2,10 +2,10 @@ const StratError = require('./StratError');
 const stackTrace = require('stack-trace');
 const stdPath = require('path');
 
-module.exports = async function (rawInvoker, myHostName, ignoreFrames = 2) {
+module.exports = async function (rawInvoker, myHostName) {
   const invoker = composeInvoker(rawInvoker, myHostName);
   const Majordomo = functionName => {
-    const caller = captureCaller(stackTrace.get(), ignoreFrames);
+    const caller = captureCaller(stackTrace.get());
     if (typeof functionName !== 'string'
       || functionName.split('.').length !== 2) {
       throw new StratError(caller, new Error(`Input to strat must be a string of the form ServiceName.functionName EX: HelloWorld.foo`));
@@ -14,7 +14,7 @@ module.exports = async function (rawInvoker, myHostName, ignoreFrames = 2) {
       functionName = functionName.replace('this.', `${caller.service}.`);
     }
     return async event => {
-      const caller = captureCaller(stackTrace.get(), ignoreFrames - 1);
+      const caller = captureCaller(stackTrace.get());
       const config = await invoker(caller, `${myHostName}.majordomoConfig`);
       const inScope = config.inScope;
       const onHost = config.onHost;
@@ -33,7 +33,7 @@ module.exports = async function (rawInvoker, myHostName, ignoreFrames = 2) {
   };
 
   Majordomo.dispatch = async rawEvent => {
-    const caller = captureCaller(stackTrace.get(), ignoreFrames - 1);
+    const caller = captureCaller(stackTrace.get());
     if (rawEvent === 'Birth') {
       try {
         const config = await Majordomo(`${myHostName}.majordomoConfig`)();
@@ -72,26 +72,24 @@ function composeInvoker (rawInvoker, myHostName) {
 }
 
 function captureCaller (stack, ignoreFrames) {
-  let relevantStack = stack.slice(ignoreFrames);
-  if (relevantStack.length === 0) {
-    relevantStack = stack.slice(ignoreFrames - 1);
-  }
+  let relevantStack = stack.slice(1);
 
-  return relevantStack.map(frame => {
-    const file = frame.getFileName();
-    //sometimes this happens?
-    if (file === null) {
-      return;
-    }
-    const fileTokens = file.split('/');
-    const service = fileTokens[fileTokens.length - 2].split('.')[0];
-    return {
-      file: file,
-      service: service,
-      functionName: frame.getFunctionName(),
-      line: frame.getLineNumber(),
-      col: frame.getColumnNumber(),
-      frame: frame
-    };
-  })[0];
+  const frame = relevantStack[0];
+  if (frame === undefined) return undefined;
+  const file = frame.getFileName();
+  //sometimes this happens?
+  //todo figure it out?
+  if (file === null) {
+    return;
+  }
+  const fileTokens = file.split('/');
+  const service = fileTokens[fileTokens.length - 2].split('.')[0];
+  return {
+    file: file,
+    service: service,
+    functionName: frame.getFunctionName(),
+    line: frame.getLineNumber(),
+    col: frame.getColumnNumber(),
+    frame: frame
+  };
 };
