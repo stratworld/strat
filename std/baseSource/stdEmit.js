@@ -6,6 +6,11 @@ module.exports = async event => {
   const declaration = await reflect();
   const matches = await Promise.all(declaration.subscribers
     .map(async subscriber => [await match({
+      //matchers mutate the event!  This is unsafe to do in parallel!
+      //todo: pick a solution:
+      // 1) deep copy the event for each matcher
+      // 2) change the API to not have matchers mutate the event
+      // 3) expect matchers to deep copy if they return a new event
       event: event,
       pattern: subscriber.pattern
     }), subscriber.reference]));

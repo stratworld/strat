@@ -4,7 +4,8 @@ const path = require('path');
 module.exports = {
   target: 'node',
   entry: {
-    majordomo: './std/majordomo/majordomo.js'
+    majordomo: './std/majordomo/majordomo.js',
+    httpMatcher: './std/Http/httpMatcher.js'
   },
   output: {
     path: path.resolve('./std'),

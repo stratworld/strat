@@ -1,7 +1,6 @@
 const nodeEval = require('node-eval');
 const Archive = require('../../util/archiveBuilder');
 const stdPath = require('path');
-const Http = require('./Http');
 const config = require("../config")();
 const fs = require('../../util/fileSystem');
 
@@ -61,8 +60,8 @@ function getRegistry (archive, hosts, substrateImpls) {
     .reduce((lookup, artifactTuple) => {
       const artifact = artifactTuple[1];
       const hostName = artifactTuple[0];
-      lookup[artifact.name] = (artifact.media === '.txt'
-        ? loadResource: loadFunction)(artifact, archive, hostName, substrateImpls);
+      lookup[artifact.name] = (artifact.media === '.js'
+        ? loadFunction: loadResource)(artifact, archive, hostName, substrateImpls);
       return lookup;
     }, {});
 }
@@ -97,9 +96,10 @@ function loadFunction (artifact, archive, hostName, substrateImpls) {
 }
 
 function loadResource (artifact, archive) {
-  const filePath = stdPath.join(
-    artifact.name,
-    "data.txt");
+  const fileName = artifact.absolutePath === false
+    ? `data${artifact.media}`
+    : stdPath.basename(artifact.absolutePath);
+  const filePath = stdPath.join(artifact.name, fileName);
 
   return async function () {
     return archive.read(filePath).toString();

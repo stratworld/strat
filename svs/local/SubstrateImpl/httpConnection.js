@@ -11,7 +11,7 @@ module.exports = function () {
       const body = Buffer.concat(chunks).toString();
       dispatch({
         path: request.url,
-        method: request.method,
+        method: request.method.toLowerCase(),
         body: chunks.length > 0 ? body : undefined
       })
       .then(result => format(result, response))

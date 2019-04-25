@@ -5,5 +5,5 @@ source Http {
 
   Birth -> SUBSTRATE.httpConnection
   Extern -> SUBSTRATE.httpReception
-  match (any):any -> "./httpMatcher.js"
+  match (any):any -> "../httpMatcher.bundle.js"
 }
