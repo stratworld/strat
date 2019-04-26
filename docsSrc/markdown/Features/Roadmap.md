@@ -2,9 +2,27 @@
 
 The following features are presented in rough priority order.  The work required varies greatly between epic, with some requiring language development expertise and others DevOps skills and experience with proprietary clouds.
 
+# Namespaces
+
+We essentially just have textual inclusion (not exactly but close) right now, which is fine for MVP but will suck long term.
+
 # Runtime Instrumentation & Insight
 
-When people first encounter Strat their immediate reservations are usually around how Strat impacts traditional operational tasks and best practices like monitoring, alarming, and logging.  Also, nearly everyone wants to know what "stuff" gets built--they want to get their hands on the infrastructure.  Strat has to walk the line between making users comfortable (and effective) in the short term while working to make these concerns obsolete in the long term.
+When people first encounter Strat their immediate reservations are usually around how Strat impacts traditional operational tasks and best practices like monitoring, alarming, and logging.  Also, nearly everyone wants to know what "stuff" gets built--they want to get their hands on the infrastructure.  Strat has to walk the line between making users comfortable (and effective) in the short term while working to make these concerns obsolete in the long term.  System stack traces are a great step in this direction, and they're a perfect example of something Strat is better positioned to do relative to traditional software.
+
+# std Libraries
+
+## stdBlob
+
+Nearly every language has a file system standard library.  The "file system" of the cloud may very well be blob storage.  It should be fairly straightforward to provide a get/put API that works for every cloud and single machines.
+
+## stdSQL
+
+Much more ambitious than stdBlob is an SQL service that's always available on any Strat substrate (think "give me the SQL database on this cloud machine").  From a point of view disconnected from the mountain of human effort spent on operating SQL instances, it seems possible.  Ambitious, but possible.
+
+## stdLog
+
+What does "console.log" or "println" translate to in a cloud?  The requirements for this will evolve based on early users' needs for debugging and logging.
 
 # Shapes (types) & OpenAPI Integration
 
@@ -30,6 +48,17 @@ Nobody has been particularly successful at addressing all 3 of these concerns--t
 
 Its worth mentioning that traditional type algebra and much of type systems theory is not applicable to Strat because Strat functions don't invoke other Strat functions within Strat program text.  For example, if a program has the following functions:
 
+Some type system properties, and notes along with them:
+
+strong
+  - When deserializing events we'll be beholden to the target language's type system--its best to select the stricter option (vs weak) so we don't conflict with target languages' type systems.
+static
+  - We'll need to generate types at compile time for component languages
+structural
+  - Nominal type systems have fallen out of favor with software engieers recently for good reason.  Structural systems deal with changing data better than nominal systems.  With a structural type system users can aopt changing APIs at their own pace (assuming only additions are made), and API designers can add functionality freely without breaking existing API surface area.  TODO: how do these structural types map to nominal types in, for instance, Java?
+non-behavioral
+  - Events can't (and shouldn't) contain behavior like functions.
+
 ```strat
   foo (int):string
   bar ():int
@@ -53,104 +82,15 @@ Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goal
 
 Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  Its not clear what APIGateway brings to the table for Strat other than a massive latency tax.  The optimal solution is likely some combination of direct Lambda calls, CloudFront->Lambda, and CloudFront->s3.  This is all pretty in-the-weeds of AWS, but the current state of affairs of 500ms for a simple api call is not acceptable for a production system, and if we're to make good on "better infrastructure than you're making by hand" a realistic goal should be TP99 <50ms api calls (assuming they terminate in a single lambda, and assuming the client is in a place close-ish to an AWS datacenter).
 
-# "public by" / Custom connection semantics
+# "public by" / Custom connection semantics / Versioning
 
-Right now when a user adds the public keyword to a function they get a bare-bones https based rest client.  Users will want to specify how clients will connect to their systems to add authentication/authorization.
-
-# Runtime Pattern Matching + Values
-
-In the code:
-```
-Http { method: "get" } ->
-```
-
-{ method: "get" } represents a pattern that should be matched by the strat runtime.  Right now, this matching is done within the Http event source's proxy function, but there's no reason the runtime shouldn't handle this branching.  This feature is important to decrease the barrier to entry for writing custom sources.
-
-Related to generic pattern definition is generic value definition, or expanding the string literal artifact with any JSON-y object.
-
-
-# Dispatch Grammar Reduction
-
-There are several different hard-coded grammar productions for dispatches and functions that should be generic.  Immagine the following:
-
-```
-Cron { "/5****" } -> "Every 5th minute",
-Cron { "0****" } -> "Every hour" ->
-  myFunc ():any -> "./myFunc.js"
-```
-
-This is a way events can be translated into constants then sent to an artifact. Or this:
-
-```
-Http { } -> "./myProxy.js" -> Other.myFn
-```
-
-My best idea for how this would work is dynamically generating composed pipelines in stratc:
-
-```st
-service Composition {
-  Http { } -> "./myProxy.js" -> Other.myFn
-}
-```
-
-Would become:
-
-```
-service Composition {
-  Http {} -> compositionPipeline_AB ():any -> 
-    "./strat_generated_Composition_AB.js"
-  compositionPipeline_AB_A ():any -> "./myProxy.js"
-  compositionPipeline_AB_B ():any -> Other.myFn
-}
-```
- Where "strat\_generated\_Composition\_AB.js" is some buffer generated at compile time that will compose the two functions A and B.
-
-# Strat.emit & Source Extensions
-
-Immagine the usecase of a custom 404 page.  Here's some mock-y Strat that could do that:
-
-```st
-source CustomErrorHttp {
-  include "Http"
-
-  notFound ():any -> "<h1>custom 404 page</h1>"
-
-  Http {} -> customHttp ():any -> "./customHttp.js"
-}
-```
-```javascript
-const Strat = require('strat');
-module.exports = async event => {
-
-  // Strat.emit creates a "CustomErrorHttp" event and attempts to route it
-  // to a receiver
-  // strat runtime tries to find a receiver through pattern matching
-  // returns undefined if nobody matches
-  // or maybe throws
-  try {
-    return Strat.emit(event);
-  } catch (something) {
-    return Strat('CustomErrorHttp.notFound')();
-  }
-};
-```
-```st
-source CustomHttpConsumer {
-  include "./CustomErrorHttp"
-
-  CustomErrorHttp { method: "get" path: "*"} -> "<h1>thing</h1>"
-}
-```
+Early versions of the compiler had a public keyword that would generate a bunch of Strat code that 3rd parties could use to include your running service.  The long term version for this is to allow users to provide connection semantics as a sort of mini-SDK that Strat would make available and download for 3rd parties.  I removed it from the compiler because it wasn't complete or thought-through enough, with the major gap bieng how users would version their "public" apis.
 
 # Browser Host
 
 This is so that users can call Strat("Books.getBooks") inside a browser and a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utilizing direct Lambda calls.
 
 This also opens the way for people to write client-side "services" that can be included and run inside a user's browser.  The big question here is how does Strat know / how does the user specify that a particular service should be client-side.
-
-# Foreign Source/Service Interface
-
-Strat needs a way for developers to add source and service libraries that expose more exotic infrastructure that a particular substrate provides.  This problem is analagous to foreign function interfaces in normal languages.
 
 # Config Settings
 
@@ -163,18 +103,14 @@ Right now the svs.json is very bare-bones.  This is great.  Config files suck.  
 
 # Language Support
 
-Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  For a language to be supported by Strat, it must have the following features:
-
-  - Basic SDK support for all major cloud providers
-
-Languages that are aligned with Strat's performance tradeoffs and user experience biases are higher priority.
+Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  Languages that are aligned with Strat's performance tradeoffs and user experience biases are higher priority.
 
 ## High Priority Languages
 
   - Python
   - Go (requires shapes complete)
   - JVM (requires shapes complete for Java & Kotlin)
-  
+
 ## Low Priority Languages
 
   - .Net (if Azure substrate is completed this bumps up)

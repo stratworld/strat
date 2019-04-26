@@ -6,7 +6,6 @@ module.exports = match => {
     return matchError(parseInt(match.pattern), req);
   }
   if (match.pattern === 'any'
-    //todo: match on any numeric status > 200
     || (match.pattern == 404 && match.event == 404)) {
     return {
       matched: true,

@@ -67,6 +67,7 @@ describe('hosts', () => {
   it('should not include Xs functions inside Https host', async () => {
     const result = await hosts(httpService);
     const servicesWithFunctionsOnThisHost = result.hosts.Http.artifacts
+      .filter(a => a.name.indexOf('reflect') === -1)
       .toMap(v => true, k => k.name.split('.')[0]);
     assert(result.hosts.Http.containers.X === undefined);
     assert(servicesWithFunctionsOnThisHost['X'] === undefined);

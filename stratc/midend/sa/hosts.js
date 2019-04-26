@@ -8,6 +8,8 @@ module.exports = deps => ast => {
       artifacts: []
     });
 
+  const reflectFns = {};
+
   traverse(ast, ['file', 'service|source'])
     .flatmap(container => traverse(container, ['body', 'function'])
       .map(fn => [getName(container), fn]))
@@ -15,14 +17,18 @@ module.exports = deps => ast => {
       const containerName = containerFnTuple[0];
       const fnAst = containerFnTuple[1];
       const targetHost = hosts[ast.movedScopes[containerName] || containerName];
-      
+
       // dangerous javascript mutation bugs lurk here:
       // need to be careful to create new objects for the hosts
       targetHost.containers = Object.assign({
         [containerName]: true
       }, targetHost.containers);
+      const artifact = getArtifact(fnAst, containerName);
+      if (artifact.name.indexOf('.reflect') > -1) {
+        reflectFns[containerName] = artifact;
+      }
       targetHost.artifacts
-        = targetHost.artifacts.concat(getArtifact(fnAst, containerName));
+        = targetHost.artifacts.concat(artifact);
     });
 
   hosts
@@ -31,6 +37,11 @@ module.exports = deps => ast => {
       const name = kvp[0];
       const host = kvp[1];
       host.inScope = ast.scopes[name];
+      const reflectFnsToAdd = host.inScope
+        .keys()
+        .filter(containerName => !host.containers[containerName])
+        .map(containerName => reflectFns[containerName]);
+      host.artifacts = host.artifacts.concat(reflectFnsToAdd);
     });
 
   ast.hosts = hosts;

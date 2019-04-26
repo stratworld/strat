@@ -69,12 +69,17 @@ function getAbsolutifier (declaredFile, ast, deps, stdNames) {
     nodeAst.artifact = {
       token: nodeAst.tokens.artifact,
       declaredFile: declaredFile,
-      isResource: traverse(nodeAst, ['functionName', 'signature'])[0] === undefined,
+      isResource: isResource(nodeAst, path),
       absolutePath: path,
       type: isText ? 'text' : isArtifactUrl ? 'url' : 'file',
       media: isText ? '.txt' : context.path.extname(path)
     };
   }
+}
+
+function isResource (nodeAst, path) {
+  return !path
+    || traverse(nodeAst, ['functionName', 'signature'])[0] === undefined
 }
 
 function absolutify(declaredFile, artifactText, context, stdNames) {

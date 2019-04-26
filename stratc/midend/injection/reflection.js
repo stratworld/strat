@@ -54,7 +54,8 @@ function getFunctions (container) {
       const fnName = traverse(fn, ['functionName'])[0]
       return {
         name: val(fnName, 'name'),
-        line: line(fnName, 'name')
+        line: line(fnName, 'name'),
+        media: fn.artifact.media
       };
     });
 }

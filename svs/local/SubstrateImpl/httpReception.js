@@ -12,37 +12,56 @@ module.exports = async function formatHttpEvent (rawRequest) {
   }
 };
 
-function success (body) {
+function success (emitResponse) {
   return {
     status: 200,
-    body: body
+    ...emitResponse
+  };
+}
+
+function errorContentType () {
+  return {
+    headers: {
+      'Content-Type': 'text/html'
+    }
   };
 }
 
 async function tryEmitNotFound (e) {
   try {
-    return success(await emit({status: 404, error: e}));
+    const custom404 = await emit({status: 404, error: e});
+    return {
+      status: 404,
+      ...custom404
+    };
   } catch (stillNotFound) {
     if (stillNotFound.message.indexOf('No match') > -1) {
       return {
         status: 404,
-        body: 'not found'
+        body: 'not found',
+        ...errorContentType()
       };
     }
     return {
       status: 500,
-      body: stillNotFound.stack
+      body: stillNotFound.stack,
+      ...errorContentType()
     };
   }
 }
 
 async function tryEmitError (e) {
   try {
-    return success(await emit({status: 500, error: e}));
+    const customError = await emit({status: 500, error: e});
+    return {
+      status: 500,
+      ...customError
+    };
   } catch (stillError) {
     return {
       status: 500,
-      body: e.stack
+      body: e.stack,
+      ...errorContentType()
     };
   }
 }
