@@ -60,8 +60,8 @@ function getRegistry (archive, hosts, substrateImpls) {
     .reduce((lookup, artifactTuple) => {
       const artifact = artifactTuple[1];
       const hostName = artifactTuple[0];
-      lookup[artifact.name] = (artifact.media === '.js'
-        ? loadFunction: loadResource)(artifact, archive, hostName, substrateImpls);
+      lookup[artifact.name] = (artifact.isResource
+        ? loadResource: loadFunction)(artifact, archive, hostName, substrateImpls);
       return lookup;
     }, {});
 }

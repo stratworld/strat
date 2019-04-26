@@ -58,7 +58,8 @@ function getAbsolutifier (declaredFile, ast, deps, stdNames) {
   const context = isUrlContext ? deps.internet : deps.fs;
   return function (nodeAst) {
     const artifactText = val(nodeAst, 'artifact');
-    const isArtifactUrl = deps.internet.isUrl(artifactText);
+    const isArtifactUrl = deps.internet.isUrl(declaredFile)
+      || deps.internet.isUrl(artifactText);
     const path = absolutify(
       declaredFile,
       artifactText,
@@ -68,6 +69,7 @@ function getAbsolutifier (declaredFile, ast, deps, stdNames) {
     nodeAst.artifact = {
       token: nodeAst.tokens.artifact,
       declaredFile: declaredFile,
+      isResource: traverse(nodeAst, ['functionName', 'signature'])[0] === undefined,
       absolutePath: path,
       type: isText ? 'text' : isArtifactUrl ? 'url' : 'file',
       media: isText ? '.txt' : context.path.extname(path)
