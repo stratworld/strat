@@ -1,6 +1,6 @@
 {
   "name": "stratc",
-  "version": "0.2.13",
+  "version": "0.3.2",
   "description": "A language to represent and execute intent for cloud infrastructure",
   "main": "stratc.js",
   "preferGlobal": true,
