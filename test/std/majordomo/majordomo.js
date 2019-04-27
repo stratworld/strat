@@ -1,5 +1,9 @@
 const assert = require('assert');
 const hoster = require('./domoHoster');
+const birth = {
+  _stratEvent: 'Birth',
+  event: 'Birth'
+};
 
 describe('majordomo', () => {
   it('should depend on majordomoConfig', async () => {
@@ -22,7 +26,7 @@ describe('majordomo', () => {
       }
     }, 'test');
 
-    await host.dispatch('Birth');
+    await host.dispatch(birth);
     assert(called);
   });
   it('should resolve function names', async () => {
@@ -42,7 +46,7 @@ describe('majordomo', () => {
       'test.x': () => 'x called'
     }, 'test');
 
-    const r = await host.dispatch('Birth');
+    const r = await host.dispatch(birth);
     assert.deepStrictEqual(r, {'test.foo':'x called'});
   });
   describe('resolution', () => {
@@ -64,7 +68,7 @@ describe('majordomo', () => {
       }, 'test');
 
       try {
-        await host.dispatch('Birth');
+        await host.dispatch(birth);
         assert(false);
       } catch (e) {
         assert(e.message.indexOf('NotInScope.x is undefined') > -1)
@@ -97,7 +101,7 @@ describe('majordomo', () => {
           }, 'test');
 
           try {
-            await host.dispatch('Birth');
+            await host.dispatch(birth);
             assert(false);
           } catch (e) {
             assert(e.message.indexOf('Input to strat must be a string') > -1);
@@ -126,7 +130,7 @@ describe('majordomo', () => {
         }
       }, 'test');
 
-      const r = await host.dispatch('Birth');
+      const r = await host.dispatch(birth);
       assert.deepStrictEqual(r, {'test.foo': true});
     })
   });
@@ -155,7 +159,7 @@ describe('majordomo', () => {
         }
       }, 'test');
 
-      await host.dispatch('Birth');
+      await host.dispatch(birth);
       assert(event._stratCallee === 'AnotherHost.x');
     });
     it('should not wrap extern events', async () => {

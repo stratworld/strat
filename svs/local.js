@@ -1,10 +1,13 @@
 const nodeEval = require('node-eval');
 const Archive = require('../util/archiveBuilder');
 const fs = require('../util/fileSystem');
-
-module.exports = async function (saData) {
+const localImplFolder = fs.path.resolve(__dirname, './SubstrateImpl');
+module.exports = async function (saData, implDir, birthArgs) {
+  if (implDir === undefined) {
+    implDir = localImplFolder;
+  }
   const archive = new Archive(saData);
-  const substrateImpls = await getSubstrateImpls();
+  const substrateImpls = await getSubstrateImpls(implDir);
 
   const hosts = JSON.parse(archive.read('hosts.json').toString());
 
@@ -19,7 +22,7 @@ module.exports = async function (saData) {
   hijack.setRegistry(registry);
 
   try {
-    printBirthResults(await birth(hosts, hijack));
+    printBirthResults(await birth(hosts, hijack, birthArgs));
     process.exit(0);
   } catch (e) {
     console.log(e.stack);
@@ -96,9 +99,12 @@ function loadResource (artifact, archive) {
   }
 }
 
-async function birth (hosts, hijack) {
+async function birth (hosts, hijack, birthArgs) {
   return Promise.all(hosts.keys().map(async hostName => {
-    return await hijack.dispatch(hostName, 'Birth');
+    return await hijack.dispatch(hostName, {
+      _stratEvent: 'Birth',
+      event: birthArgs
+    });
   }));
 }
 
@@ -112,8 +118,7 @@ function printBirthResults (birthResultsArray) {
     });
 }
 
-async function getSubstrateImpls () {
-  const implDir = fs.path.resolve(__dirname, './SubstrateImpl')
+async function getSubstrateImpls (implDir) {
   const implFileNames = await fs.ls(implDir);
 
   const implFileData = (await Promise.all(implFileNames

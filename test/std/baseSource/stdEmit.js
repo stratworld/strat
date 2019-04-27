@@ -2,6 +2,10 @@ const assert = require('assert');
 const hoster = require('../majordomo/domoHoster');
 const stdPath = require('path');
 const StratError = require('../../../std/majordomo/StratError');
+const birth = {
+  _stratEvent: 'Birth',
+  event: 'Birth'
+};
 
 async function getRuntime (stuff, subs, async) {
   return (await hoster(Object.assign({
@@ -38,7 +42,7 @@ describe('stdEmit', () => {
       'test.got': e => 'my result'
     }, [{ pattern: 'any', reference: 'test.got'}]);
     
-    const x = await d('Birth');
+    const x = await d(birth);
     assert.deepStrictEqual(x, {'test.entry': 'my result'});
   });
   it('should throw if no match is found', async () => {
@@ -52,7 +56,7 @@ describe('stdEmit', () => {
     }, [{ pattern: 'x', reference: 'test.got'}]);
     
     try {
-      await d('Birth');
+      await d(birth);
       assert(false);
     } catch (e) {
       assert(e instanceof StratError);
@@ -70,7 +74,7 @@ describe('stdEmit', () => {
     }, [{ pattern: 'x', reference: 'test.got'},{ pattern: 'any', reference: 'test.got'} ]);
     
     try {
-      await d('Birth');
+      await d(birth);
       assert(false);
     } catch (e) {
       assert(e instanceof StratError);
@@ -93,7 +97,7 @@ describe('stdEmit', () => {
       { pattern: 'any', reference: 'test.got'}
     ], true);
     
-    await d('Birth');
+    await d(birth);
     assert(counter === 2);
   });
   it('should pass a mutated event', async () => {
@@ -109,7 +113,7 @@ describe('stdEmit', () => {
       }
     }, [{ pattern: 'x', reference: 'test.got'}]);
     
-    const result = await d('Birth');
+    const result = await d(birth);
     assert.deepStrictEqual(result, {'test.entry':'mutated'});
   });
 });

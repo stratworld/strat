@@ -55,7 +55,8 @@ function getFunctions (container) {
       return {
         name: val(fnName, 'name'),
         line: line(fnName, 'name'),
-        media: fn.artifact.media
+        media: fn.artifact.media,
+        isResource: fn.artifact.isResource
       };
     });
 }

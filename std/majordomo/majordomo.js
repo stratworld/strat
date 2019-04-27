@@ -34,14 +34,14 @@ module.exports = async function (rawInvoker, myHostName) {
 
   Majordomo.dispatch = async rawEvent => {
     const caller = captureCaller(stackTrace.get());
-    if (rawEvent === 'Birth') {
+    if (typeof rawEvent === 'object' && rawEvent._stratEvent === 'Birth') {
       try {
         const config = await Majordomo(`${myHostName}.majordomoConfig`)();
         const births = config.birth;
         var birth, i = 0, length = births.length, birthResults = {};
         for(; i<length; i++) {
           birth = births[i];
-          birthResults[birth] = await Majordomo(birth)('Birth');
+          birthResults[birth] = await Majordomo(birth)(rawEvent.event);
         }
         return birthResults;
       } catch (e) {

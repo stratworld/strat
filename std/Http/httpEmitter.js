@@ -13,7 +13,7 @@ const contentTypes = {
   '.txt': 'text/plain'
 };
 
-module.exports = async event => {
+async function emit (event) {
   const referenceTuple = await stdEmit(event);
   const reference = referenceTuple[1];
   const mutatedEvent = referenceTuple[0];
@@ -23,23 +23,94 @@ module.exports = async event => {
   const referenceReflect = Strat(`${referenceService}.reflect`);
   const referenceDeclaration = await referenceReflect();
 
-  const referenceMedia = referenceDeclaration
+  const referenceFnDeclaration = referenceDeclaration
     .functions
     .filter(fn => fn.name === referenceFnName)
-    .map(dec => dec.media)
     [0];
 
+  const media = referenceFnDeclaration.isResource
+    ? referenceFnDeclaration.media
+    : '.json'
+
   const headers = {
-    'Content-Type': contentTypes[referenceMedia] || contentTypes['.txt']
+    'Content-Type': contentTypes[media] || contentTypes['.txt']
   };
 
-  //todo: errors?
   const callResult = await (Strat(reference)(mutatedEvent));
   return {
     body: callResult,
     headers: headers
   };
 }
+
+module.exports = async function emitHttpEvent (rawRequest) {
+  try {
+    return success(await emit(rawRequest));
+  } catch (e) {
+    if (e.message.indexOf('No match') > -1) {
+      return await tryEmitNotFound(e);
+    }
+    return await tryEmitError(e);
+  }
+};
+
+function success (emitResponse) {
+  return {
+    status: 200,
+    ...emitResponse
+  };
+}
+
+function errorContentType () {
+  return {
+    headers: {
+      'Content-Type': 'text/html'
+    }
+  };
+}
+
+async function tryEmitNotFound (e) {
+  try {
+    const custom404 = await emit({status: 404, error: e});
+    return {
+      status: 404,
+      ...custom404
+    };
+  } catch (stillNotFound) {
+    if (stillNotFound.message.indexOf('No match') > -1) {
+      return {
+        status: 404,
+        body: 'not found',
+        ...errorContentType()
+      };
+    }
+    return {
+      status: 500,
+      body: stillNotFound.stack,
+      ...errorContentType()
+    };
+  }
+}
+
+async function tryEmitError (e) {
+  try {
+    const customError = await emit({status: 500, error: e});
+    return {
+      status: 500,
+      ...customError
+    };
+  } catch (stillError) {
+    return {
+      status: 500,
+      body: e.stack,
+      ...errorContentType()
+    };
+  }
+}
+
+
+
+
 
 // This is pretty much copy+paste stdEmit.
 // Need an interface from stdEmit that you can extend.
