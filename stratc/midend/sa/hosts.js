@@ -1,4 +1,4 @@
-const {traverse, getName} = require('../../ast');
+const {traverse, getName, val} = require('../../ast');
 
 module.exports = deps => ast => {
   const hosts = ast.scopes.keys()
@@ -37,6 +37,10 @@ module.exports = deps => ast => {
       const name = kvp[0];
       const host = kvp[1];
       host.inScope = ast.scopes[name];
+      //todo: do something clever here?
+      //like a checksum or something?
+      host.id = val(ast, 'id');
+      host.name = name;
       const reflectFnsToAdd = host.inScope
         .keys()
         .filter(containerName => !host.containers[containerName])

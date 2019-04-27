@@ -19,13 +19,16 @@ async function buildSysArchive (deps, hosts) {
         const fileName = artifact.absolutePath
           ? deps.fs.path.basename(artifact.absolutePath)
           : `data${artifact.media}`;
+        const saPath = `${artifact.name}/${fileName}`;
         archive.addDataAsFile(
           artifact.data,
-          `${artifact.name}/${fileName}`);
+          saPath);
+        artifact.saPath = saPath;
         delete artifact.data;
         delete artifact.declaredFile;
         delete artifact.type;
         delete artifact.token;
+        delete artifact.absolutePath;
       });
     });
 

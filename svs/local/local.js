@@ -70,10 +70,7 @@ function getRegistry (archive, hosts, substrateImpls) {
 //maybe not; maybe the domo does everything
 //maybe the domo turns shit to gold
 function loadFunction (artifact, archive, hostName, substrateImpls) {
-  const fileName = artifact.absolutePath === false
-    ? `data${artifact.media}`
-    : stdPath.basename(artifact.absolutePath);
-  var filePath = stdPath.join(artifact.name, fileName);
+  var filePath = artifact.saPath;
 
   const substrateImpl = substrateImpls.get(artifact.name);
   var data;
@@ -96,13 +93,8 @@ function loadFunction (artifact, archive, hostName, substrateImpls) {
 }
 
 function loadResource (artifact, archive) {
-  const fileName = artifact.absolutePath === false
-    ? `data${artifact.media}`
-    : stdPath.basename(artifact.absolutePath);
-  const filePath = stdPath.join(artifact.name, fileName);
-
   return async function () {
-    return archive.read(filePath).toString();
+    return archive.read(artifact.saPath).toString();
   }
 }
 

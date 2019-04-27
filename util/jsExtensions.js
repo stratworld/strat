@@ -126,7 +126,7 @@ Object.defineProperty(Object.prototype, 'intersect',{
   value: function(other) {
     return Object.keys(this)
       .filter(key => other[key] !== undefined)
-      .constantMapping(true);
+      .toMap(key => this[key])
   },
   writable: true,
   configurable: true,
