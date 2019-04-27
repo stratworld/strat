@@ -24,12 +24,21 @@ async function buildSysArchive (deps, hosts) {
           artifact.data,
           saPath);
         artifact.saPath = saPath;
-        delete artifact.data;
-        delete artifact.declaredFile;
-        delete artifact.type;
-        delete artifact.token;
-        delete artifact.absolutePath;
       });
+    });
+
+  //Mutating the artifacts within the loop above can cause bugs
+  // because some artifacts are referenced in more than one host
+  // (like the reflect functions for example)
+  (hosts || {})
+    .values()
+    .flatmap(host => host.artifacts)
+    .forEach(artifact => {
+      delete artifact.data;
+      delete artifact.declaredFile;
+      delete artifact.type;
+      delete artifact.token;
+      delete artifact.absolutePath;
     });
 
   archive.addDataAsFile(Buffer.from(JSON.stringify(hosts)), 'hosts.json');

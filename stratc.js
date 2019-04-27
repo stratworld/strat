@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const compilerConstructor = require('./stratc/compiler');
-const svs = require('./svs/substrateFactory')();
+const svs = require('./svs/local');
 const defaultFs = require('./util/fileSystem');
 const defaultLoader = require('./util/loader');
 const defaultInternet = require('./util/theInternet');
@@ -67,10 +67,6 @@ if (typeof command === 'string' && filename === undefined) {
     filename = command;
     command = 'deploy';
   }
-}
-
-if (command === '--aws' || command === '--local') {
-  command = 'deploy';
 }
 
 if (command === 'help' || command === '-h' || command === '--help') {

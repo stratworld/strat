@@ -1,8 +1,6 @@
 const nodeEval = require('node-eval');
-const Archive = require('../../util/archiveBuilder');
-const stdPath = require('path');
-const config = require("../config")();
-const fs = require('../../util/fileSystem');
+const Archive = require('../util/archiveBuilder');
+const fs = require('../util/fileSystem');
 
 module.exports = async function (saData) {
   const archive = new Archive(saData);
