@@ -1,6 +1,6 @@
 {
   "name": "stratc",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A language for building cloud systems",
   "main": "stratc.js",
   "preferGlobal": true,
@@ -32,13 +32,13 @@
   "homepage": "https://github.com/CaptainCharlieGreen/LitSystemLanguage#readme",
   "dependencies": {
     "adm-zip": "^0.4.13",
-    "node-eval": "^2.0.0"
+    "node-eval": "^2.0.0",
+    "stack-trace": "0.0.10"
   },
   "devDependencies": {
     "mocha": "^5.2.0",
     "path-to-regexp": "^3.0.0",
     "showdown": "^1.9.0",
-    "stack-trace": "0.0.10",
     "webpack": "^4.30.0"
   }
 }

@@ -5,9 +5,9 @@ Strat is a language to represent and deploy portable cloud systems.  Strat is th
 Create HelloWorld.st:
 ```st
 service HelloWorld {
-  include "Http"
+  include "Birth"
 
-  Http { method: "get", path: "*" } -> "Hello World!"
+  Birth -> "Hello World!"
 }
 ```
 Then in your terminal ([requires npm](https://nodejs.org/en/)):
@@ -15,7 +15,6 @@ Then in your terminal ([requires npm](https://nodejs.org/en/)):
 npm install -g stratc
 stratc ./HelloWorld.st && stratc ./HelloWorld.sa
 ```
-See it at [localhost:3000](http://localhost:3000).
 
 With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments anymore.  The Strat compiler figures out how to host your system for you.  You write your system components as simple functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.
 

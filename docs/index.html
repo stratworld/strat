@@ -45,16 +45,15 @@
 <p>Strat is a language to represent and deploy portable cloud systems.  Strat is the first "infrastructure as high level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's what the future looks like:</p>
 <p>Create HelloWorld.st:</p>
 <pre><code class="st language-st">service HelloWorld {
-  include "Http"
+  include "Birth"
 
-  Http { method: "get", path: "*" } -&gt; "Hello World!"
+  Birth -&gt; "Hello World!"
 }
 </code></pre>
 <p>Then in your terminal (<a href="https://nodejs.org/en/">requires npm</a>):</p>
 <pre><code class="sh language-sh">npm install -g stratc
 stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
 </code></pre>
-<p>See it at <a href="http://localhost:3000">localhost:3000</a>.</p>
 <p>With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments anymore.  The Strat compiler figures out how to host your system for you.  You write your system components as simple functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.</p>
 <h3 id="betterinfrastructurethanwhatyourebuildingbyhand">Better infrastructure than what you're building by hand</h3>
 <p>Just how language compilers like gcc optimize your code, <strong>Strat's compiler optimizes your infrastructure to be:</strong></p>

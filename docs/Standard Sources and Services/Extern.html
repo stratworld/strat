@@ -42,7 +42,15 @@
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="extern">Extern</h1>
-<p>todo</p></div>
+<p>When building a source that will recieve events external to your Strat system, you must specify an Extern dispatch function so Strat knows which component in your source responds to these external events.</p>
+<h3 id="usage">Usage:</h3>
+<pre><code>source MySource {
+  include "Extern"
+  Extern -&gt; reception (any):any -&gt; "./myReception.js"
+}
+</code></pre>
+<p>Extern is a special source that isn't actually implemented in Strat and doesn't take a pattern.  When the Strat runtime cannot identify an event, it assumes its an external event and sends it, undisturbed, to the Extern function.  Then, the response from the Extern function is sent back as a response to the Extern event.</p>
+<p>Stratc's implementation of Extern places only a single Extern event on each infrastructure component since Strat has no way to differentiate between Extern events.  This is one of the major reasons to split software components into multiple pieces infrastrucutre, so users should be discerning in their use of Extern.</p></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>
