@@ -1,5 +1,17 @@
 # AWS SVS (staws) Guide
 
+## Install (requires npm)
+
+```bash
+npm install -g staws
+```
+
+## Run
+
+```bash
+staws HelloWorld.sa
+```
+
 Staws uses Lambda, API Gateway, and IAM to fulfill users' infrastructure requirements.  It maps each host within a .sa file to a single lambda and implements Http with API Gateway.  It creates new IAM roles for each deploy based on the ID of the .sa file, and it creates a new role for each lambda and API Gateway.  To do so, it needs access to a user with the following minimum IAM policy configuration:
 
 ```json
@@ -89,3 +101,5 @@ If your component code needs to access addtional resources outside those created
 The roles property is a map where keys are service or source names that should get extra permissions, and the values are lists of IAM-policy-document-like (the capitalization is different) objects.
 
 Action must be an array of strings, each of which must be an [AWS Action](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html).  Unfortuately, these are pretty hard to look up.  You can run your code and see what errors occur--AWS is good about letting you know what action you need.
+
+# [Source Code](https://github.com/stratworld/staws)

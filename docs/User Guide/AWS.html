@@ -42,6 +42,12 @@
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="awssvsstawsguide">AWS SVS (staws) Guide</h1>
+<h2 id="installrequiresnpm">Install (requires npm)</h2>
+<pre><code class="bash language-bash">npm install -g staws
+</code></pre>
+<h2 id="run">Run</h2>
+<pre><code class="bash language-bash">staws HelloWorld.sa
+</code></pre>
 <p>Staws uses Lambda, API Gateway, and IAM to fulfill users' infrastructure requirements.  It maps each host within a .sa file to a single lambda and implements Http with API Gateway.  It creates new IAM roles for each deploy based on the ID of the .sa file, and it creates a new role for each lambda and API Gateway.  To do so, it needs access to a user with the following minimum IAM policy configuration:</p>
 <pre><code class="json language-json">{
   "Version": "2012-10-17",
@@ -109,7 +115,8 @@
 }
 </code></pre>
 <p>The roles property is a map where keys are service or source names that should get extra permissions, and the values are lists of IAM-policy-document-like (the capitalization is different) objects.</p>
-<p>Action must be an array of strings, each of which must be an <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html">AWS Action</a>.  Unfortuately, these are pretty hard to look up.  You can run your code and see what errors occur--AWS is good about letting you know what action you need.</p></div>
+<p>Action must be an array of strings, each of which must be an <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html">AWS Action</a>.  Unfortuately, these are pretty hard to look up.  You can run your code and see what errors occur--AWS is good about letting you know what action you need.</p>
+<h1 id="sourcecodehttpsgithubcomstratworldstaws"><a href="https://github.com/stratworld/staws">Source Code</a></h1></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

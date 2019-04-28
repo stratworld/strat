@@ -54,14 +54,9 @@
 <ul>
 <li>compiles the file and builds a .sa file</li>
 <li>EX: $ stratc ./HelloWorld.st</li></ul></li>
-<li><p>[--{svs implementation}] {.sa file}</p>
+<li><p>{.sa file}</p>
 <ul>
-<li>reads the .sa file and runs it on the specified SVS implementation</li>
-<li>if no svs is supplied, stratc checks for an svs.json and uses
-the value for "substrate" provided there.</li>
-<li>if no svs.json is supplied, the local svs is used</li>
-<li>valid svs implementations: [aws, local]</li>
-<li>EX: $ stratc --aws ./HelloWorld.sa</li>
+<li>reads the .sa file and runs it locally</li>
 <li>EX: $ stratc ./HelloWorld.sa</li></ul></li>
 <li><p>-v or --version</p>
 <ul>
