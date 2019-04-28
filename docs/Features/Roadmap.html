@@ -30,32 +30,36 @@
       <div><a class="nav-page" href="/Guides/Advanced Sales Service">Advanced Sales Service</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Sources</div>
-      <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
+    <div  class="heading">Specification</div>
+      <div><a class="nav-page" href="/Specification/Grammar">Grammar</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/SA Specification">SA Specification</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Specification</div>
-      <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/Manifesto">Manifesto</a></div>
+    <div  class="heading">Standard Sources and Services</div>
+      <div><a class="nav-page" href="/Standard Sources and Services/Birth">Birth</a><a class="nav-page" href="/Standard Sources and Services/Cron">Cron</a><a class="nav-page" href="/Standard Sources and Services/Extern">Extern</a><a class="nav-page" href="/Standard Sources and Services/Http">Http</a></div>
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="roadmap">Roadmap</h1>
 <p>The following features are presented in rough priority order.  The work required varies greatly between epic, with some requiring language development expertise and others DevOps skills and experience with proprietary clouds.</p>
 <h1 id="namespaces">Namespaces</h1>
-<p>We essentially just have textual inclusion (not exactly but close) right now, which is fine for MVP but will suck long term.</p>
+<p>Strat essentially just has textual inclusion (not exactly but close) right now, which is fine for MVP but will suck long term.</p>
 <h1 id="runtimeinstrumentationinsight">Runtime Instrumentation &amp; Insight</h1>
 <p>When people first encounter Strat their immediate reservations are usually around how Strat impacts traditional operational tasks and best practices like monitoring, alarming, and logging.  Also, nearly everyone wants to know what "stuff" gets built--they want to get their hands on the infrastructure.  Strat has to walk the line between making users comfortable (and effective) in the short term while working to make these concerns obsolete in the long term.  System stack traces are a great step in this direction, and they're a perfect example of something Strat is better positioned to do relative to traditional software.</p>
 <h1 id="stdlibraries">std Libraries</h1>
-<h2 id="stdblob">stdBlob</h2>
+<h3 id="blob">Blob</h3>
 <p>Nearly every language has a file system standard library.  The "file system" of the cloud may very well be blob storage.  It should be fairly straightforward to provide a get/put API that works for every cloud and single machines.</p>
-<h2 id="stdsql">stdSQL</h2>
-<p>Much more ambitious than stdBlob is an SQL service that's always available on any Strat substrate (think "give me the SQL database on this cloud machine").  From a point of view disconnected from the mountain of human effort spent on operating SQL instances, it seems possible.  Ambitious, but possible.</p>
-<h2 id="stdlog">stdLog</h2>
-<p>What does "console.log" or "println" translate to in a cloud?  The requirements for this will evolve based on early users' needs for debugging and logging.</p>
+<h3 id="cron">Cron</h3>
+<p>A source to include that dispatches events on a time schedule.</p>
+<h3 id="sql">SQL</h3>
+<p>Much more ambitious than Blob is an SQL service that's always available on any Strat substrate (think "give me the SQL database on this cloud machine").  From a point of view disconnected from the mountain of human effort spent on operating SQL instances and fussing with ORMs, it seems possible--ambitious, but possible.</p>
+<h3 id="log">Log</h3>
+<p>What does "console.log" or "println" translate to in a cloud?  The requirements for this will evolve based on early users' needs for debugging and logging.  This is deceptively complex--there is no nice terminal user interface.  The user interface may be something like an ElasticSearch console or some kind of log stream.</p>
+<h3 id="webhook">Webhook</h3>
+<p>This will be the root of many user sources.  A std module here would encapsulate setting up the Http endpoints and the Birth handshake between the two systems.</p>
 <h1 id="shapestypesopenapiintegration">Shapes (types) &amp; OpenAPI Integration</h1>
-<p>A core responsibility of Strat is to help users describe and communicate events.  The way programming languages have historically addresed this need is with type systems.  Strat will have a type system for events, but typing events will be very different from typing in memory data structures.</p>
+<p>A core responsibility of Strat is to help users describe and communicate events.  Strat will have a type system for events, but typing events will be very different from typing in memory data structures:</p>
 <p>Events</p>
 <ul>
 <li>(1) Don't exist on a single machine--they are serialized by nature<ul>
@@ -73,22 +77,12 @@
 <li>C) Be externalizable and have a separate lifespan than component software (2)</li>
 </ul>
 <p>Nobody has been particularly successful at addressing all 3 of these concerns--there's plenty of room for invention.  Thankfully, concern C runs in the same grain as the rest of Strat, which is a critical advantage over previous attempts which had types sit in the same ecosystem as component software.</p>
-<p>Its worth mentioning that traditional type algebra and much of type systems theory is not applicable to Strat because Strat functions don't invoke other Strat functions within Strat program text.  For example, if a program has the following functions:</p>
-<p>Some type system properties, and notes along with them:</p>
-<p>strong</p>
-<ul>
-<li>When deserializing events we'll be beholden to the target language's type system--its best to select the stricter option (vs weak) so we don't conflict with target languages' type systems.
-static</li>
-<li>We'll need to generate types at compile time for component languages
-structural</li>
-<li>Nominal type systems have fallen out of favor with software engieers recently for good reason.  Structural systems deal with changing data better than nominal systems.  With a structural type system users can aopt changing APIs at their own pace (assuming only additions are made), and API designers can add functionality freely without breaking existing API surface area.  TODO: how do these structural types map to nominal types in, for instance, Java?
-non-behavioral</li>
-<li>Events can't (and shouldn't) contain behavior like functions.</li>
-</ul>
-<pre><code class="strat language-strat">  foo (int):string
-  bar ():int
-</code></pre>
-<p>There's no place for a Strat type checker to assert foo(bar()) is valid and bar(foo()) is not.  This doesn't mean Strat is beyond type theory--for instance, predicate types and sum types would be great additions:</p>
+<p>As of now, I'd like Strat's type system to be:
+  -strong
+  -static
+  -structural
+  -non-behavioral
+  -with predicates ("n &gt; 0" as a subtype of the type "number"):</p>
 <pre><code class="strat language-strat">Http { status &gt; 200 } -&gt; "./errorPage.html"
 
 Http { method: "get"|"post" } -&gt; myFunction
@@ -96,19 +90,13 @@ Http { method: "get"|"post" } -&gt; myFunction
 <h3 id="priorart">Prior art</h3>
 <p>Engineers have made good headway with some of the challenges of describing events across organizations with the <a href="https://www.openapis.org/">OpenAPI Specification</a>.  Strat's type system notation shouldn't be YAML, but it can integrate with all of the other artifacts from the OAS ecosystem, and potentially produce an OAS YAML file.</p>
 <p>Clojure's <a href="https://clojure.org/guides/spec">Spec</a> shares many of the design goals of a Strat type system.</p>
-<h1 id="awssubstrateperformanceimprovementsongoing">AWS Substrate Performance Improvements (Ongoing)</h1>
-<p>Right now all http requests are sent to APIGateway and proxied to a lambda that routes.  Its not clear what APIGateway brings to the table for Strat other than a massive latency tax.  The optimal solution is likely some combination of direct Lambda calls, CloudFront-&gt;Lambda, and CloudFront-&gt;s3.  This is all pretty in-the-weeds of AWS, but the current state of affairs of 500ms for a simple api call is not acceptable for a production system, and if we're to make good on "better infrastructure than you're making by hand" a realistic goal should be TP99 &lt;50ms api calls (assuming they terminate in a single lambda, and assuming the client is in a place close-ish to an AWS datacenter).</p>
 <h1 id="publicbycustomconnectionsemanticsversioning">"public by" / Custom connection semantics / Versioning</h1>
 <p>Early versions of the compiler had a public keyword that would generate a bunch of Strat code that 3rd parties could use to include your running service.  The long term version for this is to allow users to provide connection semantics as a sort of mini-SDK that Strat would make available and download for 3rd parties.  I removed it from the compiler because it wasn't complete or thought-through enough, with the major gap bieng how users would version their "public" apis.</p>
 <h1 id="browserhost">Browser Host</h1>
 <p>This is so that users can call Strat("Books.getBooks") inside a browser and a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utilizing direct Lambda calls.</p>
 <p>This also opens the way for people to write client-side "services" that can be included and run inside a user's browser.  The big question here is how does Strat know / how does the user specify that a particular service should be client-side.</p>
-<h1 id="configsettings">Config Settings</h1>
-<p>Right now the svs.json is very bare-bones.  This is great.  Config files suck.  A large feature set left out of Strat is fine-grained infrastructure configuration, which was intentional, but users will need it eventually, and svs.json is the perfect place to put them.  In Java, for example, if you want to set how much RAM the JVM should consume you use config files, and if you want to control the resources Strat uses you should use stratconifg.  Some obvious use cases:</p>
-<ul>
-<li><p>I want a function to run by itself and not get collapsed from scope collapse, I should be able to specify in stratconfig "hey don't modify this"</p></li>
-<li><p>I want to set fine-grained AWS config values like timeout and concurrency for specific resources.</p></li>
-</ul>
+<h1 id="sourceserviceinclusionparameters">Source/Service inclusion parameters</h1>
+<p>When including a source a user (and the source's author) may wish to provide additional information about the usage of the source.  Nothing has made it into Strat that would do this because it treads close to Turing complete-y and computation language-y features like closures and objects.  I think this is a nessecary feature long term but great care needs to be taken when deciding how data and configuration should move through Strat.</p>
 <h1 id="languagesupport">Language Support</h1>
 <p>Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  Languages that are aligned with Strat's performance tradeoffs and user experience biases are higher priority.</p>
 <h2 id="highprioritylanguages">High Priority Languages</h2>

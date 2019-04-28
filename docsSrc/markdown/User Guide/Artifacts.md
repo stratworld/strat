@@ -16,7 +16,7 @@ service Sales {
 
 Strat will attempt a get request to "https://stratosphere.strat.world/public/salesClient.js" to download the artifact data for getSales.
 
-Artifacts should be reasoned about as single file binaries.  Most languages have the capacity to create single file artifacts through build systems like Make, Webpack, javac, etc.  Those build tools should be run before Strat to create easilly deployable and runnable artifacts for Strat to consume.
+Artifacts should be reasoned about as single file binaries.  Most languages have the capacity to create single file artifacts through build systems like Make, Webpack, javac, etc.  Those build tools should be run before Strat to create easilly deployable and runnable artifacts for Strat to consume.  It is not Strat's responsibility to build component software.
 
 At compile time artifacts are loaded and placed into a .sa file, and users should be mindful of how large their artifacts are to keep .sa files to reasonable sizes.
 

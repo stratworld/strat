@@ -30,28 +30,23 @@
       <div><a class="nav-page" href="/Guides/Advanced Sales Service">Advanced Sales Service</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Sources</div>
-      <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
+    <div  class="heading">Specification</div>
+      <div><a class="nav-page" href="/Specification/Grammar">Grammar</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/SA Specification">SA Specification</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Specification</div>
-      <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/Manifesto">Manifesto</a></div>
+    <div  class="heading">Standard Sources and Services</div>
+      <div><a class="nav-page" href="/Standard Sources and Services/Birth">Birth</a><a class="nav-page" href="/Standard Sources and Services/Cron">Cron</a><a class="nav-page" href="/Standard Sources and Services/Extern">Extern</a><a class="nav-page" href="/Standard Sources and Services/Http">Http</a></div>
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="introduction">Introduction</h1>
-<p>This spec is a work in progress.</p>
-<h1 id="divisionswithinstrat">Divisions within Strat</h1>
-<p>Strat is comprised of five pieces of software:</p>
-<ol>
-<li>The compiler takes Strat program text and component artifacts and produces a .sa file</li>
-<li>The deployer takes a .sa file and produces running infrastructure</li>
-<li>The substrate informs the deployer how to create infrastructure at deploy time and informs the host how to invoke functions at runtime</li>
-<li>The host runs alongside component software and sends and recieves events for its component</li>
-<li>Event sources inform the deployer what infrastructure must be created for their particular event type and are responsible for routing events to functions at runtime.</li>
-</ol></div>
+    <div id="document"><h1 id="specificationintroduction">Specification Introduction</h1>
+<p>This spec is a work in progress.  Since Strat compiles into a "bytecode" .sa format, there are two specifications:</p>
+<ul>
+<li>The specification for the Strat Cloud Language, which is meant as a more informal usage guide leaning on the "the implementation is the spec" mentality</li>
+<li>The specification for the .sa file format and its semantics, which is a more strict document as many different vendors will be implementing competing substrates that execute .sa files.</li>
+</ul></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

@@ -30,60 +30,86 @@
       <div><a class="nav-page" href="/Guides/Advanced Sales Service">Advanced Sales Service</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Sources</div>
-      <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
+    <div  class="heading">Specification</div>
+      <div><a class="nav-page" href="/Specification/Grammar">Grammar</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/SA Specification">SA Specification</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Specification</div>
-      <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/Manifesto">Manifesto</a></div>
+    <div  class="heading">Standard Sources and Services</div>
+      <div><a class="nav-page" href="/Standard Sources and Services/Birth">Birth</a><a class="nav-page" href="/Standard Sources and Services/Cron">Cron</a><a class="nav-page" href="/Standard Sources and Services/Extern">Extern</a><a class="nav-page" href="/Standard Sources and Services/Http">Http</a></div>
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="awssvsguide">AWS SVS Guide</h1>
-<p>The AWS SVS uses Lambda, APIGateway, S3, and IAM to fulfill users' infrastructure requirements.</p>
-<h2 id="credentials">Credentials</h2>
-<p>Stratc needs credentials to create the resources above on your AWS account.  The easiest way to supply these is by letting stratc use your shared <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">credentials file</a>.  If you wish to create a custom user to have stratc run under, you can do so by supplying an access key directly inside the config block of your svs.json:</p>
+    <div id="document"><h1 id="awssvsstawsguide">AWS SVS (staws) Guide</h1>
+<p>Staws uses Lambda, API Gateway, and IAM to fulfill users' infrastructure requirements.  It maps each host within a .sa file to a single lambda and implements Http with API Gateway.  It creates new IAM roles for each deploy based on the ID of the .sa file, and it creates a new role for each lambda and API Gateway.  To do so, it needs access to a user with the following minimum IAM policy configuration:</p>
 <pre><code class="json language-json">{
-  "substrate": "aws",
-  "aws": {
-    "config": {
-      "region": "us-west-2",
-      "accessKeyId": "&lt;access key&gt;",
-      "secretAccessKey": "&lt;secret&gt;"
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "apigateway:DELETE",
+        "apigateway:UpdateRestApiPolicy",
+        "apigateway:PUT",
+        "apigateway:PATCH",
+        "apigateway:GET",
+        "apigateway:POST",
+        "iam:GetRole",
+        "iam:CreateRole",
+        "iam:UpdateRole",
+        "iam:PutRolePolicy",
+        "iam:PassRole"
+      ],
+      "Resource": "*"
     }
+  ]
+}
+</code></pre>
+<h1 id="stawscommandreference">staws command reference</h1>
+<pre><code>  -v or --version   prints the version of staws
+  -h or --help      prints this documentation
+  .sa file          deploys the contents of the .sa file
+                      EX: staws HelloWorld.sa
+</code></pre>
+<h1 id="stawsjson">staws.json</h1>
+<p>Users can supply a staws.json in the same directory they're executing staws from to provide additional AWS specific behavior.  If no staws.json is found, staws provides a default:</p>
+<pre><code class="json language-json">"config": {
+  "region": "us-west-2"
+}
+</code></pre>
+<h2 id="credentials">Credentials</h2>
+<p>The easiest way to supply credentials while running staws is by letting stratc use your shared <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">credentials file</a>.  If you wish to create a custom user to have staws run under, you can do so by supplying an access key directly inside the config block of your staws.json:</p>
+<pre><code class="json language-json">{
+  "config": {
+    "region": "us-west-2",
+    "accessKeyId": "&lt;access key&gt;",
+    "secretAccessKey": "&lt;secret&gt;"
   }
 }
 </code></pre>
-<p>Keys provided this way override keys from your shared credentials file.  A minimum IAM policy configuration for stratc to run is:</p>
+<h2 id="region">region</h2>
+<p>A region must be supplied in your staws.json, and that region must have Lambda and API gateway.</p>
+<h2 id="additionallambdapermissions">Additional Lambda Permissions</h2>
+<p>If your component code needs to access addtional resources outside those created by Strat like a DynamoDb table you can supply them in the staws.json config file in a roles property:</p>
 <pre><code class="json language-json">{
-
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": [
-                "lambda:CreateFunction",
-                "apigateway:DELETE",
-                "apigateway:UpdateRestApiPolicy",
-                "apigateway:PUT",
-                "apigateway:PATCH",
-                "apigateway:GET",
-                "iam:CreateRole",
-                "iam:UpdateRole",
-                "iam:PutRolePolicy",
-                "iam:PassRole",
-                "s3:CreateBucket",
-                "s3:PutObject",
-                "apigateway:POST"
-            ],
-            "Resource": "*"
-        }
+  "config": {
+    "region": "us-west-2"
+  },
+  "roles": {
+    "&lt;SERVICE NAME&gt;": [
+      {
+        "action": [ "dynamodb:Scan" ],
+        "arn": "arn:aws:dynamodb:*:*:table/&lt;YourTable&gt;"
+      }
     ]
+  }
 }
-</code></pre></div>
+</code></pre>
+<p>The roles property is a map where keys are service or source names that should get extra permissions, and the values are lists of IAM-policy-document-like (the capitalization is different) objects.</p>
+<p>Action must be an array of strings, each of which must be an <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html">AWS Action</a>.  Unfortuately, these are pretty hard to look up.  You can run your code and see what errors occur--AWS is good about letting you know what action you need.</p></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

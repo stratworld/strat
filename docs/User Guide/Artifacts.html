@@ -30,16 +30,16 @@
       <div><a class="nav-page" href="/Guides/Advanced Sales Service">Advanced Sales Service</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Sources</div>
-      <div><a class="nav-page" href="/Sources/Cron">Cron</a><a class="nav-page" href="/Sources/Http">Http</a></div>
+    <div  class="heading">Specification</div>
+      <div><a class="nav-page" href="/Specification/Grammar">Grammar</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/SA Specification">SA Specification</a></div>
     </div>
     <div class="group">
-    <div  class="heading">Specification</div>
-      <div><a class="nav-page" href="/Specification/Functions">Functions</a><a class="nav-page" href="/Specification/Introduction">Introduction</a><a class="nav-page" href="/Specification/Manifesto">Manifesto</a></div>
+    <div  class="heading">Standard Sources and Services</div>
+      <div><a class="nav-page" href="/Standard Sources and Services/Birth">Birth</a><a class="nav-page" href="/Standard Sources and Services/Cron">Cron</a><a class="nav-page" href="/Standard Sources and Services/Extern">Extern</a><a class="nav-page" href="/Standard Sources and Services/Http">Http</a></div>
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Role Extensions">Role Extensions</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="artifacts">Artifacts</h1>
 <p>Artifacts are the terminal element in a function or dispatch definition, and they must always be a string.  They're the user code that gets deployed and run in response to events.  Legal artifacts are:</p>
@@ -53,7 +53,7 @@
 }
 </code></pre>
 <p>Strat will attempt a get request to "https://stratosphere.strat.world/public/salesClient.js" to download the artifact data for getSales.</p>
-<p>Artifacts should be reasoned about as single file binaries.  Most languages have the capacity to create single file artifacts through build systems like Make, Webpack, javac, etc.  Those build tools should be run before Strat to create easilly deployable and runnable artifacts for Strat to consume.</p>
+<p>Artifacts should be reasoned about as single file binaries.  Most languages have the capacity to create single file artifacts through build systems like Make, Webpack, javac, etc.  Those build tools should be run before Strat to create easilly deployable and runnable artifacts for Strat to consume.  It is not Strat's responsibility to build component software.</p>
 <p>At compile time artifacts are loaded and placed into a .sa file, and users should be mindful of how large their artifacts are to keep .sa files to reasonable sizes.</p>
 <h1 id="limits">Limits</h1>
 <p>Some substrates may have restrictions on how large code bundles can be for particular infrastructure.  In the long term Strat may be smart enough to avoid this infrastructure for large artifacts but it is not today, so users should be aware of artifact size limits for their target substrate.  The AWS substrate deploys artifacts to Lambda, which has a 50MB limit for code bundles.  Users may hit this limit with smaller artifacts because strat may deploy multiple artifacts to the same Lambda.  If this happens, users can get more space by splitting their artifacts into different scopes at the tradeoff of extra network hops and Lambda invocations.</p></div>
