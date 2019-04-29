@@ -17,13 +17,17 @@
     <a href="/Features/Roadmap" class="heading">Roadmap</a>
     <a href="https://github.com/stratworld/strat" target="_blank" class="heading">Source</a>
     <a class="stratosphere heading" href="/Stratosphere.html">Stratosphere</a>
-    <a href="mailto:interest@strat.world" class="heading">Contact</a>
+    <a href="/Contact/Contact" class="heading">Contact</a>
   </div>
   <div class="row">
     <div id="menu" class="navigation">
     <div class="group">
+    <div  class="heading">Contact</div>
+      <div><a class="nav-page" href="/Contact/Contact">Contact</a></div>
+    </div>
+    <div class="group">
     <div  class="heading">Features</div>
-      <div><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
+      <div><a class="nav-page" href="/Features/Requests">Requests</a><a class="nav-page" href="/Features/Roadmap">Roadmap</a></div>
     </div>
     <div class="group">
     <div  class="heading">Guides</div>
@@ -42,7 +46,7 @@
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="thestratcloudlanguage">The Strat Cloud Language</h1>
-<p>Strat is a language to represent and deploy portable cloud systems.  Strat is the first "infrastructure as high level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's what the future looks like:</p>
+<p>Strat is a language to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event driven and service oriented systems running on the cloud.  Strat is the first "infrastructure as high level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:</p>
 <p>Create HelloWorld.st:</p>
 <pre><code class="st language-st">service HelloWorld {
   include "Birth"
@@ -54,7 +58,7 @@
 <pre><code class="sh language-sh">npm install -g stratc
 stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
 </code></pre>
-<p>With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments anymore.  The Strat compiler figures out how to host your system for you.  You write your system components as simple functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.</p>
+<p>With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments.  The Strat compiler figures out how to host your system for you.  You write your system components as functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.</p>
 <h3 id="betterinfrastructurethanwhatyourebuildingbyhand">Better infrastructure than what you're building by hand</h3>
 <p>Just how language compilers like gcc optimize your code, <strong>Strat's compiler optimizes your infrastructure to be:</strong></p>
 <ul>
@@ -64,32 +68,11 @@ stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
 <li><strong>free from human error</strong> by performing static analysis and compiling your infrastructure code.</li>
 </ul>
 <h3 id="portabiltyisback">Portabilty is back</h3>
-<p>Lets run that hello world system on AWS.</p>
-<p>If you don't have a burner AWS account already, make one and set up your <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html">credentials file</a>.  Strat needs permissions to create resources on this AWS account.  More information about this <a href="./User%20Guide/AWS">here</a>.</p>
-<p>Run in your terminal</p>
-<pre><code>stratc --aws ./HelloWorld.sa
-</code></pre>
-<p>See it at the APIGateway URL logged in the console.</p>
-<p>Strat's portability focus is on getting predictable system behavior between development and production hardware.  The days of testing Lambdas in production are over.  If cloud providers are the new hardware vendors Strat is the new Java.</p>
-<h3 id="quitwritingsurfaceareacode">Quit writing surface area code</h3>
-<p>You know all that innane connection logic you have to write to get service A to talk to service B?  What about service authentication stuff?  Struggling with 3rd party APIs, or even the api to the service you wrote a year ago?  This is all surface area code--the stuff that connects software components together.  As our software components get smaller and more numerous, the amount of surface area code we write grows exponentially.  Strat fights back by abstracting over connection logic by using smart defaults and conventions.  It can also hook into best practice solutions like the <a href="https://www.openapis.org/">OpenAPI initiative</a>.  Here's how a service connects to another in Strat:</p>
-<p>Books.st:</p>
-<pre><code class="st language-st">service Books {
-  include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st"
-  getBooks ():any -&gt; "./getBooks.js"
-}
-</code></pre>
-<p>getBooks.js:</p>
-<pre><code class="javascript language-javascript">const Strat = require('strat');
-const getSales = Strat('Sales.getSales');
-const sales = await getSales();
-</code></pre>
-<h1 id="justice">"Just"ice</h1>
-<p>We say "just" a lot: "just do this" or "it just works!" or "I just want a server!".  The modern DevOps landscape overindexes on power and configurability over simplicity and "just-works-iness".  What's the customer value of setting up and operating <a href="https://www.hashicorp.com/products/consul">Consul</a> for your CRUD application?  Don't get us wrong, the modern cloud is an engineering marvel and you'd be crazy not to run your systems on it, but now that its been around for a while its not unreasonable to demand higher user experience standards--<strong>yaml config files don't cut it anymore</strong>.</p>
-<p>Ruby on Rails showed the world most people can get by fine with "just" the basics and convention.  Strat has traditional language influences (ML, Javascript, Java, etc.), but perhaps its most important influence is the philosophical legacy left by Rails.</p>
-<h4 id="likewhatyouseecontinuetothehelloworlddeepdiveguideshello20worldorbuildanntierbookstoreguidesbookstore">Like what you see?  Continue to the <a href="./Guides/Hello%20World">Hello World deep dive</a> or build an <a href="./Guides/Bookstore">N-tier bookstore</a>.</h4>
-<h3 id="contributing">Contributing</h3>
-<p>Strat is an ambitious project--if you're interested in working on Strat or its ecosystem, send an email to <a href="mailto:interest@strat.world">interest@strat.world</a>;</p></div>
+<p>Strat creates a bytecode-esque system artifact (.sa) file that represents your system and its dependencies, then a Strat substrate executes that .sa file to produce running infrastructure.  The .sa file format is simple and can be implemented by many different clouds, single machines, and even on-premise datacenters.  Today you can run your .sa files locally, on AWS, and on linux servers.</p>
+<p>With Strat you can write complex, fully featured systems using cutting edge technologies like Lambda without ever having to use a single proprietary API, and without sacrificing local execution and reproducability.</p>
+<h3 id="effortlessscalingneverworryabouttrafficvolumeorexpensiveservers">Effortless scaling--never worry about traffic volume or expensive servers</h3>
+<p>The AWS implementation of Strat places your software on serverless components which scale near infinitely and use a pay-as-you-go model, which means users that build their systems with Strat never have to think about load or the financial implications of beefy scalable infrastructure.</p>
+<h4 id="likewhatyouseecontinuetothehelloworlddeepdiveguideshello20worldorbuildanntierbookstoreguidesbookstore">Like what you see?  Continue to the <a href="./Guides/Hello%20World">Hello World deep dive</a> or build an <a href="./Guides/Bookstore">N-tier bookstore</a>.</h4></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

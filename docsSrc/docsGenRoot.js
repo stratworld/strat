@@ -121,7 +121,7 @@ function wrapInTemplate (html, contents, folder, name) {
     <a href="/Features/Roadmap" class="heading">Roadmap</a>
     <a href="https://github.com/stratworld/strat" target="_blank" class="heading">Source</a>
     <a class="stratosphere heading" href="/Stratosphere.html">Stratosphere</a>
-    <a href="mailto:interest@strat.world" class="heading">Contact</a>
+    <a href="/Contact/Contact" class="heading">Contact</a>
   </div>
   <div class="row">
     <div id="menu" class="navigation">${contents}</div>
