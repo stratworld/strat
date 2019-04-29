@@ -33,24 +33,27 @@ module.exports = async function (saData, implDir, birthArgs) {
 //load in majordomo functions first
 function getDomoLookup (hosts, archive, substrateImpls) {
   return hosts
-    .pairs()
-    .flatmap(kvps => {
-      const hostName = kvps[0];
-      const domoArtifact = kvps[1].artifacts
+    .values()
+    .map(host => {
+      const domoArtifact = host.artifacts
         .filter(artifact => artifact.name === 'Strat.majordomo')
         [0];
-      return kvps[1].artifacts
-        .map(artifact => [artifact.name.split('.')[0], hostName, domoArtifact]);
-    })
-    .toMap(tuple => {
-      return {
-        domo: loadFunction(tuple[2],
-          archive,
-          undefined,
-          substrateImpls),
-        hostName: tuple[1]
+      const domoFunction = loadFunction(domoArtifact,
+        archive,
+        undefined,
+        substrateImpls);
+      const lookupValue = {
+        hostName: host.name,
+        domo: domoFunction
       }
-    }, t => t[0]);
+      return [host.containers.keys(), lookupValue];
+    })
+    .reduce((lookup, nextTuple) => {
+      (nextTuple[0] || []).forEach(containerName => {
+        lookup[containerName] = nextTuple[1];
+      });
+      return lookup;
+    }, {});
 }
 
 function getRegistry (archive, hosts, substrateImpls) {

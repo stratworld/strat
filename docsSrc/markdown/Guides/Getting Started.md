@@ -20,5 +20,3 @@ npm install -g stratc
 
   - -v or --version
     - prints the version of stratc
-
-  

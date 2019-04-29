@@ -1,6 +1,6 @@
 # Hello world
 
-This guide will walk you through a simple Strat system.  You'll create a system and deploy it to your local computer then take that system and deploy it to AWS.  There are no mysterious repositories to clone--every line of code you need is here in this guide.  You will need to install [stratc](./Getting%20Started), Strat's compiler, and if you wish to deploy to AWS you will need an account that you're comfortable deploying things to.
+This guide will walk you through a simple Strat system.  You'll create a system and deploy it to your local computer then take that system and deploy it to AWS.  You will need to install [stratc](./Getting%20Started), Strat's compiler, and if you wish to deploy to AWS you will need an account that you're comfortable deploying things to.
 
 # Local Hello World
 
@@ -10,7 +10,7 @@ Create a file "HelloWorld.st" and paste the following into it:
 service HelloWorld {
   include "Http"
 
-  Http { method: "get", path: "*" } ->
+  Http ->
     helloWorld ():any ->
       "./helloWorld.js"
 }

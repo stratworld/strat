@@ -40,7 +40,7 @@ Hijack.prototype.sendEvent = function (event, hostName) {
 };
 
 Hijack.prototype.dispatch = function (hostName, event) {
-  return this.domos[hostName].dispatch(event);
+  return this.domos[this.domoLookup[hostName]].dispatch(event);
 }
 
 const hijack = new Hijack();
