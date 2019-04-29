@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "mocha": "^5.2.0",
+    "mock-require": "^3.0.3",
     "path-to-regexp": "^3.0.0",
     "showdown": "^1.9.0",
     "webpack": "^4.30.0"

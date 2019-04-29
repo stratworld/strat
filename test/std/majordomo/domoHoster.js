@@ -1,4 +1,6 @@
 const domoConstructor = require('../../../std/majordomo/majordomo');
+// const mockRequire = require('../../mocks/mockLoader');
+const mockRequire = require('mock-require');
 
 module.exports = async function (mockEnvironment, hostName) {
   const invoker = async (targetName, event) => {
@@ -8,8 +10,7 @@ module.exports = async function (mockEnvironment, hostName) {
     throw new Error(`Could not resolve name ${targetName}`);
   };
   const domo = await domoConstructor(invoker, hostName);
-  //Haskell eat your heart out
-  require('strat').setExport({
+  mockRequire('strat', {
     getResolver: function () { return domo; }
   });
 
