@@ -37,7 +37,7 @@ Strat is all about events and functions.  Its sole purpose is to describe what e
 
 An event is a single piece of serialized data that is passed into your system.  Events come from sources, and in this example we're including Http, which is the event source for http requests provided by Strat's standard library.  Including Http tells Strat that the HelloWorld service accepts http events, or in more familiar terms, that the HelloWorld service is a web server.
 
-A function is a single computational unit within your system, and it represents the actual code that gets deployed.  Functions accept events and execute code, and services are groupings of functions that control permissions.
+A function is a single computational unit within your system, and it represents the actual code that gets run.  Functions accept events and execute code, and services are groupings of functions that control permissions.
 
 The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa file, which is a deployable bundle of the entire system.  Sa files can be moved from computer to computer and contain version and other metadata about your system that make them ideal CI/CD artifacts.  Then, we deploy that .sa file to your local computer.  We could also deploy that same .sa file to the AWS substrate, but we'll keep things simple for now.
 
@@ -53,9 +53,9 @@ include "Http"
 Including Http lets us receive Http events and tells Strat this is a web server.
 
 ```
-Http { method: "get", path: "*" } ->
+Http ->
 ```
-This is an event pattern, and the gist here is we're describing what type of Http event should be sent to the following function.  This can be translated as "Http get requests on any path should be sent to the following function".
+This tells strat any Http events should be sent to the following function.
 
 ```
 helloWorld ():any ->
@@ -65,22 +65,28 @@ This is a function signature, complete with a function name, input type within t
 ```
 "./helloWorld.js"
 ```
-This is the final part of a function definition--the [artifact](../User%20Guide/Artifacts).  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs...somewhere...more on code execution can be found in the [functions section of the specification](../Specification/Functions).  The power of Strat lies in users not specifying what type of infrastructure helloWorld.js executes on.  This allows stratc to port systems between wildly different substrates and optimize systems.
+This is the final part of a function definition--the [artifact](../User%20Guide/Artifacts).  This is the code that will be run in response to the http event declared above.  For now, assume that this .js file will be run by NodeJs.  The power of Strat lies in users not specifying what type of infrastructure helloWorld.js executes on.  This allows stratc to port systems between wildly different substrates and optimize systems.
 
 # AWS Hello World
 
 Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  You'll need an AWS account, so if you don't have one go [create one now](https://portal.aws.amazon.com/billing/signup?nc2=h_ct&src=default&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start)--its easy, requires no upfront financial commitment, and won't cost you anything to run this system thanks to generous free tiers.
 
-Stratc will need to create resources on your AWS account and will need credentials to do that, so go ahead and set up your shared credentials file by following the instructions [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
-Note: you may already have one--make sure its for your test account!
+Running .sa files on AWS uses a different piece of software: [staws](https://github.com/stratworld/staws) or the "AWS substrate".  You'll need to install staws:
+
+```bash
+npm install -g staws
+```
+
+Staws will need to create resources on your AWS account and will need credentials to do that, so go ahead and set up your shared credentials file by following the instructions [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
+Note: you may already have one--make sure its for your test account!  If you're unsure about letting staws take the reins, you can read more about what permissions it requires and how it does it's job [here](../User$20Guide/AWS).
 
 Now you're ready to deploy to AWS:
 
 ```sh
-  $ stratc --aws ./HelloWorld.sa
+  $ staws ./HelloWorld.sa
 ```
 
-You'll see stratc create resources in the console.  Look for the APIGateway URL and go there.  The first load takes up to 10 seconds as AWS loads your resources for the first time.
+You'll see staws create resources in the console.  Look for the APIGateway URL and go there.  The first load takes up to 10 seconds as AWS loads your resources for the first time.
 
 
-If you're hungry for a more sophisticated example, you can check out a full n-tier architecture book store written in Strat [here](./Bookstore).
+If you're hungry for a more sophisticated example, you can check out a full n-tier architecture bookstore written in Strat [here](./Bookstore).
