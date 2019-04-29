@@ -47,7 +47,7 @@ module.exports = async function emitHttpEvent (rawRequest) {
   try {
     return success(await emit(rawRequest));
   } catch (e) {
-    if (e.message.indexOf('No match') > -1) {
+    if ((e.message || '').indexOf('No match') > -1) {
       return await tryEmitNotFound(e);
     }
     return await tryEmitError(e);

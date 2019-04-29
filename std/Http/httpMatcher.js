@@ -84,13 +84,13 @@ function checkPath (pathPattern, path) {
 }
 
 function checkMethod (methodPattern, method) {
-  if (methodPattern === '*') {
+  if (methodPattern === '*' || methodPattern === 'any') {
     return true;
   }
 
   const permittedMethods = new Set(methodPattern
     .split('|')
-    .map(m => m.trim()));
+    .map(m => (m || '').toLowerCase().trim()));
 
   return permittedMethods.has(method);
 }

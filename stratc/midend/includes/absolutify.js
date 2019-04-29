@@ -78,6 +78,9 @@ function getAbsolutifier (declaredFile, ast, deps, stdNames) {
 }
 
 function isResource (nodeAst, path) {
+  if (traverse(nodeAst, ['reference'])[0] !== undefined) {
+    return false;
+  }
   return !path
     || traverse(nodeAst, ['functionName', 'signature'])[0] === undefined
 }

@@ -61,12 +61,12 @@ module.exports = [
     name: "404 string",
     pattern: "404",
     matched: true,
-    event: {status: 404, error: {}}
+    event: {status: 404}
   },
   {
     name: "500",
     pattern: 500,
     matched: true,
-    event: {status: 500, error: {}}
+    event: {status: 500}
   },
 ];

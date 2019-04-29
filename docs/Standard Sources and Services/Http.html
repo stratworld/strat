@@ -31,7 +31,7 @@
     </div>
     <div class="group">
     <div  class="heading">Guides</div>
-      <div><a class="nav-page" href="/Guides/Advanced Sales Service">Advanced Sales Service</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
+      <div><a class="nav-page" href="/Guides/Bookstore Part 2">Bookstore Part 2</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
     <div  class="heading">Specification</div>
@@ -43,26 +43,58 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="http">HTTP</h1>
-<p>mostly todo</p>
-<p>The Http source sources http events into your system.</p>
-<p>Http's event config must have a method and a path.  The method must be:</p>
+<p><strong>Note</strong> Http is mostly implemented but does not support some usecases that will be required by many users, notably cookies and custom headers.  The long term goal for Http is to fall somewhere between where it is now and "full" Http requests and responses like those from the Node Http library.</p>
+<p>Http is a standard event source that allows your system to be called via Http servers.</p>
+<h2 id="httppatterns">Http patterns</h2>
+<p>Patterns must have a method and path property.  They both have custom matching functions.</p>
+<h3 id="method">method</h3>
+<p>Method must be a string and supports a sort of sum type notation--a list of method string separated by '|' denoting 'or' in the list. Examples:</p>
 <ul>
-<li>get</li>
-<li>post</li>
-<li>put</li>
-<li>delete</li>
+<li>"get|post" means "a get or post method"</li>
+<li>"get" means "just a get method"</li>
 </ul>
-<p>Path examples:</p>
+<p>Comparisons against the actual Http request's method are case insensitive.  The values "any" and "*" will match any method.</p>
+<h3 id="path">path</h3>
+<p>Path matching can optionally match against parameters and populate a params map on the request object like in Express.js.  Examples:</p>
 <ul>
 <li>"/"</li>
-<li>"/*/foo"</li>
+<li>"/*/foo" means "any path that terminates in /foo"</li>
 <li>"foo.html"</li>
-<li>"/foo/:argument1/bar"</li>
+<li>"/foo/:argument1/bar" will populate a map {argument1: "the value"} on the request</li>
 <li>"/:arg1/:arg2/bar"</li>
-</ul></div>
+</ul>
+<h2 id="errorpatterns">Error Patterns</h2>
+<p>If the Http source can't find a match or catches an error it will emit error events which can be caught and responded to in user code.  This allows the user to provide custom error responses.  Examples:</p>
+<pre><code class="st language-st">service Custom404 {
+  include "Http"
+
+  Http { method: "*", path: '/something' } -&gt; "Hello from something"
+  Http { status: 404 } -&gt; "./custom404.html"
+  Http { status: 500 } -&gt; "./custom500.html"
+}
+</code></pre>
+<p>Only statuses 404 and 500 are supported at the moment.</p>
+<h2 id="requestandresponseobjects">Request and Response Objects</h2>
+<p>Http will pass an event to its function of the form:</p>
+<pre><code class="js language-js">{
+  method: "the http method",
+  path: "the original path (...com/this/path/1 -&gt; '/this/path/1')",
+  body: { /* the deserialized body or undefined */ },
+  params: { /*a map with keys and values based on the path match*/ }
+}
+</code></pre>
+<p>Whatever response from the function is interpreted as the body of the response object, and ContentType headers are inferred based on the file extension of the function's artifact, with a few nuances:</p>
+<ul>
+<li>If the artifact is a .js file<ul>
+<li>and a resource, the content type is "application/javascript"</li>
+<li>or has a signature, the content type is "application/json"</li></ul></li>
+<li>If an error occured, the content type is "text/plain"</li>
+<li>If the function was a string literal, the content type is "text/plain"</li>
+</ul>
+<p>TODO: allow for more control in headers and cookies</p></div>
   </div>
   <div id="footer" class="row navigation">
     <a class="navigation" href="mailto:interest@strat.world">interest@strat.world</a>

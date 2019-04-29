@@ -41,6 +41,7 @@ async function injectProxy (dispatch, deps, service, fn, filename) {
   dispatch.functionName = fnAst.functionName;
   dispatch.artifact = fnAst.artifact;
   dispatch.artifact.media = '.js';
+  dispatch.artifact.isResource = false;
   delete dispatch.reference;
 }
 

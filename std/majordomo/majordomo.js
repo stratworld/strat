@@ -49,6 +49,7 @@ module.exports = async function (rawInvoker, myHostName) {
       }
     }
     if (typeof rawEvent === 'object' && typeof rawEvent._stratCallee === 'string') {
+      
       return await Majordomo(rawEvent._stratCallee)(rawEvent.event);
     }
     const config = await Majordomo(`${myHostName}.majordomoConfig`)();

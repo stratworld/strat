@@ -23,9 +23,16 @@ Hijack.prototype.setDomos = async function (domosByServiceName) {
 Hijack.prototype.getInvoker = function (hostName) {
   return async (dep, event) => {
     try {
+      //this is pretty cheaty but it works
+      //we have to do this because this invoker
+      //doesn't discern between hosts
+      if (typeof event === 'object' && event['_stratCallee']) {
+        event = event.event;
+      }
       return this.registry[dep](event);
-    }catch (e) {
+    } catch (e) {
       console.log('could not invoke dep ' + dep);
+      throw e;
     }
   }
 };

@@ -1,6 +1,6 @@
 
 <head>
-  <title>Standard Sources and Services: Birth | Strat Documentation</title>
+  <title>User Guide: Building Javascript Artifacts | Strat Documentation</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
@@ -45,22 +45,35 @@
     <div  class="heading">User Guide</div>
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="birth">Birth</h1>
-<p>After a Strat substrate hosts a sa file it dispatches a "Birth" event to each piece of infrastructure it created.  This is how custom sources and services can configure themselves after creation.  The Http source uses the Birth event to know what infrastructure to send Http requests to.  The actual contents of the Birth event change from substrate to substrate, and are meant to provide "implementation" information to sources and services.  Respones to Birth are output in the console that is running the substrate.</p>
-<h3 id="stawsbirth">staws Birth</h3>
-<p>Staws sends the following information to components on Birth:</p>
-<pre><code class="json language-json">{
-  "region": "a region string like us-west-2",
-  "lambdas": [
-    {
-      "[host.name]": {
-        "functionName": "the lambda function name for this host",
-        "functionArn": "the lambda function arn for this host"
-      }
-    }
+    <div id="document"><h1 id="buildingjavascriptartifacts">Building Javascript Artifacts</h1>
+<p>Here's a webpack.config.js file that does the trick.</p>
+<p>TODO: explain webpack concepts so somebody new to the tool (and perhaps even npm) can know what's going on.  This may be impossible since even the webpack team can't seemt to do this.</p>
+<pre><code class="js language-js">const webpack = require('webpack');
+const path = require('path');
+
+module.exports = {
+  target: 'node',
+  entry: {
+    //the keys are the [name] in filename below
+    //the values are relative to this file
+    getSales: './getSales.js',
+    setSales: './setSales.js'
+  },
+  output: {
+    path: path.resolve('./'),
+    filename: './[name].bundle.js',
+    library: 'strat-library',
+    libraryTarget: 'umd'
+  },
+  plugins: [
+    // this bit is important--strat is a dependency injected at runtime
+    new webpack.IgnorePlugin(/strat/gi)
   ],
-  "filename": "the absolute path of the .sa file executed"
-}
+};
+</code></pre>
+<p>Since webpack is run by javascript hypebeasts it gets very upset unless you run it in the latest and greatest way:</p>
+<p>You'll need npm 5+</p>
+<pre><code class="sh language-sh">npx webpack
 </code></pre></div>
   </div>
   <div id="footer" class="row navigation">

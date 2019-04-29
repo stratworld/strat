@@ -1,6 +1,6 @@
 
 <head>
-  <title>Guides: Advanced Sales Service | Strat Documentation</title>
+  <title>Guides: Bookstore Part 2 | Strat Documentation</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Work+Sans:600" rel="stylesheet">
@@ -31,7 +31,7 @@
     </div>
     <div class="group">
     <div  class="heading">Guides</div>
-      <div><a class="nav-page" href="/Guides/Advanced Sales Service">Advanced Sales Service</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
+      <div><a class="nav-page" href="/Guides/Bookstore Part 2">Bookstore Part 2</a><a class="nav-page" href="/Guides/Bookstore">Bookstore</a><a class="nav-page" href="/Guides/Getting Started">Getting Started</a><a class="nav-page" href="/Guides/Hello World">Hello World</a></div>
     </div>
     <div class="group">
     <div  class="heading">Specification</div>
@@ -43,9 +43,16 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="advancedguidesalesservice">Advanced Guide: Sales Service</h1>
+    <div id="document"><h1 id="bookstoreguidepart2">Bookstore Guide Part 2</h1>
+<p><strong>todo</strong> this guide was originally written as the Sales service, but since I've removed the public keyword for now it needs to be adapted to be about adding a database to the Bookstore.  Most of it will persist in its new form, but there are a couple things keeping this incomplete:</p>
+<ul>
+<li>A database schema for books</li>
+<li>A form input on the UI that travels through the stack to the database</li>
+<li>A database insertion file for the new database schema</li>
+</ul>
+<p><strong>Begin outdated Sales guide</strong></p>
 <p>In this guide we'll create our own sales service and use that instead of the public one we included in the <a href="./Bookstore">Bookstore Guide</a>.  If you haven't completed the Bookstore Guide, do that first.  The topics covered here should be the last bits needed to create an application with Strat.  We'll learn how to</p>
 <ul>
 <li>manage access to resources outside of Strat (like a database)</li>

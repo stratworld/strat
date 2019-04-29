@@ -1,4 +1,13 @@
-# Advanced Guide: Sales Service
+# Bookstore Guide Part 2
+
+__todo__ this guide was originally written as the Sales service, but since I've removed the public keyword for now it needs to be adapted to be about adding a database to the Bookstore.  Most of it will persist in its new form, but there are a couple things keeping this incomplete:
+
+  - A database schema for books
+  - A form input on the UI that travels through the stack to the database
+  - A database insertion file for the new database schema
+
+
+__Begin outdated Sales guide__
 
 In this guide we'll create our own sales service and use that instead of the public one we included in the [Bookstore Guide](./Bookstore).  If you haven't completed the Bookstore Guide, do that first.  The topics covered here should be the last bits needed to create an application with Strat.  We'll learn how to
 

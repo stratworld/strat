@@ -45,7 +45,7 @@ The first step is to run stratc on HelloWorld.st, which creates a HelloWorld.sa 
 ```
 service HelloWorld {
 ```
-Here we declare a service HelloWorld.  All functions must reside within a service.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Strat systems behaves like scope in a language like Java.
+Here we declare a service HelloWorld.  All functions must reside within a service or source.  Outside of providing grouping for functions, services also control roles and permissions within your system.  Access control in Strat systems behaves like scope in a language like Java.
 
 ```
 include "Http"

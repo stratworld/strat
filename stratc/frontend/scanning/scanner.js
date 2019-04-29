@@ -83,7 +83,7 @@ function radixHas (input) {
       return {
         value: input
           .substr(1, input.length - 2)
-          .replace('\\"', '"'),
+          .replace(/\\"/g, '"'),
         valid: true,
         type: 'STRING',
         stop: true,
