@@ -1,6 +1,6 @@
 # Strat Grammar
 
-Hopefully this yet-another-home-rolled-EBNF is understandable; '\*', '+', and '?' are interpreted as they would be in Javscript regular expressions.
+Hopefully, this yet-another-home-rolled-EBNF is understandable; '\*', '+', and '?' are interpreted as they would be in Javascript regular expressions.
 
 ```
 file

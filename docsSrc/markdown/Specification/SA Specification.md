@@ -136,7 +136,7 @@ An artifact has 4 properties:
   - name
     the name, as well as the directory in which the artifact's data is contained in the .sa file
   - absolutePath
-    the filepath the artifact is from, or false if its generated
+    the file path the artifact is from, or false if its generated
   - isResource
     a flag to tell the substrate if the file should be executed based on its media type or if it's contents represent the result of execution( if its a static file)
   - media

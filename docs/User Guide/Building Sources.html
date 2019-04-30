@@ -48,7 +48,7 @@
     <div id="document"><h1 id="buildingstratsources">Building Strat Sources</h1>
 <p>Users can build sources in Strat that emit events that other sources and services can subscribe to.</p>
 <h2 id="extern">Extern</h2>
-<p>Many sources will need to recieve events from the outside world and bring them into the Strat ecosystem.  Its important that every external event be directed to the correct function without mutation, so Strat provides a special source "Extern" that lets users tell Strat a particular function will handle outside events.  Here's an example:</p>
+<p>Many sources will need to receive events from the outside world and bring them into the Strat ecosystem.  It's important that every external event be directed to the correct function without mutation, so Strat provides a special source "Extern" that lets users tell Strat a particular function will handle outside events.  Here's an example:</p>
 <pre><code class="st language-st">source MySource {
   include "Extern"
 
@@ -57,9 +57,9 @@
   //...
 }
 </code></pre>
-<p><strong>Note:</strong> Strat doesn't know how to interpret external events--it must have an Extern function to send things it can't identify, so if your source is connected to the outside world it must provide an Extern function.  Additionally, your source can't have multiple extern functions, and stratc will only place a single extern function on each piece of infrastructure since it couldn't pick wich function to send an event to.</p>
+<p><strong>Note:</strong> Strat doesn't know how to interpret external events--it must have an Extern function to send things it can't identify, so if your source is connected to the outside world it must provide an Extern function.  Additionally, your source can't have multiple extern functions, and stratc will only place a single extern function on each piece of infrastructure since it couldn't pick which function to send an event to.</p>
 <h2 id="birth">Birth</h2>
-<p>After a source is deployed, the Birth event is dispatched to the dployed system.  Responding to the Birth event is the opportunity to extend the deployment process by connecting external systems to the deployed Strat infrastructure.  The data contained inside the Birth event is substrate specific but usually contains infrastructure implementation details like lambda function arns.</p>
+<p>After a source is deployed, the Birth event is dispatched to the deployed system.  Responding to the Birth event is the opportunity to extend the deployment process by connecting external systems to the deployed Strat infrastructure.  The data contained inside the Birth event is substrate specific but usually contains infrastructure implementation details like lambda function arns.</p>
 <h2 id="emit">Emit</h2>
 <p>To emit an event a source must call it's "emit" function, which it can access via Strat('this.emit').  If no emit function is provided on a source stratc injects the standard emit function, which just iterates through a source's subscribers looking for a match using the match function.  Sources may specify that they are "async" by putting the "async" keyword before "source" in its declaration:</p>
 <pre><code class="st language-st">async source MySource { ... }
@@ -87,7 +87,7 @@ module.exports = rawEvent =&gt; {
 }
 </code></pre>
 <h2 id="match">Match</h2>
-<p>Match is a function that can tell if a subscriber's pattern matches the event.  Like emit, match is injected into sources that do not provide their own, and can be implemented by source authors directly.  The standard match function does some basic structural type matching based on the value of the event and pattern.  Standard match returns a map that indicates if a match occured:</p>
+<p>Match is a function that can tell if a subscriber's pattern matches the event.  Like emit, match is injected into sources that do not provide their own, and can be implemented by source authors directly.  The standard match function does some basic structural type matching based on the value of the event and pattern.  Standard match returns a map that indicates if a match occurred:</p>
 <pre><code class="js language-js">{
   matched: true|false,
   event: event

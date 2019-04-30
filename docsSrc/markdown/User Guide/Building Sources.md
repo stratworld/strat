@@ -4,7 +4,7 @@ Users can build sources in Strat that emit events that other sources and service
 
 ## Extern
 
-Many sources will need to recieve events from the outside world and bring them into the Strat ecosystem.  Its important that every external event be directed to the correct function without mutation, so Strat provides a special source "Extern" that lets users tell Strat a particular function will handle outside events.  Here's an example:
+Many sources will need to receive events from the outside world and bring them into the Strat ecosystem.  It's important that every external event be directed to the correct function without mutation, so Strat provides a special source "Extern" that lets users tell Strat a particular function will handle outside events.  Here's an example:
 
 ```st
 source MySource {
@@ -16,11 +16,11 @@ source MySource {
 }
 ```
 
-__Note:__ Strat doesn't know how to interpret external events--it must have an Extern function to send things it can't identify, so if your source is connected to the outside world it must provide an Extern function.  Additionally, your source can't have multiple extern functions, and stratc will only place a single extern function on each piece of infrastructure since it couldn't pick wich function to send an event to.
+__Note:__ Strat doesn't know how to interpret external events--it must have an Extern function to send things it can't identify, so if your source is connected to the outside world it must provide an Extern function.  Additionally, your source can't have multiple extern functions, and stratc will only place a single extern function on each piece of infrastructure since it couldn't pick which function to send an event to.
 
 ## Birth
 
-After a source is deployed, the Birth event is dispatched to the dployed system.  Responding to the Birth event is the opportunity to extend the deployment process by connecting external systems to the deployed Strat infrastructure.  The data contained inside the Birth event is substrate specific but usually contains infrastructure implementation details like lambda function arns.
+After a source is deployed, the Birth event is dispatched to the deployed system.  Responding to the Birth event is the opportunity to extend the deployment process by connecting external systems to the deployed Strat infrastructure.  The data contained inside the Birth event is substrate specific but usually contains infrastructure implementation details like lambda function arns.
 
 ## Emit
 
@@ -59,7 +59,7 @@ module.exports = rawEvent => {
 
 ## Match
 
-Match is a function that can tell if a subscriber's pattern matches the event.  Like emit, match is injected into sources that do not provide their own, and can be implemented by source authors directly.  The standard match function does some basic structural type matching based on the value of the event and pattern.  Standard match returns a map that indicates if a match occured:
+Match is a function that can tell if a subscriber's pattern matches the event.  Like emit, match is injected into sources that do not provide their own, and can be implemented by source authors directly.  The standard match function does some basic structural type matching based on the value of the event and pattern.  Standard match returns a map that indicates if a match occurred:
 
 ```js
 {

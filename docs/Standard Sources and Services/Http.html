@@ -46,7 +46,7 @@
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="http">HTTP</h1>
-<p><strong>Note</strong> Http is mostly implemented but does not support some usecases that will be required by many users, notably cookies and custom headers.  The long term goal for Http is to fall somewhere between where it is now and "full" Http requests and responses like those from the Node Http library.</p>
+<p><strong>Note</strong> Http is mostly implemented but does not support some use cases that will be required by many users, notably cookies and custom headers.  The long term goal for Http is to fall somewhere between where it is now and "full" Http requests and responses like those from the Node Http library.</p>
 <p>Http is a standard event source that allows your system to be called via Http servers.</p>
 <h2 id="httppatterns">Http patterns</h2>
 <p>Patterns must have a method and path property.  They both have custom matching functions.</p>
@@ -91,7 +91,7 @@
 <li>If the artifact is a .js file<ul>
 <li>and a resource, the content type is "application/javascript"</li>
 <li>or has a signature, the content type is "application/json"</li></ul></li>
-<li>If an error occured, the content type is "text/plain"</li>
+<li>If an error occurred, the content type is "text/plain"</li>
 <li>If the function was a string literal, the content type is "text/plain"</li>
 </ul>
 <p>TODO: allow for more control in headers and cookies</p></div>

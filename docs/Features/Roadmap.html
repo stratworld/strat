@@ -61,9 +61,9 @@
 <h3 id="log">Log</h3>
 <p>What does "console.log" or "println" translate to in a cloud?  The requirements for this will evolve based on early users' needs for debugging and logging.  This is deceptively complex--there is no nice terminal user interface.  The user interface may be something like an ElasticSearch console or some kind of log stream.</p>
 <h3 id="webhook">Webhook</h3>
-<p>This will be the root of many user sources.  A std module here would encapsulate setting up the Http endpoints and the Birth handshake between the two systems.</p>
+<p>This will be the root of many user sources.  An std module here would encapsulate setting up the Http endpoints and the Birth handshake between the two systems.</p>
 <h1 id="shapestypesopenapiintegration">Shapes (types) &amp; OpenAPI Integration</h1>
-<p>A core responsibility of Strat is to help users describe and communicate events.  Strat will have a type system for events, but typing events will be very different from typing in memory data structures:</p>
+<p>A core responsibility of Strat is to help users describe and communicate events.  Strat will have a type system for events, but typing events will be very different from typing in-memory data structures:</p>
 <p>Events</p>
 <ul>
 <li>(1) Don't exist on a single machine--they are serialized by nature<ul>
@@ -74,7 +74,7 @@
 <li>(2.3) and change schemas at a different rate than single machine software</li></ul></li>
 <li>(3) Are often read and manipulated directly by software engineers</li>
 </ul>
-<p>Falling out of these charactaristics, Strat's type system should:</p>
+<p>Falling out of these characteristics, Strat's type system should:</p>
 <ul>
 <li>A) Have a small delta between program text notation and serialized data representation, which can be assumed is JSON (1, 3)</li>
 <li>B) Be flexible in response to change (2)</li>
@@ -95,14 +95,14 @@ Http { method: "get"|"post" } -&gt; myFunction
 <p>Engineers have made good headway with some of the challenges of describing events across organizations with the <a href="https://www.openapis.org/">OpenAPI Specification</a>.  Strat's type system notation shouldn't be YAML, but it can integrate with all of the other artifacts from the OAS ecosystem, and potentially produce an OAS YAML file.</p>
 <p>Clojure's <a href="https://clojure.org/guides/spec">Spec</a> shares many of the design goals of a Strat type system.</p>
 <h1 id="publicbycustomconnectionsemanticsversioning">"public by" / Custom connection semantics / Versioning</h1>
-<p>Early versions of the compiler had a public keyword that would generate a bunch of Strat code that 3rd parties could use to include your running service.  The long term version for this is to allow users to provide connection semantics as a sort of mini-SDK that Strat would make available and download for 3rd parties.  I removed it from the compiler because it wasn't complete or thought-through enough, with the major gap bieng how users would version their "public" apis.</p>
+<p>Early versions of the compiler had a public keyword that would generate a bunch of Strat code that 3rd parties could use to include your running service.  The long term version for this is to allow users to provide connection semantics as a sort of mini-SDK that Strat would make available and download for 3rd parties.  I removed it from the compiler because it wasn't complete or thought-through enough, with the major gap being how users would version their "public" apis.</p>
 <h1 id="browserhost">Browser Host</h1>
 <p>This is so that users can call Strat("Books.getBooks") inside a browser and a Strat browser host figures out how to make the API request.  100% doable.  Great customer experience.  Potentially more performant than what a user could build by hand by utilizing direct Lambda calls.</p>
 <p>This also opens the way for people to write client-side "services" that can be included and run inside a user's browser.  The big question here is how does Strat know / how does the user specify that a particular service should be client-side.</p>
 <h1 id="sourceserviceinclusionparameters">Source/Service inclusion parameters</h1>
-<p>When including a source a user (and the source's author) may wish to provide additional information about the usage of the source.  Nothing has made it into Strat that would do this because it treads close to Turing complete-y and computation language-y features like closures and objects.  I think this is a nessecary feature long term but great care needs to be taken when deciding how data and configuration should move through Strat.</p>
+<p>When including a source a user (and the source's author) may wish to provide additional information about the usage of the source.  Nothing has made it into Strat that would do this because it treads close to Turing complete-y and computation language-y features like closures and objects.  I think this is a necessary feature long term but great care needs to be taken when deciding how data and configuration should move through Strat.</p>
 <h1 id="languagesupport">Language Support</h1>
-<p>Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  Languages that are aligned with Strat's performance tradeoffs and user experience biases are higher priority.</p>
+<p>Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  Languages that are aligned with Strat's performance tradeoffs and user experience biases are a higher priority.</p>
 <h2 id="highprioritylanguages">High Priority Languages</h2>
 <ul>
 <li>Python</li>

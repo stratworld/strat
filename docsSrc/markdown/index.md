@@ -1,6 +1,6 @@
 # The Strat Cloud Language
 
-Strat is a language to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event driven and service oriented systems running on the cloud.  Strat is the first "infrastructure as high level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:
+Strat is a language to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event-driven and service-oriented systems running on the cloud.  Strat is the first "infrastructure as high-level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:
 
 Create HelloWorld.st:
 ```st
@@ -16,7 +16,7 @@ npm install -g stratc
 stratc ./HelloWorld.st && stratc ./HelloWorld.sa
 ```
 
-With Strat you don't specify infrastructure details, just how you don't write gotos and register assignments.  The Strat compiler figures out how to host your system for you.  You write your system components as functions in languges you already know like Javascript, then you write Strat files that describe how those files form a system.
+In Strat, you don't specify infrastructure details, just how you don't write gotos and register assignments.  The Strat compiler figures out how to host your system for you.  You write your system components as functions in languages you already know like Javascript, then you write Strat files that describe how those files form a system.
 
 ### Better infrastructure than what you're building by hand
 
@@ -29,9 +29,9 @@ Just how language compilers like gcc optimize your code, __Strat's compiler opti
 
 ### Portabilty is back
 
-Strat creates a bytecode-esque system artifact (.sa) file that represents your system and its dependencies, then a Strat substrate executes that .sa file to produce running infrastructure.  The .sa file format is simple and can be implemented by many different clouds, single machines, and even on-premise datacenters.  Today you can run your .sa files locally, on AWS, and on linux servers.
+Strat creates a bytecode-esque system artifact (.sa) file that represents your system and its dependencies, then a Strat substrate executes that .sa file to produce running infrastructure.  The .sa file format is simple and can be implemented by many different clouds, single machines, and even on-premise datacenters.  Today you can run your .sa files locally, on AWS, and on Linux servers.
 
-With Strat you can write complex, fully featured systems using cutting edge technologies like Lambda without ever having to use a single proprietary API, and without sacrificing local execution and reproducability.
+With Strat, you can write complex, fully featured systems using cutting edge technologies like Lambda without ever having to use a single proprietary API, and without sacrificing local execution and reproducibility.
 
 ### Effortless scaling--never worry about traffic volume or expensive servers
 

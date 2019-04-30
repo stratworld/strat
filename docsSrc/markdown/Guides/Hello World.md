@@ -50,7 +50,7 @@ Here we declare a service HelloWorld.  All functions must reside within a servic
 ```
 include "Http"
 ```
-Including Http lets us receive Http events and tells Strat this is a web server.
+Including Http let's us receive Http events and tells Strat this is a web server.
 
 ```
 Http ->
@@ -69,7 +69,7 @@ This is the final part of a function definition--the [artifact](../User%20Guide/
 
 # AWS Hello World
 
-Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  You'll need an AWS account, so if you don't have one go [create one now](https://portal.aws.amazon.com/billing/signup?nc2=h_ct&src=default&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start)--its easy, requires no upfront financial commitment, and won't cost you anything to run this system thanks to generous free tiers.
+Now that you're acquainted with the basics of Strat, lets do something more exciting--run this on real, production worthy infrastructure.  You'll need an AWS account, so if you don't have one go [create one now](https://portal.aws.amazon.com/billing/signup?nc2=h_ct&src=default&redirect_url=https%3A%2F%2Faws.amazon.com%2Fregistration-confirmation#/start)--it's easy, requires no upfront financial commitment, and won't cost you anything to run this system thanks to generous free tiers.
 
 Running .sa files on AWS uses a different piece of software: [staws](https://github.com/stratworld/staws) or the "AWS substrate".  You'll need to install staws:
 
@@ -78,7 +78,7 @@ npm install -g staws
 ```
 
 Staws will need to create resources on your AWS account and will need credentials to do that, so go ahead and set up your shared credentials file by following the instructions [here](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-shared.html).
-Note: you may already have one--make sure its for your test account!  If you're unsure about letting staws take the reins, you can read more about what permissions it requires and how it does it's job [here](../User$20Guide/AWS).
+Note: you may already have one--make sure it's for your test account!  If you're unsure about letting staws take the reins, you can read more about what permissions it requires and how it does its job [here](../User$20Guide/AWS).
 
 Now you're ready to deploy to AWS:
 

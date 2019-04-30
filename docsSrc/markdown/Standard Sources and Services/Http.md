@@ -1,6 +1,6 @@
 # HTTP
 
-__Note__ Http is mostly implemented but does not support some usecases that will be required by many users, notably cookies and custom headers.  The long term goal for Http is to fall somewhere between where it is now and "full" Http requests and responses like those from the Node Http library.
+__Note__ Http is mostly implemented but does not support some use cases that will be required by many users, notably cookies and custom headers.  The long term goal for Http is to fall somewhere between where it is now and "full" Http requests and responses like those from the Node Http library.
 
 
 Http is a standard event source that allows your system to be called via Http servers.
@@ -64,7 +64,7 @@ Whatever response from the function is interpreted as the body of the response o
   - If the artifact is a .js file
     - and a resource, the content type is "application/javascript"
     - or has a signature, the content type is "application/json"
-  - If an error occured, the content type is "text/plain"
+  - If an error occurred, the content type is "text/plain"
   - If the function was a string literal, the content type is "text/plain"
 
 TODO: allow for more control in headers and cookies

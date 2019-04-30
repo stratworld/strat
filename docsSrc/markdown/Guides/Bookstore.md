@@ -81,7 +81,7 @@ curl localhost:3000/api/books
 
 ### Static Files
 
-Now lets add the client "single page application".  We're going to avoid all the heavy handed stuff like React and Webpack in this tutorial.  Those tools are compatible with Strat but they add a build step that can get hairy fast, so we're keeping it to basic html and javascript.
+Now lets add the client "single page application".  We're going to avoid all the heavy-handed stuff like React and Webpack in this tutorial.  Those tools are compatible with Strat but they add a build step that can get hairy fast, so we're keeping it to basic html and javascript.
 
 Here's our client html file "index.html":
 
@@ -179,7 +179,7 @@ Strat can either host your code on compute infrastructure like Lambda or Docker 
 
 ### Sales Dependency
 
-Lets spice things up by adding an external service dependency.  If you've ever worked on a large service oriented architecture you know that no service exists in isolation, and connecting to external services can be a massive PITA.
+Let's spice things up by adding an external service dependency.  If you've ever worked on a large service-oriented architecture you know that no service exists in isolation, and connecting to external services can be a massive PITA.
 
 Change the assignment of getSales in getBooks.js:1 from
 ```js
@@ -197,7 +197,7 @@ Build, run, and check out [localhost:3000/api/books](http://localhost:3000/api/b
 stratc Bookstore.st && stratc Bookstore.sa
 ```
 
-I have led you astray!  You should see the error "Sales.getSales is undefined".  Strat brings the concept of scope to infrastructure.  Strat's implementation of scope is based on the lexical scope you're used to in regular languages.  When you deploy your systems onto cloud substrates like AWS Strat builds roles and access control to enforce the same scope you see when you write your Strat files.  Looking at Bookstore.st now, you can see inside FrontendProxy a reference to Books.getBooks.  This works because FrontendProxy and Books are defined at the top level of the same file.  The two services exist within the same scope, and any function inside Books can call any function inside FrontendProxy.  Sales exists elsewhere, and its not included so Strat doesn't know how to resolve it within the service Books's scope.  Lets fix that by adding
+I have led you astray!  You should see the error "Sales.getSales is undefined".  Strat brings the concept of scope to infrastructure.  Strat's implementation of scope is based on the lexical scope you're used to in regular languages.  When you deploy your systems onto cloud substrates like AWS Strat builds roles and access control to enforce the same scope you see when you write your Strat files.  Looking at Bookstore.st now, you can see inside FrontendProxy a reference to Books.getBooks.  This works because FrontendProxy and Books are defined at the top level of the same file.  The two services exist within the same scope, and any function inside Books can call any function inside FrontendProxy.  Sales exists elsewhere, and it's not included so Strat doesn't know how to resolve it within the service Books's scope.  Let's fix that by adding
 
 ```st
 include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
@@ -225,7 +225,7 @@ Strat's lexical scope means now that you've included Sales inside Books, anythin
 
 This concludes the N-tier architecture sans database, which we'll cover in the advanced tutorial.
 
-Now you're not the kind of person to just blindly copy and paste code without reading and understanding it first right?  You surely noticed that you're including a Sales URL and not some file.  This is a great idea put forth by [Deno](https://deno.land/) and it works great for service inclusions.  Strat includes can be either relative files, URLs, or std library names like "Http".  Have a look at that [included url](https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st)--its a Strat file and it specifies a service!  URL includes in Strat allow users to download entire services and run them inside their own infrastructure.  I know what you're thinking--this seems *wildly unsafe*!  Well each service included this way gets its own isolated piece of infrastructure to run on that is:
+Now you're not the kind of person to just blindly copy and paste code without reading and understanding it first, right?  You surely noticed that you're including a Sales URL and not some file.  This is a great idea put forth by [Deno](https://deno.land/) and it works great for service inclusions.  Strat includes can be either relative files, URLs, or std library names like "Http".  Have a look at that [included url](https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/strat/Sales/Sales.st)--its a Strat file and it specifies a service!  URL includes in Strat allow users to download entire services and run them inside their own infrastructure.  I know what you're thinking--this seems *wildly unsafe*!  Well, each service included this way gets its own isolated piece of infrastructure to run on that is:
 
   - devoid of any permissions
   - can only receive and respond with json

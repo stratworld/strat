@@ -6,5 +6,5 @@ Feature requests should be made on the issue tracker for [Strat on github](https
 
 # Support
 
-If you need support using Strat and staws you can reach out on the team's [Zulip server](https://strat.zulipchat.com/#narrow/stream/196719-support) (its like Slack/IRC)
+If you need support using Strat and staws you can reach out on the team's [Zulip server](https://strat.zulipchat.com/#narrow/stream/196719-support) (it's like Slack/IRC)
 

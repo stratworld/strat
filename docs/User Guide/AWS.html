@@ -103,7 +103,7 @@
 <h2 id="region">region</h2>
 <p>A region must be supplied in your staws.json, and that region must have Lambda and API gateway.</p>
 <h2 id="additionallambdapermissions">Additional Lambda Permissions</h2>
-<p>If your component code needs to access addtional resources outside those created by Strat like a DynamoDb table you can supply them in the staws.json config file in a roles property:</p>
+<p>If your component code needs to access additional resources outside those created by Strat like a DynamoDb table you can supply them in the staws.json config file in a roles property:</p>
 <pre><code class="json language-json">{
   "config": {
     "region": "us-west-2"
@@ -119,7 +119,7 @@
 }
 </code></pre>
 <p>The roles property is a map where keys are service or source names that should get extra permissions, and the values are lists of IAM-policy-document-like (the capitalization is different) objects.</p>
-<p>Action must be an array of strings, each of which must be an <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html">AWS Action</a>.  Unfortuately, these are pretty hard to look up.  You can run your code and see what errors occur--AWS is good about letting you know what action you need.</p>
+<p>Action must be an array of strings, each of which must be an <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/api-permissions-reference.html">AWS Action</a>.  Unfortunately, these are pretty hard to look up.  You can run your code and see what errors occur--AWS is good about letting you know what action you need.</p>
 <h1 id="sourcecodehttpsgithubcomstratworldstaws"><a href="https://github.com/stratworld/staws">Source Code</a></h1></div>
   </div>
   <div id="footer" class="row navigation">

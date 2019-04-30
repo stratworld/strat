@@ -30,11 +30,11 @@ What does "console.log" or "println" translate to in a cloud?  The requirements 
 
 ### Webhook
 
-This will be the root of many user sources.  A std module here would encapsulate setting up the Http endpoints and the Birth handshake between the two systems.
+This will be the root of many user sources.  An std module here would encapsulate setting up the Http endpoints and the Birth handshake between the two systems.
 
 # Shapes (types) & OpenAPI Integration
 
-A core responsibility of Strat is to help users describe and communicate events.  Strat will have a type system for events, but typing events will be very different from typing in memory data structures:
+A core responsibility of Strat is to help users describe and communicate events.  Strat will have a type system for events, but typing events will be very different from typing in-memory data structures:
 
 Events
 
@@ -46,7 +46,7 @@ Events
     - (2.3) and change schemas at a different rate than single machine software
   - (3) Are often read and manipulated directly by software engineers
 
-Falling out of these charactaristics, Strat's type system should:
+Falling out of these characteristics, Strat's type system should:
 
   - A) Have a small delta between program text notation and serialized data representation, which can be assumed is JSON (1, 3)
   - B) Be flexible in response to change (2)
@@ -75,7 +75,7 @@ Clojure's [Spec](https://clojure.org/guides/spec) shares many of the design goal
 
 # "public by" / Custom connection semantics / Versioning
 
-Early versions of the compiler had a public keyword that would generate a bunch of Strat code that 3rd parties could use to include your running service.  The long term version for this is to allow users to provide connection semantics as a sort of mini-SDK that Strat would make available and download for 3rd parties.  I removed it from the compiler because it wasn't complete or thought-through enough, with the major gap bieng how users would version their "public" apis.
+Early versions of the compiler had a public keyword that would generate a bunch of Strat code that 3rd parties could use to include your running service.  The long term version for this is to allow users to provide connection semantics as a sort of mini-SDK that Strat would make available and download for 3rd parties.  I removed it from the compiler because it wasn't complete or thought-through enough, with the major gap being how users would version their "public" apis.
 
 # Browser Host
 
@@ -85,11 +85,11 @@ This also opens the way for people to write client-side "services" that can be i
 
 # Source/Service inclusion parameters
 
-When including a source a user (and the source's author) may wish to provide additional information about the usage of the source.  Nothing has made it into Strat that would do this because it treads close to Turing complete-y and computation language-y features like closures and objects.  I think this is a nessecary feature long term but great care needs to be taken when deciding how data and configuration should move through Strat.
+When including a source a user (and the source's author) may wish to provide additional information about the usage of the source.  Nothing has made it into Strat that would do this because it treads close to Turing complete-y and computation language-y features like closures and objects.  I think this is a necessary feature long term but great care needs to be taken when deciding how data and configuration should move through Strat.
 
 # Language Support
 
-Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  Languages that are aligned with Strat's performance tradeoffs and user experience biases are higher priority.
+Strat won't stay confined to javascript long term.  Below are common languages that Strat could support in the future.  Languages that are aligned with Strat's performance tradeoffs and user experience biases are a higher priority.
 
 ## High Priority Languages
 

@@ -2,7 +2,7 @@
 
 Here's a webpack.config.js file that does the trick.
 
-TODO: explain webpack concepts so somebody new to the tool (and perhaps even npm) can know what's going on.  This may be impossible since even the webpack team can't seemt to do this.
+TODO: explain webpack concepts so somebody new to the tool (and perhaps even npm) can know what's going on.  This may be impossible since even the webpack team can't seem to do this.
 
 ```js
 const webpack = require('webpack');
