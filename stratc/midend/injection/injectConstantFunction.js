@@ -37,5 +37,5 @@ function addFunctionIntoContainer (container, fn) {
 
 function wrapInfo (info) {
   //what a line!
-  return `const d = JSON.parse('${JSON.stringify(info)}');module.exports = () => d;`;
+  return `const d = JSON.parse('${JSON.stringify(info).replace(/\\\\/g, '/')}');module.exports = () => d;`;
 }
