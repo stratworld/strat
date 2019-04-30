@@ -43,7 +43,7 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="stratbookstoreguide">Strat Bookstore Guide</h1>
 <p>In this guide we'll make a simple bookstore that uses a:</p>
@@ -197,7 +197,7 @@ const getSales = Strat('Sales.getSales');
 <pre><code>stratc Bookstore.st &amp;&amp; stratc Bookstore.sa
 </code></pre>
 <p>I have led you astray!  You should see the error "Sales.getSales is undefined".  Strat brings the concept of scope to infrastructure.  Strat's implementation of scope is based on the lexical scope you're used to in regular languages.  When you deploy your systems onto cloud substrates like AWS Strat builds roles and access control to enforce the same scope you see when you write your Strat files.  Looking at Bookstore.st now, you can see inside FrontendProxy a reference to Books.getBooks.  This works because FrontendProxy and Books are defined at the top level of the same file.  The two services exist within the same scope, and any function inside Books can call any function inside FrontendProxy.  Sales exists elsewhere, and its not included so Strat doesn't know how to resolve it within the service Books's scope.  Lets fix that by adding</p>
-<pre><code class="st language-st">include include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
+<pre><code class="st language-st">include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
 </code></pre>
 <p>to the top of the Books service, just how we have include "Http" at the top of FrontendProxy.  Your Bookstore.st file should look like this:</p>
 <pre><code class="st language-st">service FrontendProxy {
@@ -208,7 +208,7 @@ const getSales = Strat('Sales.getSales');
 }
 
 service Books {
-  include include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
+  include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
   getBooks ():any -&gt; "./getBooks.js"
 }
 </code></pre>

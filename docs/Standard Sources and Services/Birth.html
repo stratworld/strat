@@ -43,7 +43,7 @@
     </div>
     <div class="group">
     <div  class="heading">User Guide</div>
-      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Services">Building Services</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
+      <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
     <div id="document"><h1 id="birth">Birth</h1>
 <p>After a Strat substrate hosts a sa file it dispatches a "Birth" event to each piece of infrastructure it created.  This is how custom sources and services can configure themselves after creation.  The Http source uses the Birth event to know what infrastructure to send Http requests to.  The actual contents of the Birth event change from substrate to substrate, and are meant to provide "implementation" information to sources and services.  Respones to Birth are output in the console that is running the substrate.</p>

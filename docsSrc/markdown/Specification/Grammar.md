@@ -10,7 +10,7 @@ service
   "service" IDENTIFIER body
 
 source
-  (async)? "source" IDENTIFIER body
+  "async"? "source" IDENTIFIER body
 
 body
   "{" (component|include)* "}"

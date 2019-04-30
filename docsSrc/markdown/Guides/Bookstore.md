@@ -200,7 +200,7 @@ stratc Bookstore.st && stratc Bookstore.sa
 I have led you astray!  You should see the error "Sales.getSales is undefined".  Strat brings the concept of scope to infrastructure.  Strat's implementation of scope is based on the lexical scope you're used to in regular languages.  When you deploy your systems onto cloud substrates like AWS Strat builds roles and access control to enforce the same scope you see when you write your Strat files.  Looking at Bookstore.st now, you can see inside FrontendProxy a reference to Books.getBooks.  This works because FrontendProxy and Books are defined at the top level of the same file.  The two services exist within the same scope, and any function inside Books can call any function inside FrontendProxy.  Sales exists elsewhere, and its not included so Strat doesn't know how to resolve it within the service Books's scope.  Lets fix that by adding
 
 ```st
-include include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
+include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
 ```
 
 to the top of the Books service, just how we have include "Http" at the top of FrontendProxy.  Your Bookstore.st file should look like this:
@@ -214,7 +214,7 @@ service FrontendProxy {
 }
 
 service Books {
-  include include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
+  include "https://s0tjdzrsha.execute-api.us-west-2.amazonaws.com/Sales/Sales.st"
   getBooks ():any -> "./getBooks.js"
 }
 ```
