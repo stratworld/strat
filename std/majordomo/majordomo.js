@@ -83,7 +83,7 @@ function captureCaller (stack, ignoreFrames) {
   if (file === null) {
     return;
   }
-  const fileTokens = file.split('/');
+  const fileTokens = file.split(stdPath.sep);
   const service = fileTokens[fileTokens.length - 2].split('.')[0];
   return {
     file: file,

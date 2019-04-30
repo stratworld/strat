@@ -1,6 +1,6 @@
 {
   "name": "stratc",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "A language for building cloud systems",
   "main": "stratc.js",
   "preferGlobal": true,
