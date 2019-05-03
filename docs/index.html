@@ -58,7 +58,7 @@
 <pre><code class="sh language-sh">npm install -g stratc
 stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
 </code></pre>
-<p>In existing configuration management tools you specify infrastructure details directly--"this is a Lambda", "deploy this in a container", "this talks to SQS", etc.  Strat exposes a standard library that abstracts over these proprietary services just how <a href="https://nodejs.org/api/fs.html">NodeJS's fs</a> abstracts over each operating system's file API.</p>
+<p>In existing configuration management tools, you specify infrastructure details directly--"this is a Lambda", "deploy this in a container", "this talks to SQS", etc.  Strat exposes a standard library that abstracts over these proprietary services just how <a href="https://nodejs.org/api/fs.html">NodeJS's fs</a> abstracts over each operating system's file API.</p>
 <h3 id="servicesaslibraries">Services as Libraries</h3>
 <p>Write, extend, and include entire services in your system.  Here's how you'd incorporate a GitHub commit webhook inside your system:</p>
 <pre><code class="st language-st">service ContinuousIntegration {
@@ -79,7 +79,7 @@ stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
   Birth -&gt; "./registerGitHubWebhook.js"
 }
 </code></pre>
-<p>While the current generation of configuration management extends themselves with "plugins" and yaml files, Strat places all the power in the community's hands with a robust foreign function interface, a standard library, and powerful inclusion semantics.  Authoring a service or source in Strat others can use is as easy as creating a module or library for computation languages.</p>
+<p>While the current generation of configuration management extends itself with "plugins", yaml files, and closed source features, Strat places all the power in the community's hands with a robust foreign function interface, a standard library, and powerful inclusion semantics.  Authoring a service or source in Strat others can use is as easy as creating a module or library for computation languages.</p>
 <h3 id="betterinfrastructurethanwhatyourebuildingbyhand">Better infrastructure than what you're building by hand</h3>
 <p>Just how language compilers like gcc optimize your code, <strong>Strat's compiler optimizes your infrastructure to be:</strong></p>
 <ul>

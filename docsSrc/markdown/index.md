@@ -16,7 +16,7 @@ npm install -g stratc
 stratc ./HelloWorld.st && stratc ./HelloWorld.sa
 ```
 
-In existing configuration management tools you specify infrastructure details directly--"this is a Lambda", "deploy this in a container", "this talks to SQS", etc.  Strat exposes a standard library that abstracts over these proprietary services just how [NodeJS's fs](https://nodejs.org/api/fs.html) abstracts over each operating system's file API.
+In existing configuration management tools, you specify infrastructure details directly--"this is a Lambda", "deploy this in a container", "this talks to SQS", etc.  Strat exposes a standard library that abstracts over these proprietary services just how [NodeJS's fs](https://nodejs.org/api/fs.html) abstracts over each operating system's file API.
 
 ### Services as Libraries
 
@@ -45,7 +45,7 @@ source GitHubCommit {
 }
 ```
 
-While the current generation of configuration management extends themselves with "plugins" and yaml files, Strat places all the power in the community's hands with a robust foreign function interface, a standard library, and powerful inclusion semantics.  Authoring a service or source in Strat others can use is as easy as creating a module or library for computation languages.
+While the current generation of configuration management extends itself with "plugins", yaml files, and closed source features, Strat places all the power in the community's hands with a robust foreign function interface, a standard library, and powerful inclusion semantics.  Authoring a service or source in Strat others can use is as easy as creating a module or library for computation languages.
 
 ### Better infrastructure than what you're building by hand
 
