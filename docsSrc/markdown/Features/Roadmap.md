@@ -20,6 +20,8 @@ Nearly every language has a file system standard library.  The "file system" of 
 
 A source to include that dispatches events on a time schedule.
 
+### Queue
+
 ### SQL
 
 Much more ambitious than Blob is an SQL service that's always available on any Strat substrate (think "give me the SQL database on this cloud machine").  From a point of view disconnected from the mountain of human effort spent on operating SQL instances and fussing with ORMs, it seems possible--ambitious, but possible.
