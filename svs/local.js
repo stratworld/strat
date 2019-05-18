@@ -79,6 +79,9 @@ function loadFunction (artifact, archive, hostName, substrateImpls) {
   var data;
   if (substrateImpl !== undefined) {
     data = substrateImpl.data;
+    if (Buffer.isBuffer(data)) {
+      data = data.toString();
+    }
     filePath = substrateImpl.path;
   } else {
     data = archive.read(filePath).toString();
