@@ -2,12 +2,11 @@ const nodeEval = require('node-eval');
 const Archive = require('../util/archiveBuilder');
 const fs = require('../util/fileSystem');
 const localImplFolder = fs.path.resolve(__dirname, './SubstrateImpl');
-module.exports = async function (saData, implDir, birthArgs) {
-  if (implDir === undefined) {
-    implDir = localImplFolder;
+module.exports = async function (saData, substrateImpls, birthArgs) {
+  if (substrateImpls === undefined) {
+    substrateImpls = await getSubstrateImpls(localImplFolder);
   }
   const archive = new Archive(saData);
-  const substrateImpls = await getSubstrateImpls(implDir);
 
   const hosts = JSON.parse(archive.read('hosts.json').toString());
 

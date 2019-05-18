@@ -1,8 +1,8 @@
 {
   "name": "stratc",
-  "version": "0.3.8",
+  "version": "0.3.11",
   "description": "A language for building cloud systems",
-  "main": "stratc.js",
+  "main": "index.js",
   "preferGlobal": true,
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha test/stratc/**/*.js test/std/**/*.js --reporter spec",
