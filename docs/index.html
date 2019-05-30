@@ -45,51 +45,57 @@
     <div  class="heading">User Guide</div>
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="thestratcloudlanguage">The Strat Cloud Language</h1>
-<p>Strat is a language to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event-driven and service-oriented systems running on the serverless cloud.  Strat is the first "infrastructure as high-level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:</p>
+    <div id="document"><h1 id="thestratcoordinationlanguage">The Strat Coordination Language</h1>
+<p>Strat is a language to connect software together.  All that glue code and configuration you write today--that's what Strat is here for.  Strat helps you connect your software to:</p>
+<ul>
+<li>other software components, like in a service-oriented architecture</li>
+<li>the infrastructure it runs on</li>
+<li>the access controls it needs to do its job</li>
+</ul>
+<p>You write functions in languages you know like Javascript and Go and Strat compiles them into event-driven and service-oriented systems running on the serverless cloud.</p>
+<h1 id="helloworld">Hello World</h1>
 <p>Create HelloWorld.st:</p>
 <pre><code class="st language-st">service HelloWorld {
-  include "Birth"
+  include "Http"
 
-  Birth -&gt; "Hello World!"
+  Http { method: "get", path: "*" } -&gt; "Hello World!"
 }
 </code></pre>
 <p>Then in your terminal (<a href="https://nodejs.org/en/">requires npm</a>):</p>
 <pre><code class="sh language-sh">npm install -g stratc
 stratc ./HelloWorld.st &amp;&amp; stratc ./HelloWorld.sa
+curl localhost:3000
 </code></pre>
-<p>In existing configuration management tools, you specify infrastructure details directly--"this is a Lambda", "deploy this in a container", "this talks to SQS", etc.  Strat exposes a standard library that abstracts over these proprietary services just how <a href="https://nodejs.org/api/fs.html">NodeJS's fs</a> abstracts over each operating system's file API.</p>
-<h3 id="servicesaslibraries">Services as Libraries</h3>
-<p>Write, extend, and include entire services in your system.  Here's how you'd incorporate a GitHub commit webhook inside your system:</p>
-<pre><code class="st language-st">service ContinuousIntegration {
-  include "./GitHubCommit"
+<p>This creates a hello world system, complete with a web server and "component" that returns "Hello World!".</p>
+<h1 id="whyanewlanguagewhatisacoordinationlanguage">Why a new language?  What is a "coordination language"?</h1>
+<p>Programming languages are about telling <strong>single</strong> computers what to do.  They assume their job begins and ends with their machine's RAM and CPU, and they let operating systems deal with the outside world.  This worked great in 1970, but as we build smaller and smaller components we have to reach outside the single machine to connect to the outside world constantly, and it hurts every time.</p>
+<p><strong>Software today is as much about gluing components together as it is about writing algorithms, but both industry and academia think this is a "lesser" task.</strong>  A new approach is needed, one that respects and devotes itself to connecting software--a coordination language.  Gluing software together doesn't have to be sludge work, and we don't have to haphazardly stumble through the task.  Here are some of the ways Strat coordinates systems by implementing the same ideas that have enriched programming over the last 50 years.</p>
+<p><strong>Portability-</strong> In the 1990s programmers were struggling to build compilers and programs for every possible computer architecture.  To cope, Sun made Java and the JVM.  We're in a similar place today with the litany of clouds and cloud services becoming the new hardware vendors, each trying to lock their customers in with slightly different proprietary APIs.  Strat compiles your code into a "system artifact", which can be run on any infrastructure that implements the Strat substrate API.  The result is you can build your system and run it on a massive array of infrastructure from single machines to AWS to on-premise datacenters.  Today, a substrate implementation exists for AWS and local machines, and a GCP implementation is right around the corner. </p>
+<p><strong>Access-</strong> Since the 1960s programming languages have had scope and inclusion.  It's such an intuitive concept we don't even think about it-- it's effortless:</p>
+<pre><code>const x;
+function inner () {
+  const y;
+  console.log(x); // this works!
+}
+console.log(y); // this doesn't!
+</code></pre>
+<p>Imagine having to create a role for every function you make--sounds crazy right?  Some people making advanced serverless systems do just that!  Here's how Strat solves user roles with scope:</p>
+<pre><code class="st language-st">service X {
+  include "./database.st"
 
-  GitHubCommit { repository: "Stratosphere" } -&gt; "./beginCIBuild.js"
+  // works!
+  // (Database is a service defined in ./database.st)
+  getData ():any -&gt; js `() =&gt; Database.get('foo')`
+}
+
+service Y {
+  // Database is not defined!
+  // The infrastructure Y is deployed to won't have
+  // access to the Database service.
+  getData ():any -&gt; js `() =&gt; Database.get('foo')`
 }
 </code></pre>
-<p>And the GitHubCommit library only uses the Strat standard library, so its 100% portable:</p>
-<pre><code class="st language-st">source GitHubCommit {
-  //Strat handles setting up ApiGateway, local with ngrok, etc.
-  include "Http"
-  include "Birth"
-
-  Http { method: "post", path: "Strat/GitHubCommit" } -&gt;
-    "./gitHubWebhookReception.js"
-
-  Birth -&gt; "./registerGitHubWebhook.js"
-}
-</code></pre>
-<p>While the current generation of configuration management extends itself with "plugins", yaml files, and closed source features, Strat places all the power in the community's hands with a robust foreign function interface, a standard library, and powerful inclusion semantics.  Authoring a service or source in Strat others can use is as easy as creating a module or library for computation languages.</p>
-<h3 id="betterinfrastructurethanwhatyourebuildingbyhand">Better infrastructure than what you're building by hand</h3>
-<p>Just how language compilers like gcc optimize your code, <strong>Strat's compiler optimizes your infrastructure to be:</strong></p>
-<ul>
-<li><strong>more secure</strong> by building the narrowest access control for every component in your system</li>
-<li><strong>faster and cheaper</strong> by sharing resources like lambda invocations between what would be discrete components in hand-rolled architectures.</li>
-<li><strong>free from configuration errors</strong> by generating static files, compute resources, and roles with a compiler, Strat produces correct, best-in-class infrastructure every time.</li>
-</ul>
-<h3 id="portabiltyisback">Portabilty is back</h3>
-<p>Strat creates a bytecode-esque system artifact (.sa) file that represents your system and its dependencies, then a Strat substrate executes that .sa file to produce running infrastructure.  The .sa file format is simple and can be implemented by many different clouds, single machines, and even on-premise datacenters.  Today you can run your .sa files locally, on AWS, and on Linux servers.</p>
-<p>With Strat, you can write complex, fully featured systems using cutting edge technologies like Lambda without ever having to use a single proprietary API, and without sacrificing local execution and reproducibility.</p>
+<p><strong>Error Handling-</strong> Stack traces are useful tools for debugging large systems, but with highly distributed architectures they turn into noise quickly.  Error information at the lowest levels of your system can tell you exactly what went wrong, but as that exception gets sent over operating systems, networks, and other components it degrades with each step.  Eventually, the end user is met with a 500 internal server error unless the programmer takes immense care.  Strat stops the error-telephone game by preserving stack traces and error information across components.</p>
 <h4 id="likewhatyouseecontinuetothehelloworlddeepdiveguideshello20worldorbuildanntierbookstoreguidesbookstore">Like what you see?  Continue to the <a href="./Guides/Hello%20World">Hello World deep dive</a> or build an <a href="./Guides/Bookstore">N-tier bookstore</a>.</h4></div>
   </div>
   <div id="footer" class="row navigation">
