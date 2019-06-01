@@ -1,4 +1,4 @@
-# The Strat Cloud Language
+# The Strat Coordination Language
 
 Strat is a language to represent and deploy portable cloud systems.  Build event and web components in plain "computation languges" like Javascript and Go then write Strat code to hook your components together to form a system.  Strat "compiles" your system into serverless functions, custom user roles, and other infrastructure components.
 
