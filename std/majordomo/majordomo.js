@@ -80,7 +80,7 @@ function captureCaller (stack, ignoreFrames) {
   const file = frame.getFileName();
   //sometimes this happens?
   //todo figure it out?
-  if (file === null) {
+  if (file === null || file === undefined) {
     return;
   }
   const fileTokens = file.split(stdPath.sep);
