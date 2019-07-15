@@ -1,13 +1,13 @@
-# The Strat Cloud Language
+# The Strat Coordination Framework
 
-Strat is a language to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event-driven and service-oriented systems running on the serverless cloud.  Strat is the first "infrastructure as high-level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:
+Strat is a framework to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event-driven and service-oriented systems running on the serverless cloud.  Strat is the first "infrastructure as high-level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:
 
 Create HelloWorld.st:
 ```st
 service HelloWorld {
-  include "Birth"
+  include "Http"
 
-  Birth -> "Hello World!"
+  Http -> "Hello World!"
 }
 ```
 Then in your terminal ([requires npm](https://nodejs.org/en/)):

@@ -45,13 +45,13 @@
     <div  class="heading">User Guide</div>
       <div><a class="nav-page" href="/User Guide/AWS">AWS</a><a class="nav-page" href="/User Guide/Artifacts">Artifacts</a><a class="nav-page" href="/User Guide/Building Javascript Artifacts">Building Javascript Artifacts</a><a class="nav-page" href="/User Guide/Building Sources">Building Sources</a><a class="nav-page" href="/User Guide/Stratc Commands">Stratc Commands</a></div>
     </div></div>
-    <div id="document"><h1 id="thestratcloudlanguage">The Strat Cloud Language</h1>
-<p>Strat is a language to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event-driven and service-oriented systems running on the serverless cloud.  Strat is the first "infrastructure as high-level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:</p>
+    <div id="document"><h1 id="thestratcoordinationframework">The Strat Coordination Framework</h1>
+<p>Strat is a framework to represent and deploy portable cloud systems.  Strat takes simple functions written in languages you know like Javascript and Go and compiles them into event-driven and service-oriented systems running on the serverless cloud.  Strat is the first "infrastructure as high-level code" language, and it represents an evolutionary leap over tools like Terraform, CloudFormation, and Serverless Framework.  Here's hello world:</p>
 <p>Create HelloWorld.st:</p>
 <pre><code class="st language-st">service HelloWorld {
-  include "Birth"
+  include "Http"
 
-  Birth -&gt; "Hello World!"
+  Http -&gt; "Hello World!"
 }
 </code></pre>
 <p>Then in your terminal (<a href="https://nodejs.org/en/">requires npm</a>):</p>
