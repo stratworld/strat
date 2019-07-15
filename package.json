@@ -32,7 +32,9 @@
   "homepage": "https://github.com/CaptainCharlieGreen/LitSystemLanguage#readme",
   "dependencies": {
     "adm-zip": "^0.4.13",
+    "js-yaml": "^3.13.1",
     "node-eval": "^2.0.0",
+    "serverless": "^1.47.0",
     "stack-trace": "0.0.10"
   },
   "devDependencies": {

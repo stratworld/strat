@@ -64,8 +64,8 @@ if (typeof command === 'string' && filename === undefined) {
     filename = command;
     command = 'build';
   } else if (command.indexOf('.sa') > 0) {
-    filename = command;
-    command = 'deploy';
+    // filename = command;
+    // command = 'run';
   }
 }
 
@@ -79,7 +79,7 @@ if (command === 'help' || command === '-h' || command === '--help') {
   var work;
   if (typeof stdinData === 'object') {
     work = stdinData.then(data => compile(command, data, filename))
-  } else if (command === 'deploy') {
+  } else if (command === 'run') {
     work = defaultFs.cat(filename)
       .then(svs);
   } else if (typeof filename === 'string') {

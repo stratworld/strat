@@ -33,6 +33,11 @@ async function recursiveLs (absoluteDirectoryPath) {
 }
 
 async function rimraf (absolutePath) {
+  try {
+    await stat(absolutePath)
+  } catch (doesNotExist) {
+    return;
+  }
   if (await isDirectory(absolutePath)) {
     const filesInDirectory = await ls(absolutePath);
     if (filesInDirectory.length !== 0) {
